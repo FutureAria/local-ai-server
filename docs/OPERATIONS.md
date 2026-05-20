@@ -9,6 +9,7 @@
 - OpenAI, Claude, Gemini 같은 외부 LLM API를 운영 경로에 추가하지 않는다.
 - `LOCAL_API_KEY`를 설정한 경우 보호 endpoint에는 `X-API-Key`를 사용한다.
 - `LOCAL_RATE_LIMIT_PER_MINUTE`로 보호 endpoint의 process-local in-memory rate limit을 조정한다. 기본값은 `120`이고, `0`이면 비활성화된다.
+- `AGENT_EXECUTION_ENABLED` 기본값은 `false`이며, 현재 Agent API는 preview-only 계획 생성만 수행한다.
 - `.env`, API key, DB password, 개인 문서 원문, 운영 로그 파일은 Git에 올리지 않는다.
 - 원본 색인 대상 폴더의 파일은 수정하거나 삭제하지 않는다.
 

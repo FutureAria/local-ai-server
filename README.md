@@ -28,6 +28,7 @@
 - `.txt`, `.md`, `.html`, `.htm` 문서 업로드, 로컬 폴더 색인, read-only 폴더 색인 preview
 - optional dependency 설치 시 `.pdf`, `.docx` 문서 텍스트 추출
 - 문서 검색 기반 RAG 답변
+- 실행형 Agent preview-only 계획 API
 - Typer CLI
 - SFT JSONL export
 - pytest 기반 기본 테스트
@@ -54,6 +55,7 @@
 - DB/Chroma 저장 단계 실패 시 SQLite 변경을 rollback하고 명확한 `DocumentIndexingError`를 반환합니다.
 - `/documents/index-folder-preview`는 실제 저장 없이 예상 chunk 수와 embedding batch 수를 계산합니다.
 - RAG 답변은 문서 밖 코드, 링크, 보안 세부사항, 추측성 표현을 감지하면 보수적인 fallback 답변으로 대체될 수 있습니다.
+- `/agent/plan`은 웹 이동, 폴더 열기, shell 실행 같은 요청을 위험도와 승인 필요 action으로 분류하지만 실제 실행하지 않습니다.
 
 ## Architecture
 
@@ -255,6 +257,9 @@ local-ai logs --limit 20 --offset 0
 local-ai logs --mode rag --query JWT --limit 20 --offset 0
 local-ai log 1
 local-ai feedbacks --limit 20 --offset 0
+local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"
+local-ai agent-runs --limit 20 --offset 0
+local-ai agent-run 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -296,6 +301,9 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `DELETE /documents/{document_id}`
 - `POST /search`
 - `POST /feedback`
+- `POST /agent/plan`
+- `GET /agent/runs`
+- `GET /agent/runs/{run_id}`
 
 ```bash
 export LOCAL_API_KEY=change-me
@@ -316,6 +324,26 @@ export LOCAL_RATE_LIMIT_PER_MINUTE=120
 ```
 
 `LOCAL_RATE_LIMIT_PER_MINUTE=0`으로 설정하면 rate limit을 비활성화합니다. 이 제한은 단일 프로세스 메모리 기준이므로 여러 worker나 여러 서버 인스턴스를 운영하는 공개 서비스용 분산 rate limit은 아닙니다.
+
+## Agent Preview API
+
+실행형 Agent의 첫 단계로 preview-only 계획 API를 제공합니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/plan \
+  -H "Content-Type: application/json" \
+  -d '{"instruction":"GitHub 웹 열고 내 폴더도 열어줘"}'
+```
+
+CLI:
+
+```bash
+local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"
+local-ai agent-runs
+local-ai agent-run 1
+```
+
+현재 이 API는 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행을 수행하지 않습니다. 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 비활성 상태를 반환합니다. `AGENT_EXECUTION_ENABLED` 기본값은 `false`입니다.
 
 ## SFT Export
 
@@ -466,6 +494,7 @@ python scripts/public_release_check.py --root . --json
 - `local-ai search "JWT 인증 흐름"`: Chroma 검색 성공
 - `local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름..."`: sources 포함 RAG 답변 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 임시 Markdown 문서 기반 API smoke test 가능
+- `local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"`: 실행형 Agent preview-only 계획 생성 가능
 
 `llama3.2`가 문서 밖 코드나 링크를 만들 수 있어, RAG 답변에는 보수적인 guard가 들어 있습니다. 코드 블록, 외부 URL, 문서에 없는 보안 세부사항, 추측성 표현이 감지되면 문서 기반 fallback 답변으로 대체합니다.
 
@@ -514,6 +543,7 @@ ollama pull nomic-embed-text
 - PDF/DOCX는 optional dependency 설치 시 텍스트 추출을 지원합니다. 스캔 이미지 기반 PDF OCR은 아직 지원하지 않습니다.
 - HTML/HTM은 표준 라이브러리 기반 텍스트 추출을 지원하지만, JavaScript 렌더링 결과나 동적 페이지 크롤링은 지원하지 않습니다.
 - Chroma와 SQLite 동기화 복구는 read-only 점검과 repair preview까지만 지원합니다. 실제 repair/rebuild는 아직 수행하지 않습니다.
+- 실행형 Agent는 preview-only 계획 단계입니다. 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 아직 수행하지 않습니다.
 - embedding은 batch 처리되고 preview에서 예상 batch 수를 볼 수 있지만, 매우 큰 문서의 실시간 진행률 표시는 아직 없습니다.
 - 자동 로그 rotation은 아직 구현하지 않았고, 운영 로그 정책은 문서로만 제공합니다.
 - 인증은 로컬 API key 수준이며, 다중 사용자 권한 관리는 없습니다.

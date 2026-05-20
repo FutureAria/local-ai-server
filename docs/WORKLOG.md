@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `77 passed` |
+| `.venv/bin/pytest` | `86 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -265,7 +265,10 @@
 - `scripts/public_release_check.py`를 추가해 GitHub 공개 전 로컬 데이터와 secret 후보를 read-only로 점검할 수 있게 했다.
 - `tests/test_public_release_check.py`를 추가해 `.env`, SQLite, `.env.example`, `.gitkeep` 처리 기준을 검증했다.
 - 현재 실제 워크스페이스에서 `python scripts/public_release_check.py --root . --json`는 로컬 SQLite, Chroma, uploads 파일을 공개 전 제외 대상 finding으로 탐지한다. 삭제는 수행하지 않았다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `77 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- 실행형 Agent preview-only 계획 API를 추가했다. `/agent/plan`, `/agent/runs`, `/agent/runs/{run_id}`는 요청을 위험도와 승인 필요 action으로 분류/저장/조회하지만 실제 browser/file/shell 실행은 수행하지 않는다.
+- `local-ai agent-plan`, `local-ai agent-runs`, `local-ai agent-run` CLI 명령을 추가했다.
+- `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가했고, `tests/test_security.py`와 `tests/test_cli.py`를 Agent endpoint/CLI까지 확장했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `86 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 
 ### 응답 형식 업데이트
 

@@ -169,6 +169,25 @@ def feedbacks(
         _print_response(client.get(f"{_base_url()}/feedback", params=params))
 
 
+@app.command("agent-plan")
+def agent_plan(instruction: str) -> None:
+    payload = {"instruction": instruction}
+    with httpx.Client(timeout=60.0) as client:
+        _print_response(client.post(f"{_base_url()}/agent/plan", json=payload, headers=_headers()))
+
+
+@app.command("agent-runs")
+def agent_runs(limit: int = 20, offset: int = 0) -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.get(f"{_base_url()}/agent/runs", params={"limit": limit, "offset": offset}, headers=_headers()))
+
+
+@app.command("agent-run")
+def agent_run(run_id: int) -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.get(f"{_base_url()}/agent/runs/{run_id}", headers=_headers()))
+
+
 @app.command("integrity")
 def integrity() -> None:
     with httpx.Client(timeout=30.0) as client:

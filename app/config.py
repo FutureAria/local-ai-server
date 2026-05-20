@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     embedding_max_retries: int = Field(default=2, ge=0, le=10, alias="EMBEDDING_MAX_RETRIES")
     local_api_key: str | None = Field(default=None, alias="LOCAL_API_KEY")
     local_rate_limit_per_minute: int = Field(default=120, ge=0, alias="LOCAL_RATE_LIMIT_PER_MINUTE")
+    agent_execution_enabled: bool = Field(default=False, alias="AGENT_EXECUTION_ENABLED")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

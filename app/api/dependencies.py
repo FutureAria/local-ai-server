@@ -3,6 +3,7 @@ from threading import RLock
 from fastapi import Header, HTTPException, Request, status
 
 from app.config import get_settings
+from app.services.agent_service import AgentService
 from app.services.document_service import DocumentService
 from app.services.feedback_service import FeedbackService
 from app.services.rate_limiter import InMemoryRateLimiter, rate_limit_identity
@@ -18,6 +19,7 @@ _document_service: DocumentService | None = None
 _search_service: SearchService | None = None
 _rag_service: RagService | None = None
 _feedback_service: FeedbackService | None = None
+_agent_service: AgentService | None = None
 
 
 def require_api_key(
@@ -82,3 +84,11 @@ def get_feedback_service() -> FeedbackService:
         if _feedback_service is None:
             _feedback_service = FeedbackService()
         return _feedback_service
+
+
+def get_agent_service() -> AgentService:
+    global _agent_service
+    with _service_lock:
+        if _agent_service is None:
+            _agent_service = AgentService()
+        return _agent_service

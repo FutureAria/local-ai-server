@@ -130,6 +130,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/CLAUDE_REVIEW_HANDOFF.md`에 Claude Sonnet 문서 정합성 리뷰용 입력과 출력 형식이 정리되어 있음.
 - `data/logs/`는 운영 로그용 디렉터리이며 로그 파일은 Git 제외 대상임.
 - RAG guard가 추가되어 문서 밖 코드/링크/보안 세부사항/추측성 표현을 감지하면 fallback 답변으로 대체함.
+- 실행형 Agent preview-only 계획 API가 추가됨. 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 수행하지 않음.
 
 ## 금지사항
 
@@ -181,7 +182,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `77 passed, 1 warning`
+  - `.venv/bin/pytest`: `86 passed, 1 warning`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `python scripts/public_release_check.py --root . --json`: 현재 로컬 DB/Chroma/uploads 파일을 공개 전 제외 대상 finding으로 탐지함
 
@@ -192,6 +193,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `tests/test_rate_limiter.py`를 추가해 process-local in-memory rate limiter를 검증한다.
 - `tests/test_smoke_script.py`를 추가해 `scripts/smoke_test_api.py`의 API 호출 순서를 mock으로 검증한다.
 - `tests/test_public_release_check.py`를 추가해 공개 전 read-only 보안 점검 스크립트를 검증한다.
+- `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가해 Agent preview plan 생성과 조회 API를 검증한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함
@@ -201,3 +203,4 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
   - rate limit 초과 시 `429`와 `Retry-After` header를 반환함
   - smoke script가 `health → upload → search → ask-with-docs → feedback → stats` 순서로 호출함
   - public release check가 `.env`, SQLite, uploads, Chroma, secret 후보를 탐지하고 `.env.example`, `.gitkeep`는 허용함
+  - `/agent/plan`이 browser/file/shell 요청을 preview-only high-risk action으로 분류함

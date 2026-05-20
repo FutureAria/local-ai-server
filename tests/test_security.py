@@ -26,6 +26,9 @@ class FakeSearchService:
         ("post", "/documents/index-folder", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
         ("delete", "/documents/1", {}),
         ("post", "/feedback", {"json": {"request_id": "1", "rating": "good"}}),
+        ("post", "/agent/plan", {"json": {"instruction": "웹 열어줘"}}),
+        ("get", "/agent/runs", {}),
+        ("get", "/agent/runs/1", {}),
     ],
 )
 def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str, path: str, kwargs: dict) -> None:

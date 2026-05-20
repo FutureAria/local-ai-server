@@ -104,6 +104,40 @@ def test_cli_index_preview_sends_api_key(monkeypatch, tmp_path) -> None:
     ]
 
 
+def test_cli_agent_plan_sends_instruction_and_api_key(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    result = CliRunner().invoke(cli_main.app, ["agent-plan", "GitHub 웹 열어줘"])
+
+    assert result.exit_code == 0
+    assert calls == [
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/agent/plan",
+            "json": {"instruction": "GitHub 웹 열어줘"},
+            "headers": {"X-API-Key": "secret"},
+        }
+    ]
+
+
+def test_cli_agent_runs_sends_api_key(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    result = CliRunner().invoke(cli_main.app, ["agent-runs", "--limit", "5", "--offset", "1"])
+
+    assert result.exit_code == 0
+    assert calls == [
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/agent/runs",
+            "params": {"limit": 5, "offset": 1},
+            "headers": {"X-API-Key": "secret"},
+        }
+    ]
+
+
 def test_cli_upload_missing_file_fails_before_http_call(monkeypatch, tmp_path) -> None:
     calls = _install_fake_client(monkeypatch)
     missing_file = tmp_path / "missing.md"

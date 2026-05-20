@@ -26,6 +26,9 @@
 - `POST /documents/index-folder`
 - `DELETE /documents/{document_id}`
 - `POST /feedback`
+- `POST /agent/plan`
+- `GET /agent/runs`
+- `GET /agent/runs/{run_id}`
 
 주의:
 
@@ -74,6 +77,14 @@
 - 출처를 지어내지 않는다.
 - 문서 밖 코드, 링크, 보안 세부사항, 추측성 표현이 감지되면 보수적인 fallback 답변으로 대체될 수 있다.
 
+## Agent 안전 기준
+
+- `/agent/plan`은 preview-only 계획 생성만 수행한다.
+- 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 수행하지 않는다.
+- `AGENT_EXECUTION_ENABLED` 기본값은 `false`다.
+- agent plan 기록은 사용자 요청 내용을 포함할 수 있으므로 `/agent/*` endpoint는 `LOCAL_API_KEY`가 설정된 경우 보호된다.
+- 실제 browser/file/shell 실행 기능을 활성화하려면 별도 보안 리뷰와 사용자 승인이 필요하다.
+
 ## 공개 전 체크리스트
 
 자동 점검:
@@ -100,6 +111,7 @@ python scripts/public_release_check.py --root .
 아래 작업은 사용자 승인 없이 진행하지 않는다.
 
 - 실제 repair/delete/rebuild 실행
+- 실제 browser/file/shell agent 실행
 - 외부 LLM API 활성화
 - 외부 URL 크롤링
 - 브라우저 click/fill/submit interaction 추가

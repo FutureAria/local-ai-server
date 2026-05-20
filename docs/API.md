@@ -26,8 +26,11 @@ X-API-Key: <LOCAL_API_KEY>
 - `POST /documents/index-folder`
 - `DELETE /documents/{document_id}`
 - `POST /feedback`
+- `POST /agent/plan`
+- `GET /agent/runs`
+- `GET /agent/runs/{run_id}`
 
-조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 API key 없이 읽을 수 있다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
+조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
 ## Rate Limit
 
@@ -318,6 +321,45 @@ curl "http://127.0.0.1:8000/feedback?rating=bad&limit=20&offset=0"
 curl "http://127.0.0.1:8000/feedback?chat_log_id=1&limit=20&offset=0"
 ```
 
+## Agent Preview
+
+### `POST /agent/plan`
+
+실행형 Agent 요청을 preview-only 실행 계획으로 분류한다. 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/plan \
+  -H "Content-Type: application/json" \
+  -d '{"instruction":"GitHub 웹 열고 내 폴더도 열어줘"}'
+```
+
+응답 핵심 필드:
+
+- `run_id`
+- `status=planned`
+- `risk_level`
+- `execution_enabled=false`
+- `actions`
+- `actions[].tool`
+- `actions[].risk_level`
+- `actions[].requires_approval`
+
+### `GET /agent/runs`
+
+agent plan 기록을 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/agent/runs
+```
+
+### `GET /agent/runs/{run_id}`
+
+agent plan 상세를 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/agent/runs/1
+```
+
 ## CLI 대응
 
 CLI는 위 API를 HTTP로 호출한다. CLI 내부에 비즈니스 로직을 중복 구현하지 않는다.
@@ -340,5 +382,8 @@ local-ai repair-preview
 local-ai logs
 local-ai log 1
 local-ai feedbacks
+local-ai agent-plan "GitHub 웹 열어줘"
+local-ai agent-runs
+local-ai agent-run 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
