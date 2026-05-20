@@ -53,6 +53,7 @@ class AssistantService:
                 "ping": "GET /assistant/ping",
                 "config": "GET /assistant/config",
                 "dashboard": "GET /assistant/dashboard",
+                "ui_contract": "GET /assistant/ui-contract",
                 "action_preview": "POST /assistant/action-preview",
                 "bootstrap": "POST /assistant/bootstrap",
                 "status": "GET /assistant/status",
@@ -65,6 +66,46 @@ class AssistantService:
                 "shell_policy": "GET /project/shell-policy",
                 "shell_dry_run": "POST /project/shell-dry-run",
             },
+        }
+
+    def ui_contract(self) -> dict:
+        return {
+            "service": self.settings.service_name,
+            "version": "1",
+            "protected": bool(self.settings.local_api_key),
+            "auth": {
+                "supported_headers": ["X-API-Key", "Authorization: Bearer <LOCAL_API_KEY>"],
+                "secret_returned": False,
+                "note": "LOCAL_API_KEY 값은 API 응답에 포함하지 않습니다.",
+            },
+            "startup_sequence": [
+                {"step": 1, "method": "GET", "path": "/assistant/ping", "purpose": "server/auth quick check"},
+                {"step": 2, "method": "GET", "path": "/assistant/config", "purpose": "safe local settings"},
+                {"step": 3, "method": "GET", "path": "/assistant/dashboard", "purpose": "dashboard cards"},
+                {"step": 4, "method": "POST", "path": "/assistant/bootstrap", "purpose": "sessions and project root state"},
+            ],
+            "message_flow": [
+                {"step": 1, "method": "POST", "path": "/assistant/action-preview", "purpose": "intent/risk preview"},
+                {"step": 2, "method": "POST", "path": "/assistant/message", "purpose": "safe routed answer"},
+                {"step": 3, "method": "GET", "path": "/assistant/sessions/{session_id}/messages", "purpose": "paged history"},
+            ],
+            "response_types": {
+                "answer": "assistant answer bubble",
+                "search_results": "search result panel",
+                "index_preview": "folder index preview panel",
+                "needs_project_root": "project root required warning",
+                "shell_dry_run": "shell dry-run policy panel",
+                "agent_plan": "high-risk plan preview panel",
+                "status": "project phase/status panel",
+                "action_preview": "pre-send intent preview panel",
+            },
+            "safety": _safety(),
+            "blocked_actions": ["shell_execution", "browser_interaction", "file_write_delete", "external_llm_api"],
+            "notes": [
+                "이 계약은 UI 렌더링용 read-only 안내입니다.",
+                "실제 shell 실행, 파일 수정/삭제, 브라우저 조작은 활성화하지 않습니다.",
+                "런타임 LLM과 embedding은 Ollama local API만 사용합니다.",
+            ],
         }
 
     def action_preview(self, request: AssistantActionPreviewRequest) -> dict:

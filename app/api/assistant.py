@@ -19,6 +19,7 @@ from app.schemas.assistant import (
     AssistantSessionListResponse,
     AssistantSessionResponse,
     AssistantStatusResponse,
+    AssistantUiContractResponse,
     ProjectRootValidateRequest,
     ProjectRootValidateResponse,
 )
@@ -42,6 +43,13 @@ def assistant_action_preview(
     assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> dict:
     return assistant_service.action_preview(request)
+
+
+@router.get("/ui-contract", response_model=AssistantUiContractResponse)
+def assistant_ui_contract(
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.ui_contract()
 
 
 @router.get("/ping", response_model=AssistantPingResponse)

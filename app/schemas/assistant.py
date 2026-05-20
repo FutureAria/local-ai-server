@@ -95,6 +95,19 @@ class AssistantDashboardResponse(BaseModel):
     ui: dict
 
 
+class AssistantUiContractResponse(BaseModel):
+    service: str
+    version: str
+    protected: bool
+    auth: dict
+    startup_sequence: list[dict]
+    message_flow: list[dict]
+    response_types: dict
+    safety: dict
+    blocked_actions: list[str]
+    notes: list[str]
+
+
 class AssistantBootstrapRequest(BaseModel):
     project_root: str | None = Field(default=None, max_length=1024)
     include_sessions: bool = True

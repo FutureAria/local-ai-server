@@ -35,7 +35,7 @@ class FakeClient:
             return FakeResponse(
                 {
                     "current_phase": {
-                        "phase": 12,
+                        "phase": 13,
                         "title": "Live browser UI QA",
                         "status": "next",
                         "summary": "Exercise browser UI.",
@@ -66,6 +66,8 @@ class FakeClient:
             return FakeResponse({"service": "local-ai-server", "documents": {"documents_count": 0}})
         if url.endswith("/assistant/dashboard"):
             return FakeResponse({"service": "local-ai-server", "cards": {"connection": {"status": "ready"}}})
+        if url.endswith("/assistant/ui-contract"):
+            return FakeResponse({"service": "local-ai-server", "version": "1", "startup_sequence": []})
         if url.endswith("/assistant/sessions/session-1/messages"):
             return FakeResponse({"session_id": "session-1", "total_messages": 1, "messages": []})
         if url.endswith("/assistant/sessions"):
@@ -100,7 +102,7 @@ class FakeClient:
                 {
                     "service": "local-ai-server",
                     "capabilities": {"endpoints": {"message": "POST /assistant/message"}},
-                    "status": {"current_phase": {"phase": 12}},
+                    "status": {"current_phase": {"phase": 13}},
                     "project_root": {"safe_for_read_only_agent": True},
                     "sessions": {"sessions": []},
                     "recommended_calls": [],
@@ -160,9 +162,9 @@ def test_cli_status_and_next_show_phase(monkeypatch) -> None:
 
     assert status_result.exit_code == 0
     assert next_result.exit_code == 0
-    assert "현재 차수: 12차" in status_result.output
+    assert "현재 차수: 13차" in status_result.output
     assert "Recommended Next Model" in status_result.output
-    assert "다음 차수: 12차" in next_result.output
+    assert "다음 차수: 13차" in next_result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
         {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
@@ -225,6 +227,7 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
     config_result = CliRunner().invoke(cli_main.app, ["assistant-config"])
     status_result = CliRunner().invoke(cli_main.app, ["assistant-status"])
     dashboard_result = CliRunner().invoke(cli_main.app, ["assistant-dashboard"])
+    ui_contract_result = CliRunner().invoke(cli_main.app, ["assistant-ui-contract"])
     action_preview_result = CliRunner().invoke(
         cli_main.app,
         ["assistant-action-preview", "브라우저 열어줘", "--project-root", "/tmp/project"],
@@ -261,6 +264,7 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
     assert config_result.exit_code == 0
     assert status_result.exit_code == 0
     assert dashboard_result.exit_code == 0
+    assert ui_contract_result.exit_code == 0
     assert action_preview_result.exit_code == 0
     assert bootstrap_result.exit_code == 0
     assert session_result.exit_code == 0
@@ -293,6 +297,11 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
         {
             "method": "GET",
             "url": "http://127.0.0.1:8000/assistant/dashboard",
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/assistant/ui-contract",
             "headers": {"X-API-Key": "secret"},
         },
         {

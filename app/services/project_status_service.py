@@ -67,6 +67,12 @@ PROJECT_PHASES = [
     },
     {
         "phase": 12,
+        "title": "Assistant UI contract",
+        "status": "done",
+        "summary": "Read-only UI contract endpoint and CLI command for startup and message flow integration.",
+    },
+    {
+        "phase": 13,
         "title": "Live browser UI QA",
         "status": "next",
         "summary": "Exercise the connected browser UI against the local assistant API and refine rendering details.",
@@ -74,6 +80,7 @@ PROJECT_PHASES = [
 ]
 
 SAFE_NEXT_TASKS = [
+    "Use GET /assistant/ui-contract as the browser UI integration checklist.",
     "Use POST /assistant/action-preview before sending messages that may become agent or shell dry-run requests.",
     "Use GET /assistant/sessions/{session_id}/messages for paged chat history rendering.",
     "Call GET /assistant/ping, GET /assistant/config, and GET /assistant/dashboard from the browser UI.",

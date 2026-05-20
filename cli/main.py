@@ -270,6 +270,11 @@ def assistant_action_preview(message: str, project_root: str | None = None, mode
     _print_json(_request_json("post", "/assistant/action-preview", json=payload, headers=_headers()))
 
 
+@app.command("assistant-ui-contract")
+def assistant_ui_contract() -> None:
+    _print_json(_request_json("get", "/assistant/ui-contract", headers=_headers()))
+
+
 @app.command("assistant-bootstrap")
 def assistant_bootstrap(project_root: str | None = None, include_sessions: bool = True, sessions_limit: int = 10) -> None:
     payload = {

@@ -42,6 +42,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /assistant/action-preview`
 - `GET /assistant/ping`
 - `GET /assistant/config`
+- `GET /assistant/ui-contract`
 - `GET /assistant/status`
 - `GET /assistant/dashboard`
 - `POST /assistant/bootstrap`
@@ -227,6 +228,22 @@ curl http://127.0.0.1:8000/assistant/config
 - `storage`
 - `safety`
 - `rate_limit`
+
+### `GET /assistant/ui-contract`
+
+브라우저 UI가 따라야 할 시작 순서, 메시지 흐름, 응답 타입, 차단 기능을 한 번에 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/ui-contract
+```
+
+응답 핵심 필드:
+
+- `startup_sequence`
+- `message_flow`
+- `response_types`
+- `blocked_actions`
+- `auth.secret_returned=false`
 
 ### `GET /assistant/status`
 
@@ -739,6 +756,7 @@ local-ai assistant-capabilities
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-ping
 local-ai assistant-config
+local-ai assistant-ui-contract
 local-ai assistant-status
 local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server

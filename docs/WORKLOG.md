@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `146 passed` |
+| `.venv/bin/pytest` | `148 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -279,7 +279,7 @@
 - 차수/다음 작업/Recommended Next Model을 확인하는 `/project/status`, `/project/next`, `local-ai status`, `local-ai next`를 추가했다.
 - `local-ai agent-plan`, `local-ai agent-runs`, `local-ai agent-run`, `local-ai agent-results`, `local-ai agent-approve`, `local-ai agent-reject`, `local-ai agent-execute` CLI 명령을 추가했다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가했고, `tests/test_security.py`와 `tests/test_cli.py`를 Agent endpoint/CLI까지 확장했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 
 ### Assistant automation safeguard polish
 
@@ -289,7 +289,7 @@
 - shell dry-run은 allowlist/blocked token 기반으로 `allowed_preview` 또는 `blocked`를 반환하며 실제 명령은 실행하지 않는다.
 - `/project/status` 차수를 4차 완료, 5차 수동 로컬 QA/운영 polish 단계로 갱신했다.
 - README, `docs/API.md`, `SECURITY.md`, `docs/OPERATIONS.md`, `docs/PROJECT_SUMMARY.md`를 실제 동작과 맞게 갱신했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 - `scripts/public_release_check.py --root . --json` 결과는 `ok=true`, finding 없음이다.
 
 ### Local UI Bearer token 호환
@@ -297,7 +297,7 @@
 - `LOCAL_API_KEY` 보호 endpoint가 기존 `X-API-Key`와 함께 `Authorization: Bearer <LOCAL_API_KEY>`도 허용하도록 했다.
 - 브라우저 기반 로컬 UI의 `Bearer token` 입력칸에 같은 로컬 키를 넣어 붙일 수 있게 했다.
 - `tests/test_security.py`에 Bearer header 허용 테스트를 추가했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 - `scripts/public_release_check.py --root . --json` 결과는 `ok=true`, finding 없음이다.
 
 ### UI Bridge Assistant API
@@ -316,7 +316,7 @@
 - `GET /assistant/sessions`와 `local-ai assistant-sessions`를 추가해 UI가 최근 대화 세션 목록을 조회할 수 있게 했다.
 - `GET /assistant/status`와 `local-ai assistant-status`를 추가해 UI 첫 화면용 문서/세션/integrity/안전 상태를 한 번에 조회할 수 있게 했다.
 - CORS preflight와 assistant session list 테스트를 추가했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 - `scripts/public_release_check.py --root . --json` 결과는 `ok=true`, finding 없음이다.
 
 ### UI bootstrap contract
@@ -327,7 +327,7 @@
 - shell 실행, 파일 수정/삭제, 브라우저 interaction은 계속 비활성/보호 상태로 유지했다.
 - `/project/status` 차수를 8차 UI bootstrap contract 완료, 9차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `61 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
 
 ### UI readiness helper APIs
 
@@ -337,7 +337,7 @@
 - `local-ai assistant-ping`, `local-ai assistant-config`, `local-ai assistant-dashboard` CLI 명령을 추가했다.
 - `/project/status` 차수를 9차 UI readiness helper APIs 완료, 10차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `67 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
 
 ### Assistant message paging
 
@@ -345,7 +345,7 @@
 - `local-ai assistant-messages <session_id> --limit 50 --offset 0` CLI 명령을 추가했다.
 - `/project/status` 차수를 10차 Assistant message paging 완료, 11차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `68 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
 
 ### Assistant action preview
 
@@ -354,7 +354,16 @@
 - `local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server` CLI 명령을 추가했다.
 - `/project/status` 차수를 11차 Assistant action preview 완료, 12차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `70 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `146 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+
+### Assistant UI contract
+
+- `GET /assistant/ui-contract`를 추가해 UI 시작 순서, 메시지 흐름, 응답 타입, 차단 기능, 인증 header 계약을 한 번에 조회할 수 있게 했다.
+- 이 endpoint는 read-only 계약 요약이며 실제 실행 기능을 활성화하지 않는다.
+- `local-ai assistant-ui-contract` CLI 명령을 추가했다.
+- `/project/status` 차수를 12차 Assistant UI contract 완료, 13차 Live browser UI QA 다음 단계로 갱신했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `72 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
 
 ### 응답 형식 업데이트
 

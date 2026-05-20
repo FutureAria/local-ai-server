@@ -277,6 +277,7 @@ local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-ping
 local-ai assistant-config
+local-ai assistant-ui-contract
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-status
 local-ai assistant-dashboard
@@ -375,6 +376,7 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `POST /assistant/action-preview`
 - `GET /assistant/ping`
 - `GET /assistant/config`
+- `GET /assistant/ui-contract`
 - `GET /assistant/status`
 - `GET /assistant/dashboard`
 - `POST /assistant/bootstrap`
@@ -479,6 +481,7 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 - `POST /assistant/action-preview`: 실제 실행 없이 메시지 intent, 위험도, 필요 입력값 preview
 - `GET /assistant/ping`: UI 연결, token, 로컬 API ready 상태 빠른 확인
 - `GET /assistant/config`: secret 없이 CORS, allowed roots, 모델명, 저장소, 안전 설정 확인
+- `GET /assistant/ui-contract`: UI 시작 순서, 메시지 흐름, 응답 타입, 차단 기능 계약 요약
 - `GET /assistant/status`: UI 첫 화면용 문서/세션/integrity/안전 상태 요약
 - `GET /assistant/dashboard`: UI 카드용 문서/세션/integrity/연결 상태와 최근 세션 요약
 - `POST /assistant/bootstrap`: UI 초기화용 capabilities/status/project root/sessions/UI 힌트 통합 응답
