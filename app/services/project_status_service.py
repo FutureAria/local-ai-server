@@ -31,15 +31,21 @@ PROJECT_PHASES = [
     },
     {
         "phase": 6,
-        "title": "Manual local UI integration QA",
+        "title": "Browser UI integration support",
+        "status": "done",
+        "summary": "Local CORS defaults and assistant session list API for browser UI integration.",
+    },
+    {
+        "phase": 7,
+        "title": "Live browser UI QA",
         "status": "next",
-        "summary": "Connect the browser UI to /assistant/message and validate local document RAG behavior end to end.",
+        "summary": "Exercise the connected browser UI against the local assistant API and refine response contracts.",
     },
 ]
 
 SAFE_NEXT_TASKS = [
-    "Connect the UI API URL, Bearer token, and project root to the local server.",
-    "Send a UI message to POST /assistant/message and confirm a safe response shape.",
+    "Send a real browser UI message to POST /assistant/message and confirm CORS/auth/response rendering.",
+    "Check GET /assistant/sessions in the UI after a few messages.",
     "Run upload/search/ask-with-docs against a real local .md or .txt note.",
     "Review SQLite/Chroma status with local-ai stats and local-ai integrity.",
     "Keep shell/file-write/browser-interaction/deploy/fine-tuning in blocked or review-required status.",

@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `131 passed` |
+| `.venv/bin/pytest` | `133 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -279,7 +279,7 @@
 - 차수/다음 작업/Recommended Next Model을 확인하는 `/project/status`, `/project/next`, `local-ai status`, `local-ai next`를 추가했다.
 - `local-ai agent-plan`, `local-ai agent-runs`, `local-ai agent-run`, `local-ai agent-results`, `local-ai agent-approve`, `local-ai agent-reject`, `local-ai agent-execute` CLI 명령을 추가했다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가했고, `tests/test_security.py`와 `tests/test_cli.py`를 Agent endpoint/CLI까지 확장했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `131 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `133 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 
 ### Assistant automation safeguard polish
 
@@ -289,7 +289,7 @@
 - shell dry-run은 allowlist/blocked token 기반으로 `allowed_preview` 또는 `blocked`를 반환하며 실제 명령은 실행하지 않는다.
 - `/project/status` 차수를 4차 완료, 5차 수동 로컬 QA/운영 polish 단계로 갱신했다.
 - README, `docs/API.md`, `SECURITY.md`, `docs/OPERATIONS.md`, `docs/PROJECT_SUMMARY.md`를 실제 동작과 맞게 갱신했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `131 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `133 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 - `scripts/public_release_check.py --root . --json` 결과는 `ok=true`, finding 없음이다.
 
 ### Local UI Bearer token 호환
@@ -297,7 +297,7 @@
 - `LOCAL_API_KEY` 보호 endpoint가 기존 `X-API-Key`와 함께 `Authorization: Bearer <LOCAL_API_KEY>`도 허용하도록 했다.
 - 브라우저 기반 로컬 UI의 `Bearer token` 입력칸에 같은 로컬 키를 넣어 붙일 수 있게 했다.
 - `tests/test_security.py`에 Bearer header 허용 테스트를 추가했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `131 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `133 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 - `scripts/public_release_check.py --root . --json` 결과는 `ok=true`, finding 없음이다.
 
 ### UI Bridge Assistant API
@@ -308,6 +308,15 @@
 - assistant API에서는 실제 폴더 색인 대신 preview만 수행하고, shell은 실제 실행 없이 dry-run 정책 판단만 반환한다.
 - `local-ai assistant-capabilities`, `local-ai assistant-session`, `local-ai assistant-message`, `local-ai assistant-root` CLI 명령을 추가했다.
 - 테스트 격리를 위해 `tests/conftest.py`에서 로컬 `.env`의 `LOCAL_API_KEY`가 일반 테스트를 오염시키지 않도록 처리했다.
+
+### Browser UI integration support
+
+- `LOCAL_CORS_ORIGINS` 설정을 추가하고 기본값으로 `http://127.0.0.1:5173,http://localhost:5173`을 허용했다.
+- FastAPI `CORSMiddleware`를 추가해 로컬 브라우저 UI가 `Authorization`, `Content-Type`, `X-API-Key` header로 API를 호출할 수 있게 했다.
+- `GET /assistant/sessions`와 `local-ai assistant-sessions`를 추가해 UI가 최근 대화 세션 목록을 조회할 수 있게 했다.
+- CORS preflight와 assistant session list 테스트를 추가했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `133 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- `scripts/public_release_check.py --root . --json` 결과는 `ok=true`, finding 없음이다.
 
 ### 응답 형식 업데이트
 

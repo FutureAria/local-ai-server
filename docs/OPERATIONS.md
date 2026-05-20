@@ -8,6 +8,7 @@
 - 런타임 LLM과 embedding은 Ollama local API만 사용한다.
 - OpenAI, Claude, Gemini 같은 외부 LLM API를 운영 경로에 추가하지 않는다.
 - `LOCAL_API_KEY`를 설정한 경우 보호 endpoint에는 `X-API-Key`를 사용한다. 로컬 UI가 Bearer token만 지원하면 `Authorization: Bearer <LOCAL_API_KEY>`도 사용할 수 있다.
+- `LOCAL_CORS_ORIGINS`는 브라우저 UI origin을 쉼표로 구분해 지정한다. 기본값은 `http://127.0.0.1:5173,http://localhost:5173`이다.
 - `LOCAL_RATE_LIMIT_PER_MINUTE`로 보호 endpoint의 process-local in-memory rate limit을 조정한다. 기본값은 `120`이고, `0`이면 비활성화된다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`이며, 승인된 Agent run도 기본 설정에서는 실제 실행이 차단된다.
 - Agent dry-run은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 정책 판단만 기록한다.
@@ -81,6 +82,7 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-sessions
 local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/local-ai-server
 ```
 

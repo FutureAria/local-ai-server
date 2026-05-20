@@ -33,6 +33,22 @@ class AssistantSessionResponse(BaseModel):
     messages: list["AssistantMessageItem"] = Field(default_factory=list)
 
 
+class AssistantSessionSummary(BaseModel):
+    session_id: str
+    title: str
+    project_root: str | None
+    created_at: datetime
+    updated_at: datetime
+    messages_count: int
+    last_message_preview: str | None = None
+
+
+class AssistantSessionListResponse(BaseModel):
+    sessions: list[AssistantSessionSummary]
+    limit: int
+    offset: int
+
+
 class AssistantMessageItem(BaseModel):
     id: int
     role: str

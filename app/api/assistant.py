@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_assistant_service, require_api_key
@@ -8,6 +8,7 @@ from app.schemas.assistant import (
     AssistantMessageRequest,
     AssistantMessageResponse,
     AssistantSessionCreateRequest,
+    AssistantSessionListResponse,
     AssistantSessionResponse,
     ProjectRootValidateRequest,
     ProjectRootValidateResponse,
@@ -34,6 +35,16 @@ def create_assistant_session(
 ) -> dict:
     session = assistant_service.create_session(db, title=request.title, project_root=request.project_root)
     return session_to_response(session)
+
+
+@router.get("/sessions", response_model=AssistantSessionListResponse)
+def list_assistant_sessions(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.list_sessions(db, limit=limit, offset=offset)
 
 
 @router.get("/sessions/{session_id}", response_model=AssistantSessionResponse)

@@ -40,6 +40,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
 - `POST /assistant/sessions`
+- `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
@@ -51,6 +52,22 @@ Authorization: Bearer <LOCAL_API_KEY>
 보호 endpoint는 `LOCAL_RATE_LIMIT_PER_MINUTE` 기준 process-local in-memory rate limit을 적용한다. 기본값은 분당 `120`회이며, `0`으로 설정하면 비활성화된다.
 
 제한을 초과하면 `429 Too Many Requests`와 `Retry-After` header를 반환한다.
+
+## CORS
+
+브라우저 기반 로컬 UI 호출을 위해 `LOCAL_CORS_ORIGINS`에 명시된 origin만 허용한다.
+
+기본값:
+
+```env
+LOCAL_CORS_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
+```
+
+허용 header:
+
+- `Authorization`
+- `Content-Type`
+- `X-API-Key`
 
 ## Health
 
@@ -160,6 +177,23 @@ curl -X POST http://127.0.0.1:8000/assistant/sessions \
   -H "Content-Type: application/json" \
   -d '{"title":"Demo","project_root":"/Users/juyoung/local-ai-server"}'
 ```
+
+### `GET /assistant/sessions`
+
+assistant 최근 세션 목록을 조회한다.
+
+```bash
+curl "http://127.0.0.1:8000/assistant/sessions?limit=20&offset=0"
+```
+
+응답 핵심 필드:
+
+- `sessions`
+- `sessions[].session_id`
+- `sessions[].messages_count`
+- `sessions[].last_message_preview`
+- `limit`
+- `offset`
 
 ### `GET /assistant/sessions/{session_id}`
 
@@ -568,6 +602,7 @@ local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-sessions
 local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai assist "질문"

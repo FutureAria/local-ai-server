@@ -39,6 +39,7 @@
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
 - `POST /assistant/sessions`
+- `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
@@ -51,6 +52,7 @@
 - 보호 endpoint에는 `LOCAL_RATE_LIMIT_PER_MINUTE` 기준 process-local in-memory rate limit이 적용된다. 기본값은 분당 `120`회이며, `0`으로 설정하면 비활성화된다.
 - 개인 문서가 들어 있는 환경에서는 서버를 외부 네트워크에 공개하지 말고 `127.0.0.1`에 bind한다.
 - 다중 사용자 인증/인가, 사용자별 문서 격리는 아직 구현하지 않았다.
+- 브라우저 UI CORS는 `LOCAL_CORS_ORIGINS`에 명시된 로컬 origin만 허용한다. 기본값은 `http://127.0.0.1:5173,http://localhost:5173`이다.
 
 ## 데이터 저장 위치
 

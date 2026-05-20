@@ -250,6 +250,18 @@ def assistant_session(title: str | None = None, project_root: str | None = None)
     _print_json(_request_json("post", "/assistant/sessions", json=payload, headers=_headers()))
 
 
+@app.command("assistant-sessions")
+def assistant_sessions(limit: int = 20, offset: int = 0) -> None:
+    _print_json(
+        _request_json(
+            "get",
+            "/assistant/sessions",
+            params={"limit": limit, "offset": offset},
+            headers=_headers(),
+        )
+    )
+
+
 @app.command("assistant-message")
 def assistant_message(
     message: str,

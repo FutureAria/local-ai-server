@@ -35,21 +35,21 @@ class FakeClient:
             return FakeResponse(
                 {
                     "current_phase": {
-                        "phase": 6,
-                        "title": "Manual local UI integration QA",
+                        "phase": 7,
+                        "title": "Live browser UI QA",
                         "status": "next",
-                        "summary": "Connect the browser UI.",
+                        "summary": "Exercise browser UI.",
                     },
                     "completed_phases": [
                         {"phase": 1, "title": "FastAPI local RAG server", "status": "done", "summary": "done"}
                     ],
-                    "safe_next_tasks": ["Connect UI to assistant message API"],
+                    "safe_next_tasks": ["Send a real browser UI message"],
                     "blocked_until_review": ["Unrestricted shell execution"],
                     "recommended_next_model": {
                         "recommended_ai": "Codex",
                         "recommended_model": "Codex GPT-5.5",
                         "reason": "safe implementation",
-                        "next_task": "Connect UI to assistant message API",
+                        "next_task": "Send a real browser UI message",
                         "user_action_required": "없음",
                     },
                 }
@@ -58,6 +58,8 @@ class FakeClient:
             return FakeResponse({"mode": "dry-run-only", "allowed_commands": [], "blocked_tokens": []})
         if url.endswith("/assistant/capabilities"):
             return FakeResponse({"service": "local-ai-server", "modes": ["auto"]})
+        if url.endswith("/assistant/sessions"):
+            return FakeResponse({"sessions": [], "limit": kwargs.get("params", {}).get("limit", 20), "offset": 0})
         return FakeResponse({"method": "GET"})
 
     def post(self, url: str, **kwargs) -> FakeResponse:
@@ -125,9 +127,9 @@ def test_cli_status_and_next_show_phase(monkeypatch) -> None:
 
     assert status_result.exit_code == 0
     assert next_result.exit_code == 0
-    assert "현재 차수: 6차" in status_result.output
+    assert "현재 차수: 7차" in status_result.output
     assert "Recommended Next Model" in status_result.output
-    assert "다음 차수: 6차" in next_result.output
+    assert "다음 차수: 7차" in next_result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
         {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
@@ -190,6 +192,7 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
         cli_main.app,
         ["assistant-session", "--title", "Demo", "--project-root", "/tmp/project"],
     )
+    sessions_result = CliRunner().invoke(cli_main.app, ["assistant-sessions", "--limit", "5"])
     message_result = CliRunner().invoke(
         cli_main.app,
         [
@@ -209,6 +212,7 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
 
     assert capabilities_result.exit_code == 0
     assert session_result.exit_code == 0
+    assert sessions_result.exit_code == 0
     assert message_result.exit_code == 0
     assert root_result.exit_code == 0
     assert "통합 assistant 답변" in message_result.output
@@ -222,6 +226,12 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
             "method": "POST",
             "url": "http://127.0.0.1:8000/assistant/sessions",
             "json": {"title": "Demo", "project_root": "/tmp/project"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/assistant/sessions",
+            "params": {"limit": 5, "offset": 0},
             "headers": {"X-API-Key": "secret"},
         },
         {

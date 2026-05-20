@@ -39,6 +39,7 @@ class FakeSearchService:
         ("post", "/project/shell-dry-run", {"json": {"command": "pwd"}}),
         ("get", "/assistant/capabilities", {}),
         ("post", "/assistant/sessions", {"json": {"title": "Demo"}}),
+        ("get", "/assistant/sessions", {}),
         ("get", "/assistant/sessions/session-1", {}),
         ("post", "/assistant/message", {"json": {"message": "hello"}}),
         ("post", "/assistant/project-root/validate", {"json": {"project_root": "/tmp/project"}}),

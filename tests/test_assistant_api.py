@@ -34,6 +34,23 @@ class FakeAssistantService:
             messages=[],
         )
 
+    def list_sessions(self, db, limit: int = 20, offset: int = 0):
+        return {
+            "sessions": [
+                {
+                    "session_id": "session-1",
+                    "title": "Demo",
+                    "project_root": "/tmp/project",
+                    "created_at": NOW,
+                    "updated_at": NOW,
+                    "messages_count": 1,
+                    "last_message_preview": "JWT",
+                }
+            ],
+            "limit": limit,
+            "offset": offset,
+        }
+
     def get_session(self, db, session_id: str):
         if session_id != "session-1":
             return None
@@ -103,12 +120,15 @@ def test_assistant_session_endpoints_with_mock() -> None:
         "/assistant/sessions",
         json={"title": "Demo", "project_root": "/tmp/project"},
     )
+    list_response = client.get("/assistant/sessions?limit=5&offset=0")
     get_response = client.get("/assistant/sessions/session-1")
     missing_response = client.get("/assistant/sessions/missing")
 
     app.dependency_overrides.clear()
     assert create_response.status_code == 200
     assert create_response.json()["session_id"] == "session-1"
+    assert list_response.status_code == 200
+    assert list_response.json()["sessions"][0]["messages_count"] == 1
     assert get_response.status_code == 200
     assert get_response.json()["messages"][0]["content"] == "JWT"
     assert missing_response.status_code == 404

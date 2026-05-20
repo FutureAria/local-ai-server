@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import desc, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.config import Settings, get_settings
@@ -52,6 +52,7 @@ class AssistantService:
             "endpoints": {
                 "message": "POST /assistant/message",
                 "create_session": "POST /assistant/sessions",
+                "list_sessions": "GET /assistant/sessions",
                 "get_session": "GET /assistant/sessions/{session_id}",
                 "validate_project_root": "POST /assistant/project-root/validate",
                 "shell_policy": "GET /project/shell-policy",
@@ -69,6 +70,46 @@ class AssistantService:
         db.commit()
         db.refresh(session)
         return session
+
+    def list_sessions(self, db: Session, limit: int = 20, offset: int = 0) -> dict:
+        message_counts = (
+            select(
+                AssistantMessage.session_id,
+                func.count(AssistantMessage.id).label("messages_count"),
+                func.max(AssistantMessage.id).label("last_message_id"),
+            )
+            .group_by(AssistantMessage.session_id)
+            .subquery()
+        )
+        last_messages = (
+            select(AssistantMessage.id, AssistantMessage.content)
+        ).subquery()
+        stmt = (
+            select(
+                AssistantSession,
+                func.coalesce(message_counts.c.messages_count, 0),
+                last_messages.c.content,
+            )
+            .outerjoin(message_counts, message_counts.c.session_id == AssistantSession.id)
+            .outerjoin(last_messages, last_messages.c.id == message_counts.c.last_message_id)
+            .order_by(desc(AssistantSession.updated_at))
+            .limit(limit)
+            .offset(offset)
+        )
+        sessions = []
+        for session, messages_count, last_message in db.execute(stmt).all():
+            sessions.append(
+                {
+                    "session_id": session.id,
+                    "title": session.title,
+                    "project_root": session.project_root,
+                    "created_at": session.created_at,
+                    "updated_at": session.updated_at,
+                    "messages_count": messages_count,
+                    "last_message_preview": _preview(last_message) if last_message else None,
+                }
+            )
+        return {"sessions": sessions, "limit": limit, "offset": offset}
 
     def get_session(self, db: Session, session_id: str) -> AssistantSession | None:
         stmt = (

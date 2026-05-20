@@ -20,3 +20,17 @@ def test_health() -> None:
 def test_model_ready_accepts_latest_tag() -> None:
     assert _model_ready("llama3.2", ["llama3.2:latest"]) is True
     assert _model_ready("nomic-embed-text", ["llama3.2:latest"]) is False
+
+
+def test_local_ui_cors_preflight() -> None:
+    client = TestClient(app)
+    response = client.options(
+        "/assistant/message",
+        headers={
+            "Origin": "http://127.0.0.1:5173",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization,content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:5173"

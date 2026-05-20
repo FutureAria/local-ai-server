@@ -276,6 +276,7 @@ local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-sessions
 local-ai assistant-message "내 문서 기준으로 JWT 설명해줘" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai export-sft --output data/sft_dataset.jsonl
@@ -365,6 +366,7 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
 - `POST /assistant/sessions`
+- `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
@@ -439,11 +441,18 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 
 - `GET /assistant/capabilities`: UI가 사용할 수 있는 기능과 안전 기본값 확인
 - `POST /assistant/sessions`: 대화 세션 생성
+- `GET /assistant/sessions`: 최근 대화 세션 목록 조회
 - `GET /assistant/sessions/{session_id}`: 세션 기록 조회
 - `POST /assistant/message`: 입력 메시지를 RAG/search/index preview/agent plan/shell dry-run으로 안전 분기
 - `POST /assistant/project-root/validate`: 화면에 입력한 project root 검증
 
 `/assistant/message`는 폴더 색인은 preview까지만 수행하고, shell은 dry-run 정책 판단만 반환합니다. 브라우저 클릭, 파일 수정/삭제, 실제 shell 실행은 하지 않습니다.
+
+브라우저 UI에서 호출할 수 있도록 기본 CORS 허용 origin은 아래와 같습니다.
+
+```env
+LOCAL_CORS_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
+```
 
 ## Rate Limit
 
