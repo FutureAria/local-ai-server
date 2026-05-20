@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `169 passed` |
+| `.venv/bin/pytest` | `172 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -409,7 +409,15 @@
 - `tests/test_api_docs_payloads.py`를 추가해 `docs/API.md`의 curl `-d` JSON payload 예시를 추출하고 실제 request schema로 validate한다.
 - 검증 대상은 assistant, ask, ask-with-docs, folder index preview/index, search, feedback, agent plan, project shell dry-run request payload다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py` 결과는 `1 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `169 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `172 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### Security docs contract validation
+
+- `tests/test_security_docs_contract.py`를 추가해 README와 SECURITY의 보호 endpoint 목록이 같은지 검증한다.
+- README, SECURITY, RELEASE_CHECKLIST가 외부 LLM API, shell 실행, browser interaction, 파일 생성/수정/삭제, 운영 배포, cloud/Oracle stop condition을 공유하는지 검증한다.
+- RELEASE_CHECKLIST에 `LOCAL_API_KEY=` 형태의 secret-like 예시가 들어가지 않는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_security_docs_contract.py` 결과는 `3 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `172 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 
