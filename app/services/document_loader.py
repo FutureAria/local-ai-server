@@ -1,0 +1,185 @@
+import importlib.util
+from html.parser import HTMLParser
+from pathlib import Path
+
+
+SUPPORTED_EXTENSIONS = {".txt", ".md", ".pdf", ".docx", ".html", ".htm"}
+DOCUMENT_TYPE_REQUIREMENTS = {
+    ".txt": {
+        "file_type": "txt",
+        "optional_dependency": None,
+        "description": "UTF-8 plain text",
+    },
+    ".md": {
+        "file_type": "md",
+        "optional_dependency": None,
+        "description": "UTF-8 Markdown text",
+    },
+    ".pdf": {
+        "file_type": "pdf",
+        "optional_dependency": "pypdf",
+        "description": "Text-based PDF. Scanned image OCR is not supported.",
+    },
+    ".docx": {
+        "file_type": "docx",
+        "optional_dependency": "python-docx",
+        "module_name": "docx",
+        "description": "Microsoft Word DOCX text and table extraction.",
+    },
+    ".html": {
+        "file_type": "html",
+        "optional_dependency": None,
+        "description": "UTF-8 HTML text extraction. Script/style content is ignored.",
+    },
+    ".htm": {
+        "file_type": "html",
+        "optional_dependency": None,
+        "description": "UTF-8 HTML text extraction. Script/style content is ignored.",
+    },
+}
+
+
+class DocumentLoaderError(ValueError):
+    pass
+
+
+class _HTMLTextExtractor(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._parts: list[str] = []
+        self._ignored_depth = 0
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag.lower() in {"head", "script", "style", "noscript"}:
+            self._ignored_depth += 1
+        if tag.lower() in {"p", "br", "div", "section", "article", "li", "tr", "h1", "h2", "h3", "h4", "h5", "h6"}:
+            self._parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() in {"head", "script", "style", "noscript"} and self._ignored_depth:
+            self._ignored_depth -= 1
+        if tag.lower() in {"p", "div", "section", "article", "li", "tr", "h1", "h2", "h3", "h4", "h5", "h6"}:
+            self._parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self._ignored_depth:
+            return
+        text = data.strip()
+        if text:
+            self._parts.append(text)
+
+    def text(self) -> str:
+        lines = [" ".join(line.split()) for line in "".join(self._parts).splitlines()]
+        return "\n".join(line for line in lines if line).strip()
+
+
+def file_type_for_path(path: str | Path) -> str:
+    suffix = Path(path).suffix.lower()
+    requirement = DOCUMENT_TYPE_REQUIREMENTS.get(suffix)
+    if requirement is None:
+        return suffix.lstrip(".")
+    return requirement["file_type"]
+
+
+class DocumentLoader:
+    def supported_types(self) -> list[dict]:
+        types = []
+        for extension in sorted(SUPPORTED_EXTENSIONS):
+            requirement = DOCUMENT_TYPE_REQUIREMENTS[extension]
+            module_name = requirement.get("module_name") or requirement["optional_dependency"]
+            optional_dependency = requirement["optional_dependency"]
+            available = optional_dependency is None or importlib.util.find_spec(module_name) is not None
+            types.append(
+                {
+                    "extension": extension,
+                    "file_type": requirement["file_type"],
+                    "available": available,
+                    "optional_dependency": optional_dependency,
+                    "install_hint": None if available else "pip install -e '.[documents]'",
+                    "description": requirement["description"],
+                }
+            )
+        return types
+
+    def load_text(self, path: str | Path) -> str:
+        file_path = Path(path)
+        suffix = file_path.suffix.lower()
+        if suffix not in SUPPORTED_EXTENSIONS:
+            raise DocumentLoaderError(
+                f"지원하지 않는 파일 형식입니다: {suffix}. 지원 형식: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
+            )
+        if not file_path.exists() or not file_path.is_file():
+            raise DocumentLoaderError(f"파일을 찾을 수 없습니다: {file_path}")
+        if suffix == ".pdf":
+            return self._load_pdf(file_path)
+        if suffix == ".docx":
+            return self._load_docx(file_path)
+        if suffix in {".html", ".htm"}:
+            return self._load_html(file_path)
+        try:
+            return file_path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise DocumentLoaderError(f"UTF-8 텍스트 파일만 지원합니다: {file_path}") from exc
+
+    def _load_pdf(self, file_path: Path) -> str:
+        try:
+            from pypdf import PdfReader
+        except ImportError as exc:
+            raise DocumentLoaderError(
+                "PDF 문서를 읽으려면 optional dependency가 필요합니다: "
+                "pip install -e '.[documents]'"
+            ) from exc
+
+        try:
+            reader = PdfReader(str(file_path))
+            pages = [page.extract_text() or "" for page in reader.pages]
+        except Exception as exc:
+            raise DocumentLoaderError(f"PDF 텍스트 추출에 실패했습니다: {file_path}") from exc
+
+        text = "\n\n".join(page.strip() for page in pages if page.strip()).strip()
+        if not text:
+            raise DocumentLoaderError(f"PDF에서 추출 가능한 텍스트가 없습니다: {file_path}")
+        return text
+
+    def _load_docx(self, file_path: Path) -> str:
+        try:
+            from docx import Document as DocxDocument
+        except ImportError as exc:
+            raise DocumentLoaderError(
+                "DOCX 문서를 읽으려면 optional dependency가 필요합니다: "
+                "pip install -e '.[documents]'"
+            ) from exc
+
+        try:
+            document = DocxDocument(str(file_path))
+            parts = [paragraph.text.strip() for paragraph in document.paragraphs if paragraph.text.strip()]
+            for table in document.tables:
+                for row in table.rows:
+                    cells = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+                    if cells:
+                        parts.append(" | ".join(cells))
+        except Exception as exc:
+            raise DocumentLoaderError(f"DOCX 텍스트 추출에 실패했습니다: {file_path}") from exc
+
+        text = "\n".join(parts).strip()
+        if not text:
+            raise DocumentLoaderError(f"DOCX에서 추출 가능한 텍스트가 없습니다: {file_path}")
+        return text
+
+    def _load_html(self, file_path: Path) -> str:
+        try:
+            html = file_path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise DocumentLoaderError(f"UTF-8 HTML 파일만 지원합니다: {file_path}") from exc
+
+        parser = _HTMLTextExtractor()
+        try:
+            parser.feed(html)
+            parser.close()
+        except Exception as exc:
+            raise DocumentLoaderError(f"HTML 텍스트 추출에 실패했습니다: {file_path}") from exc
+
+        text = parser.text()
+        if not text:
+            raise DocumentLoaderError(f"HTML에서 추출 가능한 텍스트가 없습니다: {file_path}")
+        return text

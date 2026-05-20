@@ -1,0 +1,3 @@
+# Keep the local log directory in the project tree.
+#
+# Runtime log files under data/logs/ are ignored by .gitignore.

@@ -1,0 +1,527 @@
+# local-ai-server
+
+`local-ai-server`는 내 컴퓨터 또는 내 서버에서만 동작하는 백엔드 전용 로컬 AI 지식 서버입니다. 런타임에서 OpenAI, Claude, Gemini 같은 외부 LLM API를 사용하지 않고, Ollama local API만 호출합니다.
+
+## 개발 배경
+
+개인 문서 기반 Q&A를 만들 때 외부 LLM API로 문서 내용이 전송되는 구조는 비용, 개인정보, 재현성 측면에서 부담이 있습니다. 이 프로젝트는 로컬 모델과 로컬 저장소만으로 문서 업로드, 색인, 검색, RAG 답변, 피드백 수집, SFT 데이터 export까지 이어지는 백엔드 흐름을 검증하기 위해 만들었습니다.
+
+최종 요약은 [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)에 별도로 정리되어 있습니다.
+문서 정합성 리뷰가 필요하면 [docs/CLAUDE_REVIEW_HANDOFF.md](docs/CLAUDE_REVIEW_HANDOFF.md)를 사용하면 됩니다.
+
+포트폴리오 관점의 핵심 목표는 다음과 같습니다.
+
+- FastAPI route는 얇게 유지하고 실제 로직은 service 계층에 둔다.
+- SQLite를 metadata source of truth로 사용하고 Chroma는 vector search 전용으로 분리한다.
+- Ollama local API만 사용해 외부 LLM API 의존성을 제거한다.
+- CLI는 백엔드를 HTTP로 호출하게 만들어 API 계약을 재사용한다.
+- 테스트와 문서로 구현된 기능, 미구현 기능, 보안 한계를 명확히 구분한다.
+
+## 현재 구현 범위
+
+- FastAPI API 서버
+- Ollama local chat API 연동
+- Ollama local embedding API 연동
+- SQLite 기반 문서/청크/채팅 로그/피드백 저장
+- Chroma 기반 로컬 vector search
+- `EMBEDDING_BATCH_SIZE` 기반 Ollama embedding batch 처리
+- `.txt`, `.md`, `.html`, `.htm` 문서 업로드, 로컬 폴더 색인, read-only 폴더 색인 preview
+- optional dependency 설치 시 `.pdf`, `.docx` 문서 텍스트 추출
+- 문서 검색 기반 RAG 답변
+- Typer CLI
+- SFT JSONL export
+- pytest 기반 기본 테스트
+
+## 기술 선택 이유
+
+| 기술 | 사용 위치 | 선택 이유 |
+|---|---|---|
+| FastAPI | HTTP API | Pydantic schema 기반 request/response 검증과 테스트가 쉽고 Python AI 생태계와 잘 맞음 |
+| Ollama | local LLM/embedding | 외부 LLM API 없이 로컬 모델로 chat과 embedding을 처리하기 위함 |
+| SQLite | metadata/log/feedback | 단일 사용자 로컬 서버에서 운영이 단순하고 파일 기반 백업이 쉬움 |
+| Chroma | vector search | 문서 chunk embedding 검색을 로컬에서 처리하기 위함 |
+| Typer | CLI | FastAPI 백엔드를 호출하는 개발자 친화적 CLI를 빠르게 제공하기 위함 |
+| SQLAlchemy | DB access | ORM 모델과 테스트용 DB 세션 구성이 명확함 |
+| pytest | test | service/API contract 중심 검증에 적합함 |
+
+## 핵심 구현 포인트
+
+- `/ask`와 `/ask-with-docs`는 질문/답변을 SQLite `chat_logs`에 저장하고 `request_id`를 반환합니다.
+- 문서 업로드와 폴더 색인은 텍스트 추출, chunking, embedding, SQLite 저장, Chroma 저장 순서로 처리합니다.
+- SQLite write transaction을 짧게 유지하기 위해 Ollama embedding은 DB write 전에 생성합니다.
+- 여러 chunk embedding은 `EMBEDDING_BATCH_SIZE` 단위로 Ollama `/api/embed`에 batch 요청합니다.
+- Chroma `PersistentClient`는 요청마다 새로 만들지 않고 프로세스 안에서 공유해 동시 요청 초기화 충돌을 줄입니다.
+- DB/Chroma 저장 단계 실패 시 SQLite 변경을 rollback하고 명확한 `DocumentIndexingError`를 반환합니다.
+- `/documents/index-folder-preview`는 실제 저장 없이 예상 chunk 수와 embedding batch 수를 계산합니다.
+- RAG 답변은 문서 밖 코드, 링크, 보안 세부사항, 추측성 표현을 감지하면 보수적인 fallback 답변으로 대체될 수 있습니다.
+
+## Architecture
+
+```text
+CLI / curl
+   |
+   v
+FastAPI routes
+   |
+   v
+Services
+  - RagService
+  - DocumentService
+  - SearchService
+  - FeedbackService
+   |
+   +--> Ollama local API
+   |      - /api/chat
+   |      - /api/embed
+   |
+   +--> SQLite
+   |      - documents
+   |      - document_chunks
+   |      - chat_logs
+   |      - feedback
+   |
+   +--> Chroma
+          - vector search only
+```
+
+## 요구사항
+
+- Python 3.11 이상
+- Ollama
+- 로컬 모델:
+  - LLM: `llama3.2`
+  - Embedding: `nomic-embed-text`
+
+## 설치
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+PDF/DOCX 문서까지 색인하려면 optional dependency를 추가로 설치합니다. 시스템 패키지는 필요하지 않고 Python 패키지만 사용합니다.
+
+```bash
+pip install -e ".[dev,documents]"
+```
+
+## Ollama 실행
+
+```bash
+ollama serve
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
+
+## 서버 실행
+
+기본적으로 로컬에서만 접근하도록 `127.0.0.1`에 bind하는 것을 권장합니다.
+
+```bash
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+## curl 테스트
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+전체 API 계약은 [docs/API.md](docs/API.md)에 정리되어 있습니다.
+
+Ollama 서버와 필요한 모델 준비 상태를 확인하려면:
+
+```bash
+curl http://127.0.0.1:8000/health/ollama
+```
+
+```bash
+curl -X POST http://127.0.0.1:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question":"Spring Boot가 뭐야?","temperature":0.2}'
+```
+
+## 문서 업로드
+
+기본 텍스트 문서는 `.txt`, `.md`, `.html`, `.htm`을 지원합니다. HTML은 UTF-8 파일에서 본문 텍스트를 추출하고 `script`, `style`, `head` 내용은 제외합니다. PDF/DOCX는 `pip install -e ".[dev,documents]"`로 optional dependency를 설치한 경우 사용할 수 있습니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/documents/upload \
+  -F "file=@./notes/backend.md"
+```
+
+```bash
+curl -X POST http://127.0.0.1:8000/documents/upload \
+  -F "file=@./notes/backend.pdf"
+```
+
+## 폴더 색인
+
+원본 파일은 삭제하거나 수정하지 않습니다. `.git`, `node_modules`, `venv`, `.venv`, `__pycache__`, `dist`, `build`, `target` 폴더는 무시합니다.
+
+실제 저장 전에 색인 대상 파일과 예상 chunk 수만 확인하려면 read-only preview를 먼저 실행합니다. 이 API는 원본 파일 수정, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않습니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/documents/index-folder-preview \
+  -H "Content-Type: application/json" \
+  -d '{"folder_path":"./notes","recursive":true}'
+```
+
+preview 응답에는 `chunks_estimated`, `embedding_batch_size`, `embedding_batches_estimated`가 포함됩니다. 실제 색인 전에 Ollama embedding batch 호출이 대략 몇 번 발생할지 확인하는 용도입니다.
+
+실제 색인은 아래 명령을 사용합니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/documents/index-folder \
+  -H "Content-Type: application/json" \
+  -d '{"folder_path":"./notes","recursive":true}'
+```
+
+응답에는 전체 색인 수뿐 아니라 `indexed_files`, `skipped_file_details`가 포함됩니다. 큰 폴더를 색인한 뒤 어떤 파일이 저장됐고 어떤 파일이 UTF-8 오류 등으로 건너뛰어졌는지 확인할 수 있습니다.
+
+## 검색
+
+```bash
+curl -X POST http://127.0.0.1:8000/search \
+  -H "Content-Type: application/json" \
+  -d '{"query":"JWT authentication","top_k":5}'
+```
+
+## 문서 기반 질문
+
+```bash
+curl -X POST http://127.0.0.1:8000/ask-with-docs \
+  -H "Content-Type: application/json" \
+  -d '{"question":"내 문서 기준으로 JWT 인증 흐름 설명해줘","top_k":5,"temperature":0.2}'
+```
+
+## Feedback
+
+`/ask`와 `/ask-with-docs` 응답의 `request_id`는 내부 `chat_logs.id`입니다. 이 값을 사용해 피드백을 저장합니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/feedback \
+  -H "Content-Type: application/json" \
+  -d '{"request_id":"1","rating":"good","corrected_answer":"수정 답변","note":"좋은 답변"}'
+```
+
+`rating`은 `good`, `bad`, `neutral`만 허용합니다.
+
+## Chat Log 조회
+
+질문/답변 기록은 SQLite `chat_logs`에 저장됩니다. 목록 조회는 긴 답변 전체를 노출하지 않고 preview만 반환합니다.
+
+```bash
+local-ai logs --limit 20 --offset 0
+local-ai logs --mode rag --query JWT --limit 20 --offset 0
+```
+
+단건 상세 조회는 전체 질문, 전체 답변, 사용 source를 반환합니다.
+
+```bash
+local-ai log 1
+```
+
+HTTP API:
+
+```bash
+curl "http://127.0.0.1:8000/chat-logs?limit=20&offset=0"
+curl "http://127.0.0.1:8000/chat-logs?mode=rag&query=JWT&limit=20&offset=0"
+curl "http://127.0.0.1:8000/chat-logs/1"
+```
+
+## CLI 사용법
+
+CLI는 FastAPI 백엔드를 호출합니다. 비즈니스 로직을 CLI에 중복 구현하지 않습니다.
+
+```bash
+local-ai health
+local-ai doctor
+local-ai stats
+local-ai integrity
+local-ai repair-preview
+local-ai document-types
+local-ai ask "Spring Boot에서 Controller와 Service 차이 설명해줘"
+local-ai upload ./notes/backend.md
+local-ai search "JWT"
+local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
+local-ai index-preview ./backend-study
+local-ai index ./backend-study
+local-ai docs
+local-ai docs --source-type upload --file-type md --query backend
+local-ai chunks 1 --limit 20 --offset 0
+local-ai logs --limit 20 --offset 0
+local-ai logs --mode rag --query JWT --limit 20 --offset 0
+local-ai log 1
+local-ai feedbacks --limit 20 --offset 0
+local-ai export-sft --output data/sft_dataset.jsonl
+```
+
+기본 서버 주소는 `http://127.0.0.1:8000`입니다. 바꾸려면:
+
+```bash
+export LOCAL_AI_SERVER_URL=http://127.0.0.1:8000
+```
+
+`local-ai docs`는 문서 목록을 read-only로 조회합니다. 필요하면 `source_type`, `file_type`, filename/path 검색어로 좁힐 수 있습니다.
+
+```bash
+local-ai docs --source-type upload
+local-ai docs --file-type md
+local-ai docs --file-type html
+local-ai docs --file-type pdf
+local-ai docs --source-type upload --file-type md --query backend
+curl "http://127.0.0.1:8000/documents?source_type=upload&file_type=md&query=backend"
+```
+
+현재 환경에서 사용할 수 있는 문서 타입과 optional dependency 준비 상태는 다음 명령으로 확인합니다.
+
+```bash
+local-ai document-types
+curl http://127.0.0.1:8000/documents/supported-types
+```
+
+## LOCAL_API_KEY
+
+`LOCAL_API_KEY`를 설정하면 보호 endpoint는 `X-API-Key` 헤더를 요구합니다.
+
+보호 endpoint:
+
+- `POST /ask`
+- `POST /ask-with-docs`
+- `POST /documents/upload`
+- `POST /documents/index-folder-preview`
+- `POST /documents/index-folder`
+- `DELETE /documents/{document_id}`
+- `POST /search`
+- `POST /feedback`
+
+```bash
+export LOCAL_API_KEY=change-me
+curl -X POST http://127.0.0.1:8000/ask \
+  -H "X-API-Key: change-me" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"안녕"}'
+```
+
+보안 운영 기준과 GitHub 공개 전 체크리스트는 [SECURITY.md](SECURITY.md)에 정리되어 있습니다.
+
+## Rate Limit
+
+보호 endpoint에는 process-local in-memory rate limit이 적용됩니다. 기본값은 분당 `120`회입니다.
+
+```bash
+export LOCAL_RATE_LIMIT_PER_MINUTE=120
+```
+
+`LOCAL_RATE_LIMIT_PER_MINUTE=0`으로 설정하면 rate limit을 비활성화합니다. 이 제한은 단일 프로세스 메모리 기준이므로 여러 worker나 여러 서버 인스턴스를 운영하는 공개 서비스용 분산 rate limit은 아닙니다.
+
+## SFT Export
+
+아직 fine-tuning을 수행하지 않습니다. 미래 LoRA/QLoRA 학습을 위한 JSONL 데이터만 준비합니다.
+
+```bash
+python scripts/export_sft_data.py --output data/sft_dataset.jsonl
+```
+
+출력 형식:
+
+```json
+{"messages":[{"role":"system","content":"You are a helpful local AI assistant."},{"role":"user","content":"..."},{"role":"assistant","content":"..."}]}
+```
+
+## Feedback 조회
+
+저장된 피드백을 read-only로 확인할 수 있습니다.
+
+```bash
+local-ai feedbacks --limit 20 --offset 0
+local-ai feedbacks --rating bad --limit 20 --offset 0
+local-ai feedbacks --chat-log-id 9 --limit 20 --offset 0
+```
+
+HTTP API:
+
+```bash
+curl "http://127.0.0.1:8000/feedback?limit=20&offset=0"
+curl "http://127.0.0.1:8000/feedback?rating=bad&limit=20&offset=0"
+curl "http://127.0.0.1:8000/feedback?chat_log_id=9&limit=20&offset=0"
+```
+
+## 저장소 상태 점검
+
+SQLite와 Chroma의 현재 상태를 read-only로 확인할 수 있습니다.
+
+```bash
+local-ai stats
+local-ai integrity
+local-ai repair-preview
+```
+
+`local-ai stats` 확인 항목:
+
+- 문서 수
+- chunk 수
+- chat log 수
+- feedback 수
+- Chroma vector 수
+- SQLite에는 기록되어 있지만 저장 파일이 없는 문서 목록
+
+`local-ai integrity` 확인 항목:
+
+- SQLite chunk 수와 Chroma vector 수 일치 여부
+- SQLite에는 chunk가 있지만 Chroma vector가 없는 항목
+- Chroma에는 vector가 있지만 SQLite chunk가 없는 orphan vector
+- 저장 파일 누락 여부
+
+현재 integrity 기능은 read-only dry-run입니다. 실제 repair/delete는 수행하지 않습니다.
+
+`local-ai repair-preview`는 integrity 결과를 기반으로 필요한 복구 후보를 미리 보여줍니다. 이 명령도 read-only이며 실제 파일 삭제, DB 수정, Chroma 수정은 수행하지 않습니다.
+
+## 운영 로그와 저장공간
+
+운영 로그, 저장공간 점검, 백업 기준은 [docs/OPERATIONS.md](docs/OPERATIONS.md)에 정리되어 있습니다.
+
+핵심 원칙:
+
+- 기본 운영은 `uvicorn` stdout/stderr 로그를 사용합니다.
+- 질문, 답변, 문서 원문, `LOCAL_API_KEY`는 일반 운영 로그에 남기지 않습니다.
+- 파일 로그가 필요하면 `data/logs/` 아래에 두며 Git에는 포함하지 않습니다.
+- 실제 repair/delete/rebuild나 운영 DB 복구는 사용자 승인 후 진행합니다.
+
+```bash
+mkdir -p data/logs
+uvicorn app.main:app --host 127.0.0.1 --port 8000 >> data/logs/server.log 2>&1
+```
+
+## Chunk 페이지 조회
+
+문서 상세 전체를 한 번에 받지 않고 chunk만 페이지 단위로 확인할 수 있습니다.
+
+```bash
+local-ai chunks 1 --limit 20 --offset 0
+```
+
+HTTP API:
+
+```bash
+curl "http://127.0.0.1:8000/documents/1/chunks?limit=20&offset=0"
+```
+
+## 테스트
+
+```bash
+pytest
+```
+
+## E2E Smoke Test
+
+서버와 Ollama 모델이 실행 중일 때 임시 Markdown 문서로 `health → upload → search → ask-with-docs → feedback → stats` 흐름을 확인할 수 있습니다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
+```
+
+`LOCAL_API_KEY`가 설정되어 있으면 smoke test도 자동으로 `X-API-Key` 헤더를 보냅니다. 이 스크립트는 테스트용 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가됩니다. 자동 삭제는 수행하지 않습니다.
+
+## GitHub 공개 전 보안 점검
+
+로컬 데이터와 secret 후보가 공개 대상에 섞여 있는지 read-only로 점검할 수 있습니다.
+
+```bash
+python scripts/public_release_check.py --root .
+python scripts/public_release_check.py --root . --json
+```
+
+현재 로컬 DB, Chroma index, 업로드 파일이 있으면 이 스크립트는 실패 코드와 함께 항목을 출력합니다. 삭제는 수행하지 않으며, 공개 전 `.gitignore`와 실제 포함 파일을 확인하기 위한 안전장치입니다.
+
+## 실제 RAG 검증 상태
+
+현재 로컬 환경에서 아래 흐름을 확인했습니다.
+
+- `local-ai doctor`: `llm_model_ready=true`, `embedding_model_ready=true`
+- `local-ai stats`: SQLite/Chroma 저장 상태 확인 성공
+- `local-ai integrity`: SQLite/Chroma 정합성 점검 성공
+- `local-ai repair-preview`: repair action 미리보기 성공
+- `local-ai document-types`: 문서 타입별 사용 가능 여부 확인 성공
+- `local-ai chunks 1 --limit 5 --offset 0`: chunk 페이지 조회 성공
+- `local-ai logs --limit 2 --offset 0`: chat log 목록 조회 성공
+- `local-ai logs --mode rag --query JWT --limit 3 --offset 0`: chat log 필터 조회 성공
+- `local-ai log 9`: chat log 상세 조회 성공
+- `local-ai feedbacks --limit 5 --offset 0`: feedback 목록 조회 성공
+- `local-ai docs --source-type upload --file-type md --query backend`: 문서 목록 필터 조회 성공
+- `local-ai index-preview /tmp/local-ai-preview`: read-only 폴더 색인 preview 성공, stats 변경 없음
+- `POST /documents/index-folder-preview`: `embedding_batch_size`, `embedding_batches_estimated` 응답 contract 확인 성공
+- `POST /documents/index-folder`: 파일별 `indexed_files`, `skipped_file_details` 응답 contract 확인 성공
+- `local-ai document-types`: PDF/DOCX optional dependency 준비 상태 확인 성공
+- `local-ai upload /tmp/local-ai-documents/jwt-docx-notes.docx`: DOCX 텍스트 추출, embedding, Chroma 저장 성공
+- `local-ai upload /tmp/local-ai-documents/jwt-pdf-notes.pdf`: PDF 텍스트 추출, embedding, Chroma 저장 성공
+- `local-ai search "DOCX Authorization header"`: DOCX chunk 검색 성공
+- `local-ai search "PDF refresh token local ai server"`: PDF chunk 검색 성공
+- `local-ai ask-docs "내 문서 기준으로 access token 전달 방식..."`: DOCX/PDF source 포함 RAG 답변 성공
+- `CHUNK_SIZE=120 CHUNK_OVERLAP=20 EMBEDDING_BATCH_SIZE=2` 환경에서 `batch-notes.txt` 업로드: 22개 chunk embedding 및 Chroma 저장 성공
+- `local-ai search "batch Authorization header access token"`: batch 업로드 문서 검색 성공
+- `local-ai upload /tmp/local-ai-smoke/backend-notes.md`: 업로드 및 chunk 저장 성공
+- `local-ai search "JWT 인증 흐름"`: Chroma 검색 성공
+- `local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름..."`: sources 포함 RAG 답변 성공
+- `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 임시 Markdown 문서 기반 API smoke test 가능
+
+`llama3.2`가 문서 밖 코드나 링크를 만들 수 있어, RAG 답변에는 보수적인 guard가 들어 있습니다. 코드 블록, 외부 URL, 문서에 없는 보안 세부사항, 추측성 표현이 감지되면 문서 기반 fallback 답변으로 대체합니다.
+
+문서 업로드는 SQLite write transaction이 오래 유지되지 않도록, Ollama embedding 생성 후 짧게 DB write를 수행하는 흐름으로 조정했습니다.
+여러 chunk embedding은 `EMBEDDING_BATCH_SIZE` 단위로 Ollama `/api/embed`에 묶어서 요청합니다. 기본값은 `8`입니다.
+일시적인 embedding 실패는 `EMBEDDING_MAX_RETRIES`만큼 batch 단위로 재시도합니다. 기본값은 `2`입니다.
+Chroma `PersistentClient`는 요청마다 새로 만들지 않고 프로세스 안에서 공유해 동시 요청 시 client 초기화 충돌을 줄입니다.
+DB/Chroma 저장 단계에서 오류가 나면 SQLite 변경은 rollback하고 명확한 색인 오류를 반환합니다.
+
+## Troubleshooting
+
+### Ollama에 연결할 수 없습니다
+
+- `ollama serve`가 실행 중인지 확인합니다.
+- `.env` 또는 환경변수의 `OLLAMA_BASE_URL`이 맞는지 확인합니다.
+- 기본값은 `http://localhost:11434`입니다.
+
+### 모델을 찾을 수 없습니다
+
+먼저 현재 준비 상태를 확인합니다.
+
+```bash
+local-ai doctor
+```
+
+`embedding_model_ready`가 `false`라면 embedding 모델이 아직 준비되지 않은 상태입니다.
+
+```bash
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
+
+### 업로드가 실패합니다
+
+- 기본 지원은 `.txt`, `.md`, `.html`, `.htm`입니다.
+- HTML은 UTF-8 파일만 처리하며, JavaScript 렌더링 결과는 추출하지 않습니다.
+- `.pdf`, `.docx`에서 optional dependency 오류가 나오면 `pip install -e ".[dev,documents]"`를 실행합니다.
+- UTF-8 텍스트 파일만 지원합니다.
+
+### 401 응답이 나옵니다
+
+- `LOCAL_API_KEY`가 설정되어 있으면 `X-API-Key` 헤더를 보내야 합니다.
+
+## 현재 한계
+
+- PDF/DOCX는 optional dependency 설치 시 텍스트 추출을 지원합니다. 스캔 이미지 기반 PDF OCR은 아직 지원하지 않습니다.
+- HTML/HTM은 표준 라이브러리 기반 텍스트 추출을 지원하지만, JavaScript 렌더링 결과나 동적 페이지 크롤링은 지원하지 않습니다.
+- Chroma와 SQLite 동기화 복구는 read-only 점검과 repair preview까지만 지원합니다. 실제 repair/rebuild는 아직 수행하지 않습니다.
+- embedding은 batch 처리되고 preview에서 예상 batch 수를 볼 수 있지만, 매우 큰 문서의 실시간 진행률 표시는 아직 없습니다.
+- 자동 로그 rotation은 아직 구현하지 않았고, 운영 로그 정책은 문서로만 제공합니다.
+- 인증은 로컬 API key 수준이며, 다중 사용자 권한 관리는 없습니다.
+- 보호 endpoint에는 process-local in-memory rate limit이 적용됩니다. 다중 worker/분산 환경용 rate limit은 아직 지원하지 않습니다.
+- HTTPS termination은 애플리케이션에서 직접 제공하지 않으며, 외부 공개가 필요하면 reverse proxy와 TLS 설정을 별도로 검토해야 합니다.
+
+## 배포 상태
+
+- 현재 구현은 로컬 실행 기준입니다.
+- 외부 클라우드 배포는 구현하지 않았습니다.
+- 외부 클라우드 credential, API key, DB password는 사용하지 않습니다.
