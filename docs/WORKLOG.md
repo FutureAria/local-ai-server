@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `192 passed` |
+| `.venv/bin/pytest` | `193 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -485,10 +485,11 @@
 ### UI connect guide
 
 - `docs/UI_CONNECT_GUIDE.md`를 추가해 별도 로컬 UI가 입력해야 할 API base URL, API key header, project root, startup 호출 순서, 안전 상태, troubleshooting을 한 곳에 정리했다.
+- `docs/UI_CONNECT_GUIDE.md`에 copy-ready 환경값 블록과 browser `fetch` 예시를 추가해 UI 코드에서 바로 연결 흐름을 가져갈 수 있게 했다.
 - README `Key Docs`와 handoff 문서에서 UI 연결 가이드를 참조하도록 연결했다.
 - `tests/test_ui_connect_guide.py`를 추가해 연결값, startup flow, 안전 경계가 문서에 유지되는지 검증한다.
-- targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_readme_quick_start.py` 결과는 `19 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `192 passed, 1 warning`이다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `15 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `193 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

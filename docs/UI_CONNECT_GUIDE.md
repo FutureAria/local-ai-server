@@ -11,6 +11,14 @@
 | Project root | `/Users/juyoung/local-ai-server` | assistant bridge가 read-only 상태 점검에 사용할 로컬 프로젝트 경로 |
 | CORS origin | `http://127.0.0.1:5173`, `http://localhost:5173` | 기본 개발 UI origin |
 
+UI나 로컬 앱에 값만 옮길 때는 아래 형태를 기준으로 둔다.
+
+```text
+LOCAL_AI_SERVER_URL=http://127.0.0.1:8000
+LOCAL_AI_PROJECT_ROOT=/Users/juyoung/local-ai-server
+LOCAL_AI_AUTH_HEADER=Authorization: Bearer <LOCAL_API_KEY>
+```
+
 주의:
 
 - 실제 `LOCAL_API_KEY` 값은 이 문서, README, 로그, 스크린샷에 남기지 않는다.
@@ -66,6 +74,65 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
   -H "Authorization: Bearer <LOCAL_API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{"message":"내 문서 기준으로 현재 상태 요약해줘","project_root":"/Users/juyoung/local-ai-server","mode":"status"}'
+```
+
+## Copy-ready fetch 예시
+
+브라우저 UI에서 사용할 수 있는 최소 `fetch` 예시다. token 값은 사용자가 입력한 값을 런타임에 넣고, 코드나 문서에 하드코딩하지 않는다.
+
+```js
+const API_BASE_URL = "http://127.0.0.1:8000";
+const PROJECT_ROOT = "/Users/juyoung/local-ai-server";
+
+function authHeaders(localApiKey) {
+  return localApiKey
+    ? { Authorization: `Bearer ${localApiKey}` }
+    : {};
+}
+
+export async function loadAssistantStartup(localApiKey) {
+  const response = await fetch(`${API_BASE_URL}/assistant/startup`, {
+    headers: authHeaders(localApiKey),
+  });
+  if (!response.ok) {
+    throw new Error(`startup failed: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function bootstrapAssistant(localApiKey) {
+  const response = await fetch(`${API_BASE_URL}/assistant/bootstrap`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders(localApiKey),
+    },
+    body: JSON.stringify({ project_root: PROJECT_ROOT }),
+  });
+  if (!response.ok) {
+    throw new Error(`bootstrap failed: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function sendAssistantMessage(localApiKey, message) {
+  const response = await fetch(`${API_BASE_URL}/assistant/message`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders(localApiKey),
+    },
+    body: JSON.stringify({
+      message,
+      project_root: PROJECT_ROOT,
+      mode: "auto",
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`message failed: ${response.status}`);
+  }
+  return response.json();
+}
 ```
 
 ## UI가 표시해야 할 안전 상태

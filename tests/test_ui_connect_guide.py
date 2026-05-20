@@ -8,6 +8,9 @@ def test_ui_connect_guide_documents_connection_values() -> None:
     text = GUIDE.read_text(encoding="utf-8")
 
     for phrase in [
+        "LOCAL_AI_SERVER_URL=http://127.0.0.1:8000",
+        "LOCAL_AI_PROJECT_ROOT=/Users/juyoung/local-ai-server",
+        "LOCAL_AI_AUTH_HEADER=Authorization: Bearer <LOCAL_API_KEY>",
         "http://127.0.0.1:8000",
         "Authorization: Bearer <LOCAL_API_KEY>",
         "X-API-Key: <LOCAL_API_KEY>",
@@ -30,6 +33,23 @@ def test_ui_connect_guide_documents_startup_flow() -> None:
         "GET /project/api-inventory",
     ]:
         assert endpoint in text
+
+
+def test_ui_connect_guide_includes_copy_ready_fetch_example() -> None:
+    text = GUIDE.read_text(encoding="utf-8")
+
+    for phrase in [
+        "## Copy-ready fetch 예시",
+        'const API_BASE_URL = "http://127.0.0.1:8000";',
+        'const PROJECT_ROOT = "/Users/juyoung/local-ai-server";',
+        "function authHeaders(localApiKey)",
+        "loadAssistantStartup",
+        "bootstrapAssistant",
+        "sendAssistantMessage",
+        "Bearer ${localApiKey}",
+        'mode: "auto"',
+    ]:
+        assert phrase in text
 
 
 def test_ui_connect_guide_keeps_safety_boundaries_visible() -> None:
