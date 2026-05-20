@@ -13,6 +13,27 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert '"external_llm_api": "not-used"' in text
 
 
+def test_ui_bridge_examples_document_message_response_types() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+
+    for response_type in [
+        "answer",
+        "search_results",
+        "index_preview",
+        "needs_project_root",
+        "shell_dry_run",
+        "agent_plan",
+        "status",
+    ]:
+        assert f"type={response_type}" in text
+        assert f'"response_type": "{response_type}"' in text
+
+    assert '"would_execute": false' in text
+    assert '"requires_approval": true' in text
+    assert '"browser_interaction": "blocked"' in text
+    assert '"file_write_delete": "blocked"' in text
+
+
 def test_ui_bridge_examples_do_not_include_real_secret_shape() -> None:
     text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
 

@@ -257,6 +257,202 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
 }
 ```
 
+## Assistant Message Response Types
+
+`POST /assistant/message`는 `type`과 `ui.response_type`으로 UI 렌더링 방식을 알려준다.
+
+### `type=answer`
+
+문서 기반 답변 또는 일반 답변이다. `ui.display="message"`이므로 채팅 bubble로 렌더링한다.
+
+```json
+{
+  "type": "answer",
+  "answer": "문서 기준 답변입니다.",
+  "used_documents": true,
+  "sources": [
+    {
+      "document_id": 1,
+      "filename": "backend-notes.md",
+      "chunk_index": 0,
+      "chunk_id": 3
+    }
+  ],
+  "ui": {
+    "response_type": "answer",
+    "severity": "info",
+    "primary_text": "문서 기준 답변입니다.",
+    "display": "message"
+  }
+}
+```
+
+### `type=search_results`
+
+문서 chunk 검색 결과다. 결과 목록은 `data.results`에 들어가며 panel로 렌더링한다.
+
+```json
+{
+  "type": "search_results",
+  "answer": "2개 검색 결과를 찾았습니다.",
+  "data": {
+    "query": "JWT",
+    "results": [
+      {
+        "chunk_id": 3,
+        "document_id": 1,
+        "filename": "backend-notes.md",
+        "chunk_index": 0,
+        "content": "JWT 인증 흐름 요약...",
+        "score": 0.12
+      }
+    ]
+  },
+  "used_documents": true,
+  "ui": {
+    "response_type": "search_results",
+    "severity": "info",
+    "primary_text": "2개 검색 결과",
+    "display": "panel"
+  }
+}
+```
+
+### `type=index_preview`
+
+폴더 색인 미리보기다. 실제 저장, embedding, Chroma write를 수행하지 않는 preview로 표시한다.
+
+```json
+{
+  "type": "index_preview",
+  "answer": "색인 미리보기 완료: 파일 3개, 예상 chunk 12개입니다.",
+  "data": {
+    "folder_path": "/Users/example/project/notes",
+    "files_count": 3,
+    "chunks_estimated": 12,
+    "embedding_batches_estimated": 3
+  },
+  "safety": {
+    "folder_index": "preview-only via assistant",
+    "file_write_delete": "blocked"
+  },
+  "ui": {
+    "response_type": "index_preview",
+    "severity": "info",
+    "primary_text": "색인 미리보기 완료",
+    "display": "panel"
+  }
+}
+```
+
+### `type=needs_project_root`
+
+요청 처리에 project root가 필요한 상태다. UI는 project root 입력 또는 선택 UI를 보여준다.
+
+```json
+{
+  "type": "needs_project_root",
+  "answer": "폴더 색인 미리보기를 하려면 project_root가 필요합니다.",
+  "data": {
+    "required_field": "project_root"
+  },
+  "ui": {
+    "response_type": "needs_project_root",
+    "severity": "warning",
+    "primary_text": "project root 필요",
+    "display": "panel"
+  }
+}
+```
+
+### `type=shell_dry_run`
+
+shell 명령을 실행하지 않고 정책 판단만 반환한다. UI는 실제 실행 버튼을 활성화하지 않는다.
+
+```json
+{
+  "type": "shell_dry_run",
+  "answer": "이 명령은 dry-run 기준 허용 후보입니다.",
+  "data": {
+    "command": "pwd",
+    "status": "allowed_preview",
+    "would_execute": false,
+    "reason": "허용된 조회 명령입니다."
+  },
+  "safety": {
+    "shell_execution": "disabled",
+    "shell_dry_run": "allowed_preview"
+  },
+  "ui": {
+    "response_type": "shell_dry_run",
+    "severity": "info",
+    "primary_text": "allowed_preview",
+    "display": "panel"
+  }
+}
+```
+
+### `type=agent_plan`
+
+브라우저 조작, 파일 수정/삭제, shell 실행 같은 고위험 요청은 실제 실행 대신 계획으로만 기록된다.
+
+```json
+{
+  "type": "agent_plan",
+  "answer": "실행형 요청은 안전한 agent plan으로만 기록했습니다. 실제 shell/browser/file-write 실행은 하지 않았습니다.",
+  "data": {
+    "run_id": 1,
+    "status": "planned",
+    "actions": [
+      {
+        "action_type": "browser_interaction",
+        "risk_level": "high",
+        "requires_approval": true,
+        "status": "blocked"
+      }
+    ]
+  },
+  "safety": {
+    "shell_execution": "disabled",
+    "browser_interaction": "blocked",
+    "file_write_delete": "blocked"
+  },
+  "ui": {
+    "response_type": "agent_plan",
+    "severity": "warning",
+    "primary_text": "실행 대신 계획만 생성",
+    "display": "panel"
+  }
+}
+```
+
+### `type=status`
+
+현재 프로젝트 차수와 다음 안전 작업을 보여주는 상태 응답이다.
+
+```json
+{
+  "type": "status",
+  "answer": "현재 차수는 14차입니다.",
+  "data": {
+    "current_phase": {
+      "phase": 14,
+      "title": "Live browser UI QA",
+      "status": "next"
+    },
+    "safe_next_tasks": [
+      "Use GET /assistant/startup from the browser UI."
+    ]
+  },
+  "ui": {
+    "response_type": "status",
+    "severity": "info",
+    "primary_text": "14차",
+    "display": "panel"
+  }
+}
+```
+
 ## UI Rendering Notes
 
 - `ui.display="message"`는 채팅 bubble로 렌더링한다.
