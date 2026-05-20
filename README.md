@@ -440,6 +440,20 @@ local-ai next
 
 `local-ai status`는 완료 차수와 현재 차수를 함께 보여주고, `local-ai next`는 다음에 Codex가 계속 진행하기 좋은 안전 작업만 요약합니다. `project/status`와 `project/next`는 조회 전용 continuation endpoint이고, shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호됩니다. shell 실행, 파일 수정/삭제, 브라우저 interaction, 배포, fine-tuning 실행은 여전히 별도 승인 전 보류 항목으로 표시됩니다.
 
+지원 endpoint:
+
+- `GET /project/status`: 현재 완료 차수와 다음 안전 작업 조회
+- `GET /project/next`: 다음 작업 후보와 Recommended Next Model 조회
+- `GET /project/shell-policy`: shell dry-run 정책 조회
+- `POST /project/shell-dry-run`: 실제 실행 없이 shell 명령 후보의 정책 판단만 조회
+
+CLI 대응:
+
+- `local-ai status`
+- `local-ai next`
+- `local-ai shell-policy`
+- `local-ai shell-dry-run "pwd"`
+
 ## Local Assistant Automation
 
 `local-ai assistant`는 세션 안에서 짧은 요약과 온보딩 상태를 확인할 수 있습니다.

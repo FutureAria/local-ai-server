@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `164 passed` |
+| `.venv/bin/pytest` | `167 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -387,7 +387,14 @@
 - Codex가 바로 할 수 있는 안전 작업과 사용자 수동 확인 또는 별도 승인 후에만 진행할 작업을 분리했다.
 - `tests/test_next_chat_handoff.py`를 추가해 handoff 문서가 브라우저 조작 없이 진행하는 안전 작업, 최신 검증 gate, UI/release 문서 링크를 유지하는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_public_docs_contract.py tests/test_ui_qa_checklist.py tests/test_readme_ui_bridge.py` 결과는 `11 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `164 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `167 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### Assistant/project docs contract polish
+
+- README `Continuation Status` 섹션에 `GET /project/status`, `GET /project/next`, `GET /project/shell-policy`, `POST /project/shell-dry-run` endpoint와 CLI 대응을 명시했다.
+- `tests/test_public_docs_contract.py`를 확장해 assistant endpoint 전체, assistant CLI 전체, project continuation endpoint/CLI가 README, API 문서, PROJECT_SUMMARY에 모두 포함되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `8 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `167 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 

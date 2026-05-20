@@ -169,7 +169,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 
 1. `docs/UI_QA_CHECKLIST.md`와 `docs/UI_BRIDGE_EXAMPLES.md`의 endpoint/response field 정합성 점검
 2. `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 assistant endpoint와 CLI 목록 교차 검증
-3. `tests/test_public_docs_contract.py`, `tests/test_ui_qa_checklist.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 보강
+3. `tests/test_public_docs_contract.py`, `tests/test_ui_qa_checklist.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
 4. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
 5. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
 
@@ -196,7 +196,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `164 passed`
+  - `.venv/bin/pytest`: `167 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -227,6 +227,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `/assistant/startup`와 `local-ai assistant-startup`을 추가했다.
 - `/project/status`는 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA를 다음 단계로 표시한다.
 - `tests/test_next_chat_handoff.py`를 추가해 이 handoff가 브라우저 조작 없이 가능한 Codex 작업과 사용자 수동 확인 작업을 분리하는지 검증한다.
+- `tests/test_public_docs_contract.py`를 확장해 assistant endpoint/CLI 전체와 project continuation endpoint/CLI가 README/API/PROJECT_SUMMARY에 모두 문서화되어 있는지 검증한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함

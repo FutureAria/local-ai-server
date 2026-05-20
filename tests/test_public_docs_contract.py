@@ -33,6 +33,55 @@ CORE_CLI_COMMANDS = [
     "local-ai shell-dry-run",
 ]
 
+ASSISTANT_ENDPOINTS = [
+    "GET /assistant/capabilities",
+    "POST /assistant/action-preview",
+    "GET /assistant/ping",
+    "GET /assistant/config",
+    "GET /assistant/ui-contract",
+    "GET /assistant/startup",
+    "GET /assistant/status",
+    "GET /assistant/dashboard",
+    "POST /assistant/bootstrap",
+    "POST /assistant/sessions",
+    "GET /assistant/sessions",
+    "GET /assistant/sessions/{session_id}",
+    "GET /assistant/sessions/{session_id}/messages",
+    "POST /assistant/message",
+    "POST /assistant/project-root/validate",
+]
+
+ASSISTANT_CLI_COMMANDS = [
+    "local-ai assistant-capabilities",
+    "local-ai assistant-action-preview",
+    "local-ai assistant-ping",
+    "local-ai assistant-config",
+    "local-ai assistant-ui-contract",
+    "local-ai assistant-startup",
+    "local-ai assistant-status",
+    "local-ai assistant-dashboard",
+    "local-ai assistant-bootstrap",
+    "local-ai assistant-session",
+    "local-ai assistant-sessions",
+    "local-ai assistant-messages",
+    "local-ai assistant-message",
+    "local-ai assistant-root",
+]
+
+PROJECT_ENDPOINTS = [
+    "GET /project/status",
+    "GET /project/next",
+    "GET /project/shell-policy",
+    "POST /project/shell-dry-run",
+]
+
+PROJECT_CLI_COMMANDS = [
+    "local-ai status",
+    "local-ai next",
+    "local-ai shell-policy",
+    "local-ai shell-dry-run",
+]
+
 PUBLIC_DOC_LINKS = [
     "docs/API.md",
     "docs/UI_BRIDGE_EXAMPLES.md",
@@ -73,6 +122,38 @@ def test_core_cli_commands_are_documented_in_public_docs() -> None:
         assert command in readme, f"{command} missing from README"
         assert command in api, f"{command} missing from API docs"
         assert command in summary, f"{command} missing from project summary"
+
+
+def test_assistant_endpoints_are_documented_in_public_docs() -> None:
+    texts = {name: path.read_text(encoding="utf-8") for name, path in DOCS.items()}
+
+    for endpoint in ASSISTANT_ENDPOINTS:
+        assert endpoint in texts["readme"], f"{endpoint} missing from README"
+        assert endpoint in texts["api"], f"{endpoint} missing from API docs"
+        assert endpoint in texts["summary"], f"{endpoint} missing from project summary"
+
+
+def test_assistant_cli_commands_are_documented_in_public_docs() -> None:
+    texts = {name: path.read_text(encoding="utf-8") for name, path in DOCS.items()}
+
+    for command in ASSISTANT_CLI_COMMANDS:
+        assert command in texts["readme"], f"{command} missing from README"
+        assert command in texts["api"], f"{command} missing from API docs"
+        assert command in texts["summary"], f"{command} missing from project summary"
+
+
+def test_project_continuation_contract_is_documented_in_public_docs() -> None:
+    texts = {name: path.read_text(encoding="utf-8") for name, path in DOCS.items()}
+
+    for endpoint in PROJECT_ENDPOINTS:
+        assert endpoint in texts["readme"], f"{endpoint} missing from README"
+        assert endpoint in texts["api"], f"{endpoint} missing from API docs"
+        assert endpoint in texts["summary"], f"{endpoint} missing from project summary"
+
+    for command in PROJECT_CLI_COMMANDS:
+        assert command in texts["readme"], f"{command} missing from README"
+        assert command in texts["api"], f"{command} missing from API docs"
+        assert command in texts["summary"], f"{command} missing from project summary"
 
 
 def test_public_docs_keep_safety_boundaries_visible() -> None:
