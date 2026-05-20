@@ -58,6 +58,22 @@ class AssistantStatusResponse(BaseModel):
     safety: dict
 
 
+class AssistantBootstrapRequest(BaseModel):
+    project_root: str | None = Field(default=None, max_length=1024)
+    include_sessions: bool = True
+    sessions_limit: int = Field(default=10, ge=1, le=50)
+
+
+class AssistantBootstrapResponse(BaseModel):
+    service: str
+    capabilities: dict
+    status: dict
+    project_root: dict | None = None
+    sessions: dict | None = None
+    recommended_calls: list[dict]
+    ui: dict
+
+
 class AssistantMessageItem(BaseModel):
     id: int
     role: str
@@ -85,6 +101,7 @@ class AssistantMessageResponse(BaseModel):
     sources: list[dict] = Field(default_factory=list)
     request_id: str | None = None
     safety: dict
+    ui: dict = Field(default_factory=dict)
 
 
 class ProjectRootValidateRequest(BaseModel):

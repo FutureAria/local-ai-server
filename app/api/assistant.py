@@ -5,6 +5,8 @@ from app.api.dependencies import get_assistant_service, require_api_key
 from app.db.database import get_db
 from app.schemas.assistant import (
     AssistantCapabilitiesResponse,
+    AssistantBootstrapRequest,
+    AssistantBootstrapResponse,
     AssistantMessageRequest,
     AssistantMessageResponse,
     AssistantSessionCreateRequest,
@@ -34,6 +36,20 @@ def assistant_status(
     assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> dict:
     return assistant_service.status(db)
+
+
+@router.post("/bootstrap", response_model=AssistantBootstrapResponse)
+def assistant_bootstrap(
+    request: AssistantBootstrapRequest,
+    db: Session = Depends(get_db),
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.bootstrap(
+        db,
+        project_root=request.project_root,
+        include_sessions=request.include_sessions,
+        sessions_limit=request.sessions_limit,
+    )
 
 
 @router.post("/sessions", response_model=AssistantSessionResponse)

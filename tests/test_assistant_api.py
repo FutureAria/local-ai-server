@@ -27,7 +27,7 @@ class FakeAssistantService:
     def status(self, db):
         return {
             "service": "local-ai-server",
-            "current_phase": {"phase": 7, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "current_phase": {"phase": 9, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
             "documents": {
                 "documents_count": 1,
                 "chunks_count": 2,
@@ -42,6 +42,30 @@ class FakeAssistantService:
             },
             "sessions": {"sessions_count": 1, "messages_count": 2},
             "safety": {"shell_execution": "disabled"},
+        }
+
+    def bootstrap(self, db, project_root=None, include_sessions=True, sessions_limit=10):
+        return {
+            "service": "local-ai-server",
+            "capabilities": self.capabilities(),
+            "status": self.status(db),
+            "project_root": {
+                "project_root": project_root,
+                "resolved_path": project_root,
+                "safe_for_read_only_agent": True,
+            }
+            if project_root
+            else None,
+            "sessions": self.list_sessions(db, limit=sessions_limit, offset=0) if include_sessions else None,
+            "recommended_calls": [
+                {"method": "POST", "path": "/assistant/message", "when": "user sends a message"}
+            ],
+            "ui": {
+                "ready": True,
+                "badge": "LOCAL API READY",
+                "message": "로컬 assistant API가 준비되었습니다.",
+                "blocked_actions": ["shell_execution", "browser_interaction"],
+            },
         }
 
     def create_session(self, db, title=None, project_root=None):
@@ -105,6 +129,7 @@ class FakeAssistantService:
                 "browser_interaction": "blocked",
                 "file_write_delete": "blocked",
             },
+            "ui": {"response_type": "answer", "severity": "info", "primary_text": "assistant", "display": "message"},
         }
 
     def validate_project_root(self, request):
@@ -145,6 +170,25 @@ def test_assistant_status_endpoint_with_mock() -> None:
     assert body["sessions"]["messages_count"] == 2
 
 
+def test_assistant_bootstrap_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.post(
+        "/assistant/bootstrap",
+        json={"project_root": "/tmp/project", "include_sessions": True, "sessions_limit": 5},
+    )
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["capabilities"]["endpoints"]["message"] == "POST /assistant/message"
+    assert body["status"]["current_phase"]["phase"] == 9
+    assert body["project_root"]["safe_for_read_only_agent"] is True
+    assert body["sessions"]["limit"] == 5
+    assert body["ui"]["ready"] is True
+
+
 def test_assistant_session_endpoints_with_mock() -> None:
     app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
     client = TestClient(app)
@@ -183,6 +227,7 @@ def test_assistant_message_endpoint_with_mock() -> None:
     assert body["used_documents"] is True
     assert body["sources"][0]["chunk_id"] == 3
     assert body["safety"]["shell_execution"] == "disabled"
+    assert body["ui"]["response_type"] == "answer"
 
 
 def test_assistant_project_root_validate_endpoint_with_mock() -> None:

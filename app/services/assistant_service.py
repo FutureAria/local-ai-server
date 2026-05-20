@@ -50,6 +50,8 @@ class AssistantService:
                 "web_fetch_enabled": self.settings.agent_web_fetch_enabled,
             },
             "endpoints": {
+                "bootstrap": "POST /assistant/bootstrap",
+                "status": "GET /assistant/status",
                 "message": "POST /assistant/message",
                 "create_session": "POST /assistant/sessions",
                 "list_sessions": "GET /assistant/sessions",
@@ -86,6 +88,37 @@ class AssistantService:
                 "messages_count": messages_count,
             },
             "safety": _safety(),
+        }
+
+    def bootstrap(
+        self,
+        db: Session,
+        project_root: str | None = None,
+        include_sessions: bool = True,
+        sessions_limit: int = 10,
+    ) -> dict:
+        root_status = None
+        if project_root:
+            root_status = self.validate_project_root(ProjectRootValidateRequest(project_root=project_root))
+        sessions = self.list_sessions(db, limit=sessions_limit, offset=0) if include_sessions else None
+        return {
+            "service": self.settings.service_name,
+            "capabilities": self.capabilities(),
+            "status": self.status(db),
+            "project_root": root_status,
+            "sessions": sessions,
+            "recommended_calls": [
+                {"method": "POST", "path": "/assistant/project-root/validate", "when": "project_root input changes"},
+                {"method": "POST", "path": "/assistant/sessions", "when": "new chat starts"},
+                {"method": "POST", "path": "/assistant/message", "when": "user sends a message"},
+                {"method": "GET", "path": "/assistant/sessions", "when": "refresh session sidebar"},
+            ],
+            "ui": {
+                "ready": True,
+                "badge": "LOCAL API READY",
+                "message": "로컬 assistant API가 준비되었습니다.",
+                "blocked_actions": ["shell_execution", "browser_interaction", "file_write_delete"],
+            },
         }
 
     def create_session(self, db: Session, title: str | None = None, project_root: str | None = None) -> AssistantSession:
@@ -162,6 +195,7 @@ class AssistantService:
                 "sources": [],
                 "request_id": str(chat_log.id),
                 "safety": _safety(),
+                "ui": _ui("answer", "info", chat_log.answer),
             }
         elif intent == "ask_with_docs":
             chat_log = await self.rag_service.ask_with_docs(
@@ -179,6 +213,7 @@ class AssistantService:
                 "sources": sources,
                 "request_id": str(chat_log.id),
                 "safety": _safety(),
+                "ui": _ui("answer", "info", chat_log.answer),
             }
         elif intent == "search":
             results = await self.search_service.search(_clean_search_query(request.message), top_k=request.top_k)
@@ -190,6 +225,7 @@ class AssistantService:
                 "used_documents": True,
                 "sources": _sources_from_results(results),
                 "safety": _safety(),
+                "ui": _ui("search_results", "info", f"{len(results)}개 검색 결과"),
             }
         elif intent == "index_preview":
             folder_path = request.project_root or session.project_root or _extract_path(request.message)
@@ -200,6 +236,7 @@ class AssistantService:
                     "answer": "폴더 색인 미리보기를 하려면 project_root가 필요합니다.",
                     "data": {"required_field": "project_root"},
                     "safety": _safety(),
+                    "ui": _ui("needs_project_root", "warning", "project root 필요"),
                 }
             else:
                 preview = self.document_service.preview_index_folder(folder_path, recursive=True)
@@ -209,6 +246,7 @@ class AssistantService:
                     "answer": f"색인 미리보기 완료: 파일 {preview['files_count']}개, 예상 chunk {preview['chunks_estimated']}개입니다.",
                     "data": preview,
                     "safety": _safety(),
+                    "ui": _ui("index_preview", "info", "색인 미리보기 완료"),
                 }
         elif intent == "shell_dry_run":
             command = _extract_shell_command(request.message)
@@ -219,6 +257,7 @@ class AssistantService:
                 "answer": result["reason"],
                 "data": result,
                 "safety": _safety(shell_status=result["status"]),
+                "ui": _ui("shell_dry_run", "warning" if result["status"] == "blocked" else "info", result["status"]),
             }
         elif intent == "agent_plan":
             run = self.agent_service.create_plan(db, request.message)
@@ -228,6 +267,7 @@ class AssistantService:
                 "answer": "실행형 요청은 안전한 agent plan으로만 기록했습니다. 실제 shell/browser/file-write 실행은 하지 않았습니다.",
                 "data": self.agent_service.to_response(run),
                 "safety": _safety(),
+                "ui": _ui("agent_plan", "warning", "실행 대신 계획만 생성"),
             }
         else:
             status = get_project_status()
@@ -237,6 +277,7 @@ class AssistantService:
                 "answer": f"현재 차수는 {status['current_phase']['phase']}차입니다.",
                 "data": status,
                 "safety": _safety(),
+                "ui": _ui("status", "info", f"{status['current_phase']['phase']}차"),
             }
 
         self._record_message(db, session, "assistant", response.get("answer") or "", response["type"], response)
@@ -338,6 +379,15 @@ def _safety(shell_status: str = "blocked") -> dict:
         "file_write_delete": "blocked",
         "folder_index": "preview-only via assistant",
         "external_llm_api": "not-used",
+    }
+
+
+def _ui(response_type: str, severity: str, primary_text: str) -> dict:
+    return {
+        "response_type": response_type,
+        "severity": severity,
+        "primary_text": primary_text[:160],
+        "display": "message" if response_type == "answer" else "panel",
     }
 
 

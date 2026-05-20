@@ -40,6 +40,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
 - `GET /assistant/status`
+- `POST /assistant/bootstrap`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
@@ -185,6 +186,30 @@ curl http://127.0.0.1:8000/assistant/status
 - `sessions`
 - `safety`
 
+### `POST /assistant/bootstrap`
+
+브라우저 UI 시작 흐름에서 필요한 capabilities, status, project root 검증 결과, 최근 session 목록, UI 표시 힌트를 한 번에 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/bootstrap \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_root":"/Users/juyoung/local-ai-server",
+    "include_sessions":true,
+    "sessions_limit":10
+  }'
+```
+
+응답 핵심 필드:
+
+- `capabilities`
+- `status`
+- `project_root`
+- `sessions`
+- `recommended_calls`
+- `ui.ready`
+- `ui.blocked_actions`
+
 ### `POST /assistant/sessions`
 
 assistant 대화 세션을 생성한다.
@@ -240,6 +265,7 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 - `sources`
 - `request_id`
 - `safety`
+- `ui`
 
 안전 기준:
 
@@ -619,6 +645,7 @@ local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-status
+local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
 local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server

@@ -249,6 +249,16 @@ def assistant_status() -> None:
     _print_json(_request_json("get", "/assistant/status", headers=_headers()))
 
 
+@app.command("assistant-bootstrap")
+def assistant_bootstrap(project_root: str | None = None, include_sessions: bool = True, sessions_limit: int = 10) -> None:
+    payload = {
+        "project_root": project_root,
+        "include_sessions": include_sessions,
+        "sessions_limit": sessions_limit,
+    }
+    _print_json(_request_json("post", "/assistant/bootstrap", json=payload, headers=_headers()))
+
+
 @app.command("assistant-session")
 def assistant_session(title: str | None = None, project_root: str | None = None) -> None:
     payload = {"title": title, "project_root": project_root}

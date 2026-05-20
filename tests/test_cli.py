@@ -35,7 +35,7 @@ class FakeClient:
             return FakeResponse(
                 {
                     "current_phase": {
-                        "phase": 8,
+                        "phase": 9,
                         "title": "Live browser UI QA",
                         "status": "next",
                         "summary": "Exercise browser UI.",
@@ -76,6 +76,18 @@ class FakeClient:
             )
         if url.endswith("/project/shell-dry-run"):
             return FakeResponse({"status": "allowed_preview", "would_execute": False})
+        if url.endswith("/assistant/bootstrap"):
+            return FakeResponse(
+                {
+                    "service": "local-ai-server",
+                    "capabilities": {"endpoints": {"message": "POST /assistant/message"}},
+                    "status": {"current_phase": {"phase": 9}},
+                    "project_root": {"safe_for_read_only_agent": True},
+                    "sessions": {"sessions": []},
+                    "recommended_calls": [],
+                    "ui": {"ready": True, "badge": "LOCAL API READY"},
+                }
+            )
         if url.endswith("/assistant/sessions"):
             return FakeResponse({"session_id": "session-1"})
         if url.endswith("/assistant/message"):
@@ -129,9 +141,9 @@ def test_cli_status_and_next_show_phase(monkeypatch) -> None:
 
     assert status_result.exit_code == 0
     assert next_result.exit_code == 0
-    assert "현재 차수: 8차" in status_result.output
+    assert "현재 차수: 9차" in status_result.output
     assert "Recommended Next Model" in status_result.output
-    assert "다음 차수: 8차" in next_result.output
+    assert "다음 차수: 9차" in next_result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
         {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
@@ -191,6 +203,7 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
 
     capabilities_result = CliRunner().invoke(cli_main.app, ["assistant-capabilities"])
     status_result = CliRunner().invoke(cli_main.app, ["assistant-status"])
+    bootstrap_result = CliRunner().invoke(cli_main.app, ["assistant-bootstrap", "--project-root", "/tmp/project"])
     session_result = CliRunner().invoke(
         cli_main.app,
         ["assistant-session", "--title", "Demo", "--project-root", "/tmp/project"],
@@ -215,6 +228,7 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
 
     assert capabilities_result.exit_code == 0
     assert status_result.exit_code == 0
+    assert bootstrap_result.exit_code == 0
     assert session_result.exit_code == 0
     assert sessions_result.exit_code == 0
     assert message_result.exit_code == 0
@@ -229,6 +243,12 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
         {
             "method": "GET",
             "url": "http://127.0.0.1:8000/assistant/status",
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/bootstrap",
+            "json": {"project_root": "/tmp/project", "include_sessions": True, "sessions_limit": 10},
             "headers": {"X-API-Key": "secret"},
         },
         {

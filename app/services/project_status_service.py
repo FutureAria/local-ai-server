@@ -43,13 +43,20 @@ PROJECT_PHASES = [
     },
     {
         "phase": 8,
+        "title": "UI bootstrap contract",
+        "status": "done",
+        "summary": "Assistant bootstrap endpoint and CLI command for browser UI startup contract.",
+    },
+    {
+        "phase": 9,
         "title": "Live browser UI QA",
         "status": "next",
-        "summary": "Exercise the connected browser UI against the local assistant API and refine response contracts.",
+        "summary": "Exercise the connected browser UI against the local assistant API and refine rendering details.",
     },
 ]
 
 SAFE_NEXT_TASKS = [
+    "Call POST /assistant/bootstrap from the browser UI startup flow and confirm token/project-root/session rendering.",
     "Send a real browser UI message to POST /assistant/message and confirm CORS/auth/response rendering.",
     "Load GET /assistant/status in the UI and confirm dashboard rendering.",
     "Check GET /assistant/sessions in the UI after a few messages.",
