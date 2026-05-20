@@ -260,10 +260,13 @@ local-ai feedbacks --limit 20 --offset 0
 local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"
 local-ai agent-runs --limit 20 --offset 0
 local-ai agent-run 1
+local-ai agent-actions 1
+local-ai agent-dry-run 1
 local-ai agent-results 1
 local-ai agent-approve 1
 local-ai agent-reject 1
 local-ai agent-execute 1
+local-ai agent-shell
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -309,6 +312,8 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
 - `GET /agent/runs/{run_id}/results`
+- `GET /agent/runs/{run_id}/actions`
+- `POST /agent/runs/{run_id}/dry-run`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
@@ -349,13 +354,18 @@ CLI:
 local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"
 local-ai agent-runs
 local-ai agent-run 1
+local-ai agent-actions 1
+local-ai agent-dry-run 1
 local-ai agent-results 1
 local-ai agent-approve 1
 local-ai agent-reject 1
 local-ai agent-execute 1
+local-ai agent-shell
 ```
 
-현재 이 API는 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 상태를 반환합니다. `agent-approve`는 상태를 `approved_pending_execution`으로 바꾸고, `agent-execute`는 승인된 run만 실행 시도합니다.
+현재 이 API는 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 상태를 반환합니다. `agent-dry-run`은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 실행 전 정책 판단만 기록합니다. `agent-approve`는 상태를 `approved_pending_execution`으로 바꾸고, `agent-execute`는 승인된 run만 실행 시도합니다.
+
+`agent-shell`은 Codex/Claude CLI처럼 터미널을 열어 사용하는 얇은 대화형 CLI입니다. 일반 문장을 입력하면 agent plan을 만들고, `/runs`, `/run 1`, `/actions 1`, `/dry-run 1`, `/approve 1`, `/execute 1`, `/results 1` 같은 명령으로 같은 FastAPI 백엔드를 호출합니다.
 
 기본값에서는 `AGENT_EXECUTION_ENABLED=false`라 모든 실제 실행이 차단됩니다. `true`로 바꿔도 현재 v1 실행 엔진은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원합니다. 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자는 차단합니다. 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 아직 수행하지 않습니다.
 

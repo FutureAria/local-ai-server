@@ -30,6 +30,8 @@ X-API-Key: <LOCAL_API_KEY>
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
 - `GET /agent/runs/{run_id}/results`
+- `GET /agent/runs/{run_id}/actions`
+- `POST /agent/runs/{run_id}/dry-run`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
@@ -364,6 +366,22 @@ agent plan 상세를 조회한다.
 curl http://127.0.0.1:8000/agent/runs/1
 ```
 
+### `GET /agent/runs/{run_id}/actions`
+
+agent action별 상태, dry-run 결과, execution 결과를 함께 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/agent/runs/1/actions
+```
+
+### `POST /agent/runs/{run_id}/dry-run`
+
+실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 실행 전 정책 판단만 기록한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/runs/1/dry-run
+```
+
 ### `POST /agent/runs/{run_id}/approve`
 
 agent plan을 승인 상태로 바꾼다. 상태는 `approved_pending_execution`이 되며, 실제 실행은 별도 `execute` 호출에서만 시도한다.
@@ -431,9 +449,12 @@ local-ai feedbacks
 local-ai agent-plan "GitHub 웹 열어줘"
 local-ai agent-runs
 local-ai agent-run 1
+local-ai agent-actions 1
+local-ai agent-dry-run 1
 local-ai agent-results 1
 local-ai agent-approve 1
 local-ai agent-reject 1
 local-ai agent-execute 1
+local-ai agent-shell
 local-ai export-sft --output data/sft_dataset.jsonl
 ```

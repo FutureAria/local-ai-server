@@ -35,6 +35,21 @@ def _print_response(response: httpx.Response) -> None:
     typer.echo(json.dumps(response.json(), ensure_ascii=False, indent=2))
 
 
+def _request_json(method: str, path: str, **kwargs) -> dict | list:
+    with httpx.Client(timeout=120.0) as client:
+        response = getattr(client, method)(f"{_base_url()}{path}", **kwargs)
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        typer.echo(f"HTTP {exc.response.status_code}: {exc.response.text}", err=True)
+        raise typer.Exit(code=1) from exc
+    return response.json()
+
+
+def _print_json(payload: dict | list) -> None:
+    typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
 @app.command()
 def health() -> None:
     with httpx.Client(timeout=30.0) as client:
@@ -192,6 +207,89 @@ def agent_run(run_id: int) -> None:
 def agent_results(run_id: int) -> None:
     with httpx.Client(timeout=30.0) as client:
         _print_response(client.get(f"{_base_url()}/agent/runs/{run_id}/results", headers=_headers()))
+
+
+@app.command("agent-actions")
+def agent_actions(run_id: int) -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.get(f"{_base_url()}/agent/runs/{run_id}/actions", headers=_headers()))
+
+
+@app.command("agent-dry-run")
+def agent_dry_run(run_id: int) -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.post(f"{_base_url()}/agent/runs/{run_id}/dry-run", headers=_headers()))
+
+
+@app.command("agent-shell")
+def agent_shell() -> None:
+    typer.echo("local-ai agent shell. 질문을 입력하면 agent plan을 만들고, /help로 명령을 봅니다.")
+    while True:
+        try:
+            command = typer.prompt("local-ai")
+        except (EOFError, KeyboardInterrupt):
+            typer.echo()
+            break
+
+        command = command.strip()
+        if not command:
+            continue
+        if command in {"/quit", "/exit", "quit", "exit"}:
+            break
+        if command == "/help":
+            typer.echo(
+                "\n".join(
+                    [
+                        "일반 문장: agent plan 생성",
+                        "/runs",
+                        "/run <id>",
+                        "/actions <id>",
+                        "/dry-run <id>",
+                        "/approve <id>",
+                        "/reject <id>",
+                        "/execute <id>",
+                        "/results <id>",
+                        "/quit",
+                    ]
+                )
+            )
+            continue
+
+        try:
+            payload = _agent_shell_dispatch(command)
+        except ValueError as exc:
+            typer.echo(str(exc), err=True)
+            continue
+        _print_json(payload)
+
+
+def _agent_shell_dispatch(command: str) -> dict | list:
+    parts = command.split(maxsplit=1)
+    name = parts[0]
+    value = parts[1] if len(parts) > 1 else ""
+
+    if name == "/runs":
+        return _request_json("get", "/agent/runs", headers=_headers())
+    if name in {"/run", "/actions", "/dry-run", "/approve", "/reject", "/execute", "/results"}:
+        if not value.isdigit():
+            raise ValueError(f"{name} 명령에는 숫자 run_id가 필요합니다.")
+        run_id = int(value)
+        if name == "/run":
+            return _request_json("get", f"/agent/runs/{run_id}", headers=_headers())
+        if name == "/actions":
+            return _request_json("get", f"/agent/runs/{run_id}/actions", headers=_headers())
+        if name == "/dry-run":
+            return _request_json("post", f"/agent/runs/{run_id}/dry-run", headers=_headers())
+        if name == "/approve":
+            return _request_json("post", f"/agent/runs/{run_id}/approve", headers=_headers())
+        if name == "/reject":
+            return _request_json("post", f"/agent/runs/{run_id}/reject", headers=_headers())
+        if name == "/execute":
+            return _request_json("post", f"/agent/runs/{run_id}/execute", headers=_headers())
+        if name == "/results":
+            return _request_json("get", f"/agent/runs/{run_id}/results", headers=_headers())
+
+    return _request_json("post", "/agent/plan", json={"instruction": command}, headers=_headers())
 
 
 @app.command("agent-approve")

@@ -30,6 +30,8 @@ class FakeSearchService:
         ("get", "/agent/runs", {}),
         ("get", "/agent/runs/1", {}),
         ("get", "/agent/runs/1/results", {}),
+        ("get", "/agent/runs/1/actions", {}),
+        ("post", "/agent/runs/1/dry-run", {}),
         ("post", "/agent/runs/1/approve", {}),
         ("post", "/agent/runs/1/reject", {}),
         ("post", "/agent/runs/1/execute", {}),

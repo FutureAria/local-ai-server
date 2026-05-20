@@ -30,6 +30,8 @@
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
 - `GET /agent/runs/{run_id}/results`
+- `GET /agent/runs/{run_id}/actions`
+- `POST /agent/runs/{run_id}/dry-run`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
@@ -84,6 +86,8 @@
 ## Agent 안전 기준
 
 - `/agent/plan`은 preview-only 계획 생성만 수행한다.
+- `/agent/runs/{run_id}/dry-run`은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 정책 판단만 기록한다.
+- `/agent/runs/{run_id}/actions`는 action별 상태와 dry-run/execution 결과를 조회한다.
 - `/agent/runs/{run_id}/approve`는 승인 상태만 기록하고 실제 실행은 수행하지 않는다.
 - `/agent/runs/{run_id}/reject`는 거절 상태만 기록한다.
 - `/agent/runs/{run_id}/execute`는 승인된 run만 실행 시도한다.

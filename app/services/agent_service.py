@@ -105,6 +105,27 @@ class AgentService:
         db.refresh(run)
         return run
 
+    def dry_run(self, db: Session, run_id: int) -> AgentRun | None:
+        run = self.get_run(db, run_id)
+        if run is None:
+            return None
+        if run.status in {"rejected", "completed"}:
+            raise ValueError("거절되었거나 완료된 agent run은 dry-run할 수 없습니다.")
+
+        plan = json.loads(run.plan_json)
+        dry_run_results = []
+        for action in plan["actions"]:
+            result = self._dry_run_action(action)
+            result["action_index"] = len(dry_run_results)
+            dry_run_results.append(result)
+
+        plan["dry_run_results"] = dry_run_results
+        plan["note"] = "dry-run 결과를 기록했습니다. dry-run은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작을 수행하지 않습니다."
+        run.plan_json = json.dumps(plan, ensure_ascii=False)
+        db.commit()
+        db.refresh(run)
+        return run
+
     def to_response(self, run: AgentRun) -> dict:
         plan = json.loads(run.plan_json)
         return {
@@ -132,6 +153,7 @@ class AgentService:
             **self.to_summary(run),
             "instruction": run.instruction,
             "actions": plan["actions"],
+            "dry_run_results": plan.get("dry_run_results", []),
             "execution_results": plan.get("execution_results", []),
         }
 
@@ -141,6 +163,30 @@ class AgentService:
             return None
         plan = json.loads(run.plan_json)
         return plan.get("execution_results", [])
+
+    def get_actions(self, db: Session, run_id: int) -> list[dict] | None:
+        run = self.get_run(db, run_id)
+        if run is None:
+            return None
+        plan = json.loads(run.plan_json)
+        dry_run_by_index = {
+            result.get("action_index"): result for result in plan.get("dry_run_results", [])
+        }
+        execution_by_index = {
+            result.get("action_index"): result for result in plan.get("execution_results", [])
+        }
+        actions = []
+        for index, action in enumerate(plan["actions"]):
+            actions.append(
+                {
+                    "action_index": index,
+                    **action,
+                    "status": _action_status(index, dry_run_by_index, execution_by_index),
+                    "dry_run_result": dry_run_by_index.get(index),
+                    "execution_result": execution_by_index.get(index),
+                }
+            )
+        return actions
 
     def _plan_actions(self, instruction: str) -> list[dict]:
         lowered = instruction.lower()
@@ -233,6 +279,175 @@ class AgentService:
             "action": action["action"],
             "status": "blocked",
             "message": "이 도구의 실제 실행기는 아직 연결되지 않았습니다. allowlist와 sandbox 정책이 필요합니다.",
+        }
+
+    def _dry_run_action(self, action: dict) -> dict:
+        if action["tool"] == "rag":
+            return {
+                "tool": action["tool"],
+                "action": action["action"],
+                "status": "allowed",
+                "execution_mode": "no_tool_execution",
+                "requires_approval": False,
+                "would_execute": False,
+                "message": "지식형 요청입니다. 별도 로컬 실행 도구 없이 처리할 수 있습니다.",
+            }
+
+        if action["tool"] == "file":
+            return self._dry_run_file_action(action)
+        if action["tool"] in {"browser", "web_search"}:
+            return self._dry_run_web_action(action)
+        if action["tool"] == "shell":
+            return {
+                "tool": action["tool"],
+                "action": action["action"],
+                "status": "disabled",
+                "execution_mode": "blocked_shell",
+                "requires_approval": True,
+                "would_execute": False,
+                "message": "shell 실행기는 2차 A단계에서 비활성화되어 있습니다. 명령 실행은 수행하지 않습니다.",
+            }
+
+        return {
+            "tool": action["tool"],
+            "action": action["action"],
+            "status": "disabled",
+            "execution_mode": "unsupported_tool",
+            "requires_approval": True,
+            "would_execute": False,
+            "message": "지원하지 않는 agent tool입니다.",
+        }
+
+    def _dry_run_file_action(self, action: dict) -> dict:
+        base = {
+            "tool": action["tool"],
+            "action": action["action"],
+            "requires_approval": True,
+            "execution_mode": "read_only_file_preview",
+            "would_execute": bool(self.settings.agent_execution_enabled),
+        }
+        if not self.settings.agent_execution_enabled:
+            return {
+                **base,
+                "status": "disabled",
+                "would_execute": False,
+                "message": "AGENT_EXECUTION_ENABLED=false 상태라 실제 파일/폴더 접근은 차단됩니다.",
+            }
+
+        requested_path = _extract_path(action["target"]) or "."
+        try:
+            resolved_path = Path(requested_path).expanduser().resolve()
+        except RuntimeError:
+            return {**base, "status": "blocked", "would_execute": False, "message": "요청 경로를 해석할 수 없습니다."}
+
+        allowed_roots = _allowed_roots(self.settings.agent_allowed_roots)
+        if not any(_is_relative_to(resolved_path, root) for root in allowed_roots):
+            return {
+                **base,
+                "status": "blocked",
+                "would_execute": False,
+                "path": str(resolved_path),
+                "message": "허용된 root 밖의 파일/폴더 접근은 실행 전 정책에서 차단됩니다.",
+            }
+        if not resolved_path.exists():
+            return {
+                **base,
+                "status": "blocked",
+                "would_execute": False,
+                "path": str(resolved_path),
+                "message": "요청한 파일/폴더가 존재하지 않아 실행할 수 없습니다.",
+            }
+        if _is_sensitive_path(resolved_path):
+            return {
+                **base,
+                "status": "blocked",
+                "would_execute": False,
+                "path": str(resolved_path),
+                "message": "민감 파일 또는 민감 폴더로 보여 실행 전 정책에서 차단됩니다.",
+            }
+        if resolved_path.is_dir():
+            return {
+                **base,
+                "status": "allowed",
+                "path": str(resolved_path),
+                "operation": "list_directory",
+                "message": "허용 root 안의 폴더 목록을 read-only로 조회할 수 있습니다.",
+            }
+
+        extension = resolved_path.suffix.lower()
+        allowed_extensions = _csv_set(self.settings.agent_file_preview_extensions)
+        if extension not in allowed_extensions:
+            return {
+                **base,
+                "status": "blocked",
+                "would_execute": False,
+                "path": str(resolved_path),
+                "operation": "preview_file",
+                "message": f"파일 preview가 허용되지 않은 확장자입니다: {extension or '(no extension)'}",
+            }
+        size_bytes = resolved_path.stat().st_size
+        if size_bytes > self.settings.agent_file_preview_max_bytes:
+            return {
+                **base,
+                "status": "blocked",
+                "would_execute": False,
+                "path": str(resolved_path),
+                "operation": "preview_file",
+                "size_bytes": size_bytes,
+                "message": "파일이 AGENT_FILE_PREVIEW_MAX_BYTES보다 커서 실행 전 정책에서 차단됩니다.",
+            }
+        return {
+            **base,
+            "status": "allowed",
+            "path": str(resolved_path),
+            "operation": "preview_file",
+            "extension": extension,
+            "size_bytes": size_bytes,
+            "message": "허용 root 안의 텍스트 파일을 read-only로 preview할 수 있습니다.",
+        }
+
+    def _dry_run_web_action(self, action: dict) -> dict:
+        base = {
+            "tool": action["tool"],
+            "action": action["action"],
+            "requires_approval": True,
+            "execution_mode": "read_only_url_fetch",
+            "would_execute": bool(self.settings.agent_execution_enabled and self.settings.agent_web_fetch_enabled),
+        }
+        url = _extract_url(action["target"])
+        if not url:
+            return {
+                **base,
+                "status": "blocked",
+                "would_execute": False,
+                "message": "명시적인 http 또는 https URL이 없어 URL fetch를 실행할 수 없습니다.",
+            }
+        parsed = urlparse(url)
+        if parsed.scheme not in {"http", "https"}:
+            return {**base, "status": "blocked", "would_execute": False, "url": url, "message": "http/https URL만 허용합니다."}
+        if not self.settings.agent_execution_enabled:
+            return {
+                **base,
+                "status": "disabled",
+                "would_execute": False,
+                "url": url,
+                "message": "AGENT_EXECUTION_ENABLED=false 상태라 URL fetch가 차단됩니다.",
+            }
+        if not self.settings.agent_web_fetch_enabled:
+            return {
+                **base,
+                "status": "disabled",
+                "would_execute": False,
+                "url": url,
+                "message": "AGENT_WEB_FETCH_ENABLED=false 상태라 URL fetch가 차단됩니다.",
+            }
+        return {
+            **base,
+            "status": "allowed",
+            "url": url,
+            "operation": "fetch_url_preview",
+            "max_bytes": self.settings.agent_web_fetch_max_bytes,
+            "message": "명시 URL을 read-only로 fetch할 수 있습니다. 브라우저 클릭/로그인/입력은 수행하지 않습니다.",
         }
 
     def _execute_file_action(self, action: dict) -> dict:
@@ -390,6 +605,15 @@ def _blocked_result(action: dict, message: str) -> dict:
         "status": "blocked",
         "message": message,
     }
+
+
+def _action_status(index: int, dry_run_by_index: dict, execution_by_index: dict) -> str:
+    if index in execution_by_index:
+        return execution_by_index[index].get("status", "executed")
+    if index in dry_run_by_index:
+        dry_status = dry_run_by_index[index].get("status", "dry_run")
+        return f"dry_run_{dry_status}"
+    return "pending"
 
 
 def _allowed_roots(value: str) -> list[Path]:

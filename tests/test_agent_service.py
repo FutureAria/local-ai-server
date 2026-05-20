@@ -224,6 +224,50 @@ def test_agent_service_execute_blocks_web_fetch_by_default(tmp_path) -> None:
         assert "AGENT_WEB_FETCH_ENABLED=false" in detail["execution_results"][0]["message"]
 
 
+def test_agent_service_dry_run_records_policy_without_execution(tmp_path) -> None:
+    allowed = tmp_path / "allowed"
+    allowed.mkdir()
+    note = allowed / "note.md"
+    note.write_text("# Note\nsecret-looking text is not read in dry-run", encoding="utf-8")
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(
+        settings=Settings(
+            AGENT_EXECUTION_ENABLED=True,
+            AGENT_ALLOWED_ROOTS=str(allowed),
+        )
+    )
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, f"파일 '{note}' 읽어줘")
+        dry_run = service.dry_run(db, run.id)
+        detail = service.to_detail(dry_run)
+        actions = service.get_actions(db, run.id)
+
+        result = detail["execution_results"]
+        assert result == []
+        assert actions[0]["status"] == "dry_run_allowed"
+        assert actions[0]["dry_run_result"]["operation"] == "preview_file"
+        assert "content_preview" not in actions[0]["dry_run_result"]
+
+
+def test_agent_service_dry_run_marks_shell_disabled(tmp_path) -> None:
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(settings=Settings(AGENT_EXECUTION_ENABLED=True))
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, "터미널 명령 실행해줘")
+        dry_run = service.dry_run(db, run.id)
+        actions = service.get_actions(db, dry_run.id)
+
+        assert actions[0]["tool"] == "shell"
+        assert actions[0]["status"] == "dry_run_disabled"
+        assert actions[0]["dry_run_result"]["would_execute"] is False
+
+
 def test_agent_html_summary_extracts_title_text_and_links() -> None:
     summary = _extract_html_summary(
         """

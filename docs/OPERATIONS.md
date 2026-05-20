@@ -10,6 +10,7 @@
 - `LOCAL_API_KEY`를 설정한 경우 보호 endpoint에는 `X-API-Key`를 사용한다.
 - `LOCAL_RATE_LIMIT_PER_MINUTE`로 보호 endpoint의 process-local in-memory rate limit을 조정한다. 기본값은 `120`이고, `0`이면 비활성화된다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`이며, 승인된 Agent run도 기본 설정에서는 실제 실행이 차단된다.
+- Agent dry-run은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 정책 판단만 기록한다.
 - `AGENT_ALLOWED_ROOTS`는 agent 파일/폴더 action의 read-only 접근 root를 제한한다.
 - `AGENT_WEB_FETCH_ENABLED`는 명시 URL read-only fetch를 별도로 제어한다.
 - `AGENT_WEB_FETCH_MAX_BYTES`는 URL fetch 응답을 지정한 바이트 이후 truncate한다.

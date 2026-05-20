@@ -130,7 +130,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/CLAUDE_REVIEW_HANDOFF.md`에 Claude Sonnet 문서 정합성 리뷰용 입력과 출력 형식이 정리되어 있음.
 - `data/logs/`는 운영 로그용 디렉터리이며 로그 파일은 Git 제외 대상임.
 - RAG guard가 추가되어 문서 밖 코드/링크/보안 세부사항/추측성 표현을 감지하면 fallback 답변으로 대체함.
-- 실행형 Agent 승인/실행 엔진 v1 API가 추가됨. 기본값에서는 실제 실행을 차단하고, enabled 상태에서도 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원함.
+- 실행형 Agent dry-run/승인/실행 엔진 v1 API가 추가됨. 기본값에서는 실제 실행을 차단하고, enabled 상태에서도 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원함.
 
 ## 금지사항
 
@@ -182,7 +182,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `105 passed, 1 warning`
+  - `.venv/bin/pytest`: `113 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `python scripts/public_release_check.py --root . --json`: 현재 로컬 DB/Chroma/uploads 파일을 공개 전 제외 대상 finding으로 탐지함
 

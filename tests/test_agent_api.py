@@ -49,6 +49,12 @@ class FakeAgentService:
     def get_results(self, db, run_id: int):
         return [{"status": "completed"}] if run_id == 1 else None
 
+    def get_actions(self, db, run_id: int):
+        return [{"action_index": 0, "status": "pending"}] if run_id == 1 else None
+
+    def dry_run(self, db, run_id: int):
+        return {"id": run_id, "status": "planned", "dry_run": True} if run_id == 1 else None
+
     def approve_run(self, db, run_id: int):
         return {"id": run_id, "status": "approved_pending_execution"} if run_id == 1 else None
 
@@ -74,6 +80,16 @@ class FakeAgentService:
                     "reason": "preview only",
                 }
             ],
+            "dry_run_results": [
+                {
+                    "tool": "browser",
+                    "action": "open_preview",
+                    "status": "disabled",
+                    "message": "dry-run",
+                }
+            ]
+            if run.get("dry_run")
+            else [],
             "execution_results": [
                 {
                     "tool": "browser",
@@ -127,6 +143,33 @@ def test_agent_results_endpoint_with_mock() -> None:
     app.dependency_overrides.clear()
     assert response.status_code == 200
     assert response.json() == [{"status": "completed"}]
+    assert missing_response.status_code == 404
+
+
+def test_agent_actions_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_agent_service] = lambda: FakeAgentService()
+    client = TestClient(app)
+
+    response = client.get("/agent/runs/1/actions")
+    missing_response = client.get("/agent/runs/999/actions")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    assert response.json() == [{"action_index": 0, "status": "pending"}]
+    assert missing_response.status_code == 404
+
+
+def test_agent_dry_run_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_agent_service] = lambda: FakeAgentService()
+    client = TestClient(app)
+
+    response = client.post("/agent/runs/1/dry-run")
+    missing_response = client.post("/agent/runs/999/dry-run")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    assert response.json()["status"] == "planned"
+    assert response.json()["dry_run_results"][0]["status"] == "disabled"
     assert missing_response.status_code == 404
 
 
