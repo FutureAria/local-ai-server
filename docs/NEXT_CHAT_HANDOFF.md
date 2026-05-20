@@ -35,6 +35,7 @@ git status
 - Typer CLI
 - SFT JSONL export
 - README, AGENTS, API, PROJECT_SUMMARY, CLAUDE_REVIEW_HANDOFF, WORKLOG, OPERATIONS, SECURITY 문서
+- GitHub 공개용 현재 상태 요약 문서 `docs/PUBLIC_RELEASE_SUMMARY.md`
 
 ## 먼저 읽을 파일
 
@@ -45,6 +46,7 @@ git status
 - `docs/UI_BRIDGE_EXAMPLES.md`
 - `docs/UI_QA_CHECKLIST.md`
 - `docs/RELEASE_CHECKLIST.md`
+- `docs/PUBLIC_RELEASE_SUMMARY.md`
 - `docs/PROJECT_SUMMARY.md`
 - `docs/CLAUDE_REVIEW_HANDOFF.md`
 - `docs/WORKLOG.md`
@@ -129,6 +131,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/UI_BRIDGE_EXAMPLES.md`에 브라우저 UI 연동용 startup/ui-contract/message 예시 payload가 정리되어 있음.
 - `docs/UI_QA_CHECKLIST.md`에 브라우저 UI 수동 QA 기준과 stop condition이 정리되어 있음.
 - `docs/RELEASE_CHECKLIST.md`에 GitHub 공개 전 release checklist와 stop condition이 정리되어 있음.
+- `docs/PUBLIC_RELEASE_SUMMARY.md`에 GitHub 공개 가능 범위, 비공개 로컬 데이터, 검증 명령, 현재 한계가 정리되어 있음.
 - `docs/OPERATIONS.md`에 로컬 운영 로그, 저장공간 점검, 백업, 수동 rotation 예시가 정리되어 있음.
 - `SECURITY.md`에 로컬 운영 보안 원칙, 공개 전 체크리스트, 고위험 작업 기준이 정리되어 있음.
 - README 앞부분에 개발 배경, 기술 선택 이유, 핵심 구현 포인트가 포트폴리오용으로 정리되어 있음.
@@ -196,7 +199,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `174 passed`
+  - `.venv/bin/pytest`: `176 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공

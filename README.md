@@ -11,6 +11,7 @@
 브라우저 UI 연동 예시 payload는 [docs/UI_BRIDGE_EXAMPLES.md](docs/UI_BRIDGE_EXAMPLES.md)에 정리되어 있습니다.
 브라우저 UI 수동 QA 기준은 [docs/UI_QA_CHECKLIST.md](docs/UI_QA_CHECKLIST.md)에 정리되어 있습니다.
 GitHub 공개 전 체크리스트는 [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)에 정리되어 있습니다.
+공개 상태 요약은 [docs/PUBLIC_RELEASE_SUMMARY.md](docs/PUBLIC_RELEASE_SUMMARY.md)에 정리되어 있습니다.
 
 포트폴리오 관점의 핵심 목표는 다음과 같습니다.
 

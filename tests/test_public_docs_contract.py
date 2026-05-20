@@ -87,6 +87,7 @@ PUBLIC_DOC_LINKS = [
     "docs/UI_BRIDGE_EXAMPLES.md",
     "docs/UI_QA_CHECKLIST.md",
     "docs/RELEASE_CHECKLIST.md",
+    "docs/PUBLIC_RELEASE_SUMMARY.md",
     "docs/PROJECT_SUMMARY.md",
     "docs/CLAUDE_REVIEW_HANDOFF.md",
     "docs/WORKLOG.md",

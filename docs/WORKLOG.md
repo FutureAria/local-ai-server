@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `174 passed` |
+| `.venv/bin/pytest` | `176 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -426,6 +426,14 @@
 - `tests/test_portfolio_docs_contract.py`를 추가해 포트폴리오 설명이 빠지거나 배포 완료처럼 과장되지 않도록 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py` 결과는 `2 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `174 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### Public release summary polish
+
+- `docs/PUBLIC_RELEASE_SUMMARY.md`를 추가해 GitHub/포트폴리오 공개 시 현재 공개 가능 범위, 비공개 로컬 데이터, 검증 명령, 명확한 한계를 한 곳에서 확인할 수 있게 했다.
+- README, `docs/PROJECT_SUMMARY.md`, `docs/NEXT_CHAT_HANDOFF.md`에서 공개 상태 요약 문서를 참조하도록 연결했다.
+- `tests/test_public_release_summary.py`를 추가해 공개 요약 문서가 local-only/Ollama-only 경계, private data 제외, 검증 명령, 미구현 위험 기능을 계속 명시하는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py` 결과는 `13 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `176 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
