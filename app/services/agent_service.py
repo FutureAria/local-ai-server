@@ -37,6 +37,30 @@ class AgentService:
     def get_run(self, db: Session, run_id: int) -> AgentRun | None:
         return db.get(AgentRun, run_id)
 
+    def approve_run(self, db: Session, run_id: int) -> AgentRun | None:
+        run = self.get_run(db, run_id)
+        if run is None:
+            return None
+        if run.status == "rejected":
+            raise ValueError("거절된 agent run은 승인할 수 없습니다.")
+        if run.status == "planned":
+            run.status = "approved_pending_execution"
+            db.commit()
+            db.refresh(run)
+        return run
+
+    def reject_run(self, db: Session, run_id: int) -> AgentRun | None:
+        run = self.get_run(db, run_id)
+        if run is None:
+            return None
+        if run.status == "approved_pending_execution":
+            raise ValueError("이미 승인된 agent run은 거절할 수 없습니다.")
+        if run.status == "planned":
+            run.status = "rejected"
+            db.commit()
+            db.refresh(run)
+        return run
+
     def to_response(self, run: AgentRun) -> dict:
         plan = json.loads(run.plan_json)
         return {

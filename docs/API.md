@@ -29,6 +29,8 @@ X-API-Key: <LOCAL_API_KEY>
 - `POST /agent/plan`
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
+- `POST /agent/runs/{run_id}/approve`
+- `POST /agent/runs/{run_id}/reject`
 
 조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
@@ -360,6 +362,22 @@ agent plan 상세를 조회한다.
 curl http://127.0.0.1:8000/agent/runs/1
 ```
 
+### `POST /agent/runs/{run_id}/approve`
+
+agent plan을 승인 상태로 바꾼다. 상태는 `approved_pending_execution`이 되지만 실제 실행은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/runs/1/approve
+```
+
+### `POST /agent/runs/{run_id}/reject`
+
+agent plan을 거절 상태로 바꾼다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/runs/1/reject
+```
+
 ## CLI 대응
 
 CLI는 위 API를 HTTP로 호출한다. CLI 내부에 비즈니스 로직을 중복 구현하지 않는다.
@@ -385,5 +403,7 @@ local-ai feedbacks
 local-ai agent-plan "GitHub 웹 열어줘"
 local-ai agent-runs
 local-ai agent-run 1
+local-ai agent-approve 1
+local-ai agent-reject 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```

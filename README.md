@@ -260,6 +260,8 @@ local-ai feedbacks --limit 20 --offset 0
 local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"
 local-ai agent-runs --limit 20 --offset 0
 local-ai agent-run 1
+local-ai agent-approve 1
+local-ai agent-reject 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -341,9 +343,11 @@ CLI:
 local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"
 local-ai agent-runs
 local-ai agent-run 1
+local-ai agent-approve 1
+local-ai agent-reject 1
 ```
 
-현재 이 API는 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행을 수행하지 않습니다. 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 비활성 상태를 반환합니다. `AGENT_EXECUTION_ENABLED` 기본값은 `false`입니다.
+현재 이 API는 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행을 수행하지 않습니다. 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 비활성 상태를 반환합니다. `agent-approve`는 상태를 `approved_pending_execution`으로 바꾸지만 실행은 하지 않습니다. `AGENT_EXECUTION_ENABLED` 기본값은 `false`입니다.
 
 ## SFT Export
 

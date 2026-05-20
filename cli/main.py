@@ -188,6 +188,18 @@ def agent_run(run_id: int) -> None:
         _print_response(client.get(f"{_base_url()}/agent/runs/{run_id}", headers=_headers()))
 
 
+@app.command("agent-approve")
+def agent_approve(run_id: int) -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.post(f"{_base_url()}/agent/runs/{run_id}/approve", headers=_headers()))
+
+
+@app.command("agent-reject")
+def agent_reject(run_id: int) -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.post(f"{_base_url()}/agent/runs/{run_id}/reject", headers=_headers()))
+
+
 @app.command("integrity")
 def integrity() -> None:
     with httpx.Client(timeout=30.0) as client:

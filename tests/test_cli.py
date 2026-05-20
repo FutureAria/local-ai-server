@@ -138,6 +138,29 @@ def test_cli_agent_runs_sends_api_key(monkeypatch) -> None:
     ]
 
 
+def test_cli_agent_approve_and_reject_send_api_key(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    approve_result = CliRunner().invoke(cli_main.app, ["agent-approve", "7"])
+    reject_result = CliRunner().invoke(cli_main.app, ["agent-reject", "8"])
+
+    assert approve_result.exit_code == 0
+    assert reject_result.exit_code == 0
+    assert calls == [
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/agent/runs/7/approve",
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/agent/runs/8/reject",
+            "headers": {"X-API-Key": "secret"},
+        },
+    ]
+
+
 def test_cli_upload_missing_file_fails_before_http_call(monkeypatch, tmp_path) -> None:
     calls = _install_fake_client(monkeypatch)
     missing_file = tmp_path / "missing.md"

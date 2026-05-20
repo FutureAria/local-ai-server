@@ -73,6 +73,8 @@ Agent Preview:
 - `POST /agent/plan`
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
+- `POST /agent/runs/{run_id}/approve`
+- `POST /agent/runs/{run_id}/reject`
 
 ## CLI 명령어 목록
 
@@ -97,6 +99,8 @@ local-ai feedbacks
 local-ai agent-plan "GitHub 웹 열어줘"
 local-ai agent-runs
 local-ai agent-run 1
+local-ai agent-approve 1
+local-ai agent-reject 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -123,11 +127,12 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `86 passed`
+- `.venv/bin/pytest`: `91 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
 - `local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"`: 실행형 Agent preview-only 계획 생성 가능
+- `local-ai agent-approve 1`: agent plan 승인 상태 기록 가능. 실제 실행은 하지 않음
 
 ## 구현된 문서 타입
 

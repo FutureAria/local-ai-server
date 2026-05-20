@@ -29,6 +29,8 @@ class FakeSearchService:
         ("post", "/agent/plan", {"json": {"instruction": "웹 열어줘"}}),
         ("get", "/agent/runs", {}),
         ("get", "/agent/runs/1", {}),
+        ("post", "/agent/runs/1/approve", {}),
+        ("post", "/agent/runs/1/reject", {}),
     ],
 )
 def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str, path: str, kwargs: dict) -> None:

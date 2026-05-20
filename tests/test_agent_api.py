@@ -46,9 +46,16 @@ class FakeAgentService:
     def get_run(self, db, run_id: int):
         return {"id": run_id} if run_id == 1 else None
 
+    def approve_run(self, db, run_id: int):
+        return {"id": run_id, "status": "approved_pending_execution"} if run_id == 1 else None
+
+    def reject_run(self, db, run_id: int):
+        return {"id": run_id, "status": "rejected"} if run_id == 1 else None
+
     def to_detail(self, run) -> dict:
         return {
             **self.to_summary(run),
+            "status": run.get("status", "planned"),
             "instruction": "웹 열어줘",
             "actions": [
                 {
@@ -91,4 +98,20 @@ def test_agent_runs_endpoints_with_mock() -> None:
     assert list_response.json()[0]["status"] == "planned"
     assert detail_response.status_code == 200
     assert detail_response.json()["actions"][0]["action"] == "open_preview"
+    assert missing_response.status_code == 404
+
+
+def test_agent_approve_and_reject_endpoints_with_mock() -> None:
+    app.dependency_overrides[get_agent_service] = lambda: FakeAgentService()
+    client = TestClient(app)
+
+    approve_response = client.post("/agent/runs/1/approve")
+    reject_response = client.post("/agent/runs/1/reject")
+    missing_response = client.post("/agent/runs/999/approve")
+
+    app.dependency_overrides.clear()
+    assert approve_response.status_code == 200
+    assert approve_response.json()["status"] == "approved_pending_execution"
+    assert reject_response.status_code == 200
+    assert reject_response.json()["status"] == "rejected"
     assert missing_response.status_code == 404

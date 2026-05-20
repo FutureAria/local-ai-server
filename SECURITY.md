@@ -29,6 +29,8 @@
 - `POST /agent/plan`
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
+- `POST /agent/runs/{run_id}/approve`
+- `POST /agent/runs/{run_id}/reject`
 
 주의:
 
@@ -80,6 +82,8 @@
 ## Agent 안전 기준
 
 - `/agent/plan`은 preview-only 계획 생성만 수행한다.
+- `/agent/runs/{run_id}/approve`는 승인 상태만 기록하고 실제 실행은 수행하지 않는다.
+- `/agent/runs/{run_id}/reject`는 거절 상태만 기록한다.
 - 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 수행하지 않는다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`다.
 - agent plan 기록은 사용자 요청 내용을 포함할 수 있으므로 `/agent/*` endpoint는 `LOCAL_API_KEY`가 설정된 경우 보호된다.

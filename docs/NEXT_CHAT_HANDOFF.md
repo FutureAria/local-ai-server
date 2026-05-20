@@ -182,7 +182,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `86 passed, 1 warning`
+  - `.venv/bin/pytest`: `91 passed, 1 warning`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `python scripts/public_release_check.py --root . --json`: 현재 로컬 DB/Chroma/uploads 파일을 공개 전 제외 대상 finding으로 탐지함
 
@@ -204,3 +204,4 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
   - smoke script가 `health → upload → search → ask-with-docs → feedback → stats` 순서로 호출함
   - public release check가 `.env`, SQLite, uploads, Chroma, secret 후보를 탐지하고 `.env.example`, `.gitkeep`는 허용함
   - `/agent/plan`이 browser/file/shell 요청을 preview-only high-risk action으로 분류함
+  - `/agent/runs/{run_id}/approve`와 `/reject`가 상태만 바꾸고 실제 실행하지 않음
