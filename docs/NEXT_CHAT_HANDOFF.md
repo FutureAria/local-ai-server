@@ -196,7 +196,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `168 passed`
+  - `.venv/bin/pytest`: `169 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -229,6 +229,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_next_chat_handoff.py`를 추가해 이 handoff가 브라우저 조작 없이 가능한 Codex 작업과 사용자 수동 확인 작업을 분리하는지 검증한다.
 - `tests/test_public_docs_contract.py`를 확장해 assistant endpoint/CLI 전체와 project continuation endpoint/CLI가 README/API/PROJECT_SUMMARY에 모두 문서화되어 있는지 검증한다.
 - `tests/test_ui_bridge_examples.py`를 확장해 UI bridge 예시 JSON이 실제 assistant Pydantic schema와 맞는지 검증한다.
+- `tests/test_api_docs_payloads.py`를 추가해 `docs/API.md` curl JSON payload 예시가 실제 request schema와 맞는지 검증한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함

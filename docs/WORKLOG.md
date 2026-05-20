@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `168 passed` |
+| `.venv/bin/pytest` | `169 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -402,7 +402,14 @@
 - `docs/UI_BRIDGE_EXAMPLES.md`의 `/assistant/startup` 예시에 `ui_contract`와 top-level `safety`를 추가해 실제 `AssistantStartupResponse` schema와 맞췄다.
 - `tests/test_ui_bridge_examples.py`를 확장해 UI bridge 예시 JSON이 `AssistantUiContractResponse`, `AssistantStartupResponse`, `AssistantMessageRequest`, `AssistantMessageResponse`로 validate되는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py` 결과는 `4 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `168 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `169 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### API docs payload schema validation
+
+- `tests/test_api_docs_payloads.py`를 추가해 `docs/API.md`의 curl `-d` JSON payload 예시를 추출하고 실제 request schema로 validate한다.
+- 검증 대상은 assistant, ask, ask-with-docs, folder index preview/index, search, feedback, agent plan, project shell dry-run request payload다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py` 결과는 `1 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `169 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 
