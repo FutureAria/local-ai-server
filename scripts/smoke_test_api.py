@@ -120,11 +120,138 @@ def run_smoke_test(base_url: str, timeout: float = 120.0) -> dict:
     return summary
 
 
+def run_assistant_bridge_smoke_test(base_url: str, project_root: str | None = None, timeout: float = 120.0) -> dict:
+    base_url = base_url.rstrip("/")
+    headers = _headers()
+    project_root = project_root or os.getcwd()
+    summary: dict = {"base_url": base_url, "project_root": project_root, "steps": []}
+
+    with httpx.Client(timeout=timeout) as client:
+        startup = client.get(f"{base_url}/assistant/startup", headers=headers)
+        _raise_for_status("assistant-startup", startup)
+        startup_body = startup.json()
+        summary["steps"].append(
+            {
+                "step": "assistant-startup",
+                "status": startup.status_code,
+                "ui_ready": startup_body.get("ui", {}).get("ready"),
+                "protected": startup_body.get("protected"),
+            }
+        )
+
+        inventory = client.get(f"{base_url}/project/api-inventory")
+        _raise_for_status("api-inventory", inventory)
+        inventory_body = inventory.json()
+        summary["steps"].append(
+            {
+                "step": "api-inventory",
+                "status": inventory.status_code,
+                "endpoints_count": inventory_body.get("endpoints_count"),
+                "protected_endpoints_count": inventory_body.get("protected_endpoints_count"),
+            }
+        )
+
+        bootstrap = client.post(
+            f"{base_url}/assistant/bootstrap",
+            json={"project_root": project_root, "include_sessions": True, "sessions_limit": 5},
+            headers=headers,
+        )
+        _raise_for_status("assistant-bootstrap", bootstrap)
+        bootstrap_body = bootstrap.json()
+        summary["steps"].append(
+            {
+                "step": "assistant-bootstrap",
+                "status": bootstrap.status_code,
+                "ui_ready": bootstrap_body.get("ui", {}).get("ready"),
+                "has_project_root": bootstrap_body.get("project_root") is not None,
+            }
+        )
+
+        preview = client.post(
+            f"{base_url}/assistant/action-preview",
+            json={"message": "현재 상태 알려줘", "project_root": project_root, "mode": "auto"},
+            headers=headers,
+        )
+        _raise_for_status("assistant-action-preview", preview)
+        preview_body = preview.json()
+        summary["steps"].append(
+            {
+                "step": "assistant-action-preview",
+                "status": preview.status_code,
+                "intent": preview_body.get("intent"),
+                "would_execute": preview_body.get("would_execute"),
+            }
+        )
+
+        message = client.post(
+            f"{base_url}/assistant/message",
+            json={"message": "현재 상태 알려줘", "project_root": project_root, "mode": "status"},
+            headers=headers,
+        )
+        _raise_for_status("assistant-message", message)
+        message_body = message.json()
+        session_id = message_body["session_id"]
+        summary["steps"].append(
+            {
+                "step": "assistant-message",
+                "status": message.status_code,
+                "session_id": session_id,
+                "response_type": message_body.get("type"),
+            }
+        )
+
+        sessions = client.get(f"{base_url}/assistant/sessions", params={"limit": 5, "offset": 0}, headers=headers)
+        _raise_for_status("assistant-sessions", sessions)
+        sessions_body = sessions.json()
+        summary["steps"].append(
+            {
+                "step": "assistant-sessions",
+                "status": sessions.status_code,
+                "sessions_count": len(sessions_body.get("sessions", [])),
+            }
+        )
+
+        messages = client.get(
+            f"{base_url}/assistant/sessions/{session_id}/messages",
+            params={"limit": 10, "offset": 0},
+            headers=headers,
+        )
+        _raise_for_status("assistant-messages", messages)
+        messages_body = messages.json()
+        summary["steps"].append(
+            {
+                "step": "assistant-messages",
+                "status": messages.status_code,
+                "total_messages": messages_body.get("total_messages"),
+            }
+        )
+
+    summary["ok"] = True
+    return summary
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run local-ai-server API smoke test against a running server.")
     parser.add_argument("--base-url", default=os.getenv("LOCAL_AI_SERVER_URL", "http://127.0.0.1:8000"))
+    parser.add_argument("--project-root", default=os.getenv("LOCAL_AI_PROJECT_ROOT", os.getcwd()))
+    parser.add_argument(
+        "--assistant-bridge-only",
+        action="store_true",
+        help="Run only the assistant/project API bridge smoke flow. This avoids upload/RAG but creates an assistant session/message.",
+    )
+    parser.add_argument(
+        "--include-assistant-bridge",
+        action="store_true",
+        help="Run the document RAG smoke flow and then the assistant/project API bridge smoke flow.",
+    )
     args = parser.parse_args()
-    print(json.dumps(run_smoke_test(args.base_url), ensure_ascii=False, indent=2))
+    if args.assistant_bridge_only:
+        result = run_assistant_bridge_smoke_test(args.base_url, project_root=args.project_root)
+    else:
+        result = run_smoke_test(args.base_url)
+        if args.include_assistant_bridge:
+            result["assistant_bridge"] = run_assistant_bridge_smoke_test(args.base_url, project_root=args.project_root)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

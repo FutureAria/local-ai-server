@@ -72,6 +72,7 @@ curl http://127.0.0.1:8000/health/ollama
 local-ai health
 local-ai doctor
 local-ai assistant-startup
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
 local-ai integrity
 ```
@@ -81,6 +82,7 @@ local-ai integrity
 - [ ] `/health`가 `status=ok`를 반환한다.
 - [ ] Ollama 모델 준비 상태를 확인했다.
 - [ ] assistant startup 응답에 secret 원문이 없다.
+- [ ] assistant bridge smoke가 브라우저 조작 없이 startup/api-inventory/bootstrap/action-preview/message/session history 흐름을 확인한다.
 - [ ] action preview가 실행하지 않고 위험도만 보여준다.
 - [ ] integrity 점검이 read-only로 동작한다.
 

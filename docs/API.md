@@ -839,3 +839,19 @@ local-ai agent-execute 1
 local-ai agent-shell
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
+
+## Smoke Script
+
+실행 중인 서버 기준 문서/RAG E2E smoke test:
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
+```
+
+브라우저 조작 없는 Assistant UI bridge smoke test:
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
+```
+
+Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 순서로 호출한다. `/assistant/message`는 `mode=status`로 호출하므로 Ollama 답변 생성은 사용하지 않지만 SQLite에 assistant session/message 기록은 추가된다.

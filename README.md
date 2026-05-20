@@ -726,6 +726,14 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 
 `LOCAL_API_KEY`가 설정되어 있으면 smoke test도 자동으로 `X-API-Key` 헤더를 보냅니다. 이 스크립트는 테스트용 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가됩니다. 자동 삭제는 수행하지 않습니다.
 
+브라우저 조작 없이 Assistant UI bridge 계약만 확인하려면 아래처럼 실행합니다. 이 흐름은 업로드/RAG/Ollama 호출을 피하고 `assistant-startup → api-inventory → assistant-bootstrap → action-preview → assistant-message(status) → sessions → messages`만 확인합니다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
+```
+
+`--assistant-bridge-only`는 `/assistant/message`를 `mode=status`로 호출하므로 외부 LLM API나 Ollama 답변 생성은 사용하지 않습니다. 다만 assistant session/message 확인을 위해 SQLite에 세션과 메시지 기록은 추가됩니다.
+
 ## GitHub 공개 전 보안 점검
 
 로컬 데이터와 secret 후보가 공개 대상에 섞여 있는지 read-only로 점검할 수 있습니다.
@@ -767,6 +775,7 @@ python scripts/public_release_check.py --root . --json
 - `local-ai search "JWT 인증 흐름"`: Chroma 검색 성공
 - `local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름..."`: sources 포함 RAG 답변 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 임시 Markdown 문서 기반 API smoke test 가능
+- `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server`: 브라우저 조작 없는 Assistant UI bridge smoke test 가능
 - `local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"`: 실행형 Agent 계획 생성 가능
 
 `llama3.2`가 문서 밖 코드나 링크를 만들 수 있어, RAG 답변에는 보수적인 guard가 들어 있습니다. 코드 블록, 외부 URL, 문서에 없는 보안 세부사항, 추측성 표현이 감지되면 문서 기반 fallback 답변으로 대체합니다.

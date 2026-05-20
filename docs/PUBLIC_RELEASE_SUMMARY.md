@@ -23,6 +23,7 @@
 - Typer CLI
 - Assistant UI bridge API contract
 - Project API inventory
+- Assistant UI bridge smoke test
 - Agent plan/dry-run/approval/read-only execution v1
 - Feedback 저장과 SFT JSONL export
 - API, 보안, 운영, QA, handoff 문서
@@ -51,7 +52,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `178 passed`
+- `.venv/bin/pytest`: `179 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

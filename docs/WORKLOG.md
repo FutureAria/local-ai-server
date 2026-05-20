@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `178 passed` |
+| `.venv/bin/pytest` | `179 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -442,6 +442,14 @@
 - `/project/status` 차수를 14차 Project API inventory 완료, 15차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_cli.py tests/test_security.py tests/test_public_docs_contract.py` 결과는 `72 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `178 passed, 1 warning`이다.
+
+### Assistant bridge smoke test
+
+- `scripts/smoke_test_api.py --assistant-bridge-only` 옵션을 추가해 브라우저 조작 없이 assistant startup, project api inventory, bootstrap, action preview, status message, sessions, messages API 흐름을 확인할 수 있게 했다.
+- 이 smoke flow는 업로드/RAG/Ollama 답변 생성을 피하지만 `/assistant/message` 확인 때문에 SQLite에 assistant session/message 기록은 추가한다.
+- `tests/test_smoke_script.py`를 확장해 문서/RAG smoke와 assistant bridge smoke의 API 호출 순서를 mock으로 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py` 결과는 `15 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `179 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
