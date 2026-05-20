@@ -35,25 +35,27 @@ class FakeClient:
             return FakeResponse(
                 {
                     "current_phase": {
-                        "phase": 4,
-                        "title": "Safer automation loop",
+                        "phase": 5,
+                        "title": "Manual local QA and operations polish",
                         "status": "next",
-                        "summary": "Continue safe polish.",
+                        "summary": "Validate local docs.",
                     },
                     "completed_phases": [
                         {"phase": 1, "title": "FastAPI local RAG server", "status": "done", "summary": "done"}
                     ],
-                    "safe_next_tasks": ["Add assistant session summaries"],
+                    "safe_next_tasks": ["Run real local document QA"],
                     "blocked_until_review": ["Unrestricted shell execution"],
                     "recommended_next_model": {
                         "recommended_ai": "Codex",
                         "recommended_model": "Codex GPT-5.5",
                         "reason": "safe implementation",
-                        "next_task": "Add assistant session summaries",
+                        "next_task": "Run real local document QA",
                         "user_action_required": "없음",
                     },
                 }
             )
+        if url.endswith("/project/shell-policy"):
+            return FakeResponse({"mode": "dry-run-only", "allowed_commands": [], "blocked_tokens": []})
         return FakeResponse({"method": "GET"})
 
     def post(self, url: str, **kwargs) -> FakeResponse:
@@ -66,6 +68,8 @@ class FakeClient:
                     "sources": [{"document_id": 1, "filename": "note.md", "chunk_index": 0, "chunk_id": 3}],
                 }
             )
+        if url.endswith("/project/shell-dry-run"):
+            return FakeResponse({"status": "allowed_preview", "would_execute": False})
         return FakeResponse({"method": "POST"})
 
 
@@ -105,12 +109,40 @@ def test_cli_status_and_next_show_phase(monkeypatch) -> None:
 
     assert status_result.exit_code == 0
     assert next_result.exit_code == 0
-    assert "현재 차수: 4차" in status_result.output
+    assert "현재 차수: 5차" in status_result.output
     assert "Recommended Next Model" in status_result.output
-    assert "다음 차수: 4차" in next_result.output
+    assert "다음 차수: 5차" in next_result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
         {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
+    ]
+
+
+def test_cli_roots_and_shell_dry_run(monkeypatch, tmp_path) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+    monkeypatch.setenv("AGENT_ALLOWED_ROOTS", str(tmp_path))
+
+    roots_result = CliRunner().invoke(cli_main.app, ["roots"])
+    policy_result = CliRunner().invoke(cli_main.app, ["shell-policy"])
+    dry_run_result = CliRunner().invoke(cli_main.app, ["shell-dry-run", "pwd"])
+
+    assert roots_result.exit_code == 0
+    assert str(tmp_path) in roots_result.output
+    assert policy_result.exit_code == 0
+    assert dry_run_result.exit_code == 0
+    assert calls == [
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/project/shell-policy",
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/project/shell-dry-run",
+            "json": {"command": "pwd"},
+            "headers": {"X-API-Key": "secret"},
+        },
     ]
 
 
@@ -326,7 +358,7 @@ def test_cli_assistant_repl_routes_docs_and_questions(monkeypatch) -> None:
     result = CliRunner().invoke(
         cli_main.app,
         ["assistant", "--top-k", "4"],
-        input="JWT 설명해줘\n/search JWT\n/docs\n/agent README 읽어줘\n/quit\n",
+        input="JWT 설명해줘\n/search JWT\n/docs\n/roots\n/status\n/next\n/shell-policy\n/shell-dry-run pwd\n/summary\n/agent README 읽어줘\n/quit\n",
     )
 
     assert result.exit_code == 0
@@ -347,6 +379,19 @@ def test_cli_assistant_repl_routes_docs_and_questions(monkeypatch) -> None:
         {
             "method": "GET",
             "url": "http://127.0.0.1:8000/documents",
+        },
+        {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
+        {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/project/shell-policy",
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/project/shell-dry-run",
+            "json": {"command": "pwd"},
+            "headers": {"X-API-Key": "secret"},
         },
         {
             "method": "POST",

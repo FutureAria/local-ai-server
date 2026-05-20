@@ -35,10 +35,10 @@ X-API-Key: <LOCAL_API_KEY>
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
-- `GET /project/status`
-- `GET /project/next`
+- `GET /project/shell-policy`
+- `POST /project/shell-dry-run`
 
-조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
+조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
 ## Rate Limit
 
@@ -93,6 +93,38 @@ curl http://127.0.0.1:8000/project/status
 ```bash
 curl http://127.0.0.1:8000/project/next
 ```
+
+### `GET /project/shell-policy`
+
+shell 실행 엔진을 활성화하기 전, dry-run 기준의 allowlist와 blocked token을 조회한다. 실제 shell 명령은 실행하지 않는다.
+
+```bash
+curl http://127.0.0.1:8000/project/shell-policy
+```
+
+응답 핵심 필드:
+
+- `mode=dry-run-only`
+- `allowed_commands`
+- `blocked_tokens`
+- `note`
+
+### `POST /project/shell-dry-run`
+
+입력한 shell 명령 후보가 현재 정책상 허용 preview인지 차단 대상인지 판단한다. 이 endpoint는 명령을 실행하지 않으며 항상 `would_execute=false`를 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/project/shell-dry-run \
+  -H "Content-Type: application/json" \
+  -d '{"command":"pwd"}'
+```
+
+응답 핵심 필드:
+
+- `command`
+- `status=allowed_preview|blocked`
+- `would_execute=false`
+- `reason`
 
 ## Ask
 
@@ -453,6 +485,9 @@ local-ai health
 local-ai doctor
 local-ai status
 local-ai next
+local-ai roots
+local-ai shell-policy
+local-ai shell-dry-run "pwd"
 local-ai assist "질문"
 local-ai assistant
 local-ai ask "질문"

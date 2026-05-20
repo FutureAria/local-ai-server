@@ -35,10 +35,13 @@
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
+- `GET /project/shell-policy`
+- `POST /project/shell-dry-run`
 
 주의:
 
-- `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 read-only 조회 endpoint다.
+- `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`는 현재 read-only 조회 endpoint다.
+- `GET /project/shell-policy`와 `POST /project/shell-dry-run`은 실제 shell을 실행하지 않지만 명령 후보가 포함될 수 있어 보호 endpoint로 둔다.
 - 보호 endpoint에는 `LOCAL_RATE_LIMIT_PER_MINUTE` 기준 process-local in-memory rate limit이 적용된다. 기본값은 분당 `120`회이며, `0`으로 설정하면 비활성화된다.
 - 개인 문서가 들어 있는 환경에서는 서버를 외부 네트워크에 공개하지 말고 `127.0.0.1`에 bind한다.
 - 다중 사용자 인증/인가, 사용자별 문서 격리는 아직 구현하지 않았다.
@@ -94,6 +97,8 @@
 - `AGENT_EXECUTION_ENABLED=false` 기본값에서는 실제 실행을 차단한다.
 - `AGENT_EXECUTION_ENABLED=true`에서도 v1 실행 엔진은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원한다.
 - 파일 preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
+- `/project/shell-policy`는 shell dry-run allowlist와 blocked token을 조회한다.
+- `/project/shell-dry-run`은 입력 명령을 실행하지 않고 `would_execute=false`인 정책 판단만 반환한다.
 - 실제 웹 이동, 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 수행하지 않는다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`다.
 - `AGENT_ALLOWED_ROOTS`는 파일/폴더 agent action이 접근할 수 있는 root를 제한한다.

@@ -182,7 +182,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `117 passed`
+  - `.venv/bin/pytest`: `120 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `python scripts/public_release_check.py --root . --json`: 현재 로컬 DB/Chroma/uploads 파일을 공개 전 제외 대상 finding으로 탐지함
 
@@ -194,6 +194,10 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `tests/test_smoke_script.py`를 추가해 `scripts/smoke_test_api.py`의 API 호출 순서를 mock으로 검증한다.
 - `tests/test_public_release_check.py`를 추가해 공개 전 read-only 보안 점검 스크립트를 검증한다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가해 Agent preview plan 생성과 조회 API를 검증한다.
+- assistant REPL에 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run <command>`를 추가했다.
+- `local-ai roots`, `local-ai shell-policy`, `local-ai shell-dry-run "pwd"`를 추가했다.
+- `/project/shell-policy`, `/project/shell-dry-run`은 실제 shell을 실행하지 않고 정책 판단만 반환한다.
+- `/project/status`는 4차 safer automation loop 완료, 5차 manual local QA and operations polish를 다음 단계로 표시한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함

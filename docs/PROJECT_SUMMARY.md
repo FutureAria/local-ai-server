@@ -12,6 +12,7 @@
 - Chroma 기반 vector search
 - 문서 검색 기반 RAG 답변 API
 - 로컬 서버를 호출하는 Typer CLI
+- assistant 세션 요약, allowed root 온보딩, shell dry-run 정책 확인
 - feedback 저장과 SFT JSONL export
 - 문서/운영/보안/API/인계 문서
 
@@ -84,6 +85,8 @@ Project:
 
 - `GET /project/status`
 - `GET /project/next`
+- `GET /project/shell-policy`
+- `POST /project/shell-dry-run`
 
 ## CLI 명령어 목록
 
@@ -92,6 +95,9 @@ local-ai health
 local-ai doctor
 local-ai status
 local-ai next
+local-ai roots
+local-ai shell-policy
+local-ai shell-dry-run "pwd"
 local-ai assist "질문"
 local-ai assistant
 local-ai ask "질문"
@@ -145,13 +151,14 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `117 passed`
+- `.venv/bin/pytest`: `120 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
 - `local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"`: 실행형 Agent 계획 생성 가능
 - `local-ai agent-approve 1`: agent plan 승인 상태 기록 가능. 실제 실행은 하지 않음
 - `local-ai agent-execute 1`: 승인된 run 실행 시도 가능. 기본 설정에서는 고위험 실행을 차단함
+- `local-ai assistant` 내부 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run pwd`: 로컬 비서 세션과 안전 정책 확인 가능
 
 ## 구현된 문서 타입
 
@@ -181,6 +188,7 @@ optional dependency 설치 시 지원:
 - 보호 endpoint에는 `LOCAL_RATE_LIMIT_PER_MINUTE` 기준 process-local in-memory rate limit 적용
 - 실행형 Agent는 계획, dry-run, 승인, 실행 엔진 v1 단계이며 기본값에서는 실제 실행 비활성
 - 실행 엔진 v1은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원
+- shell dry-run은 allowlist/blocked token 기반 정책 판단만 제공하며 실제 명령을 실행하지 않음
 - `.env`, SQLite DB, Chroma index, 업로드 파일, 로그 파일, SFT export 파일은 Git 제외
 - 질문/답변/문서 원문/API key를 운영 로그에 남기지 않는 것을 권장
 - 실제 repair/delete/rebuild, 외부 크롤링, 시스템 의존성 설치, 운영 배포는 사용자 승인 전 진행하지 않음
@@ -199,6 +207,7 @@ optional dependency 설치 시 지원:
 - 실시간 색인 진행률 job API는 아직 없다.
 - Chroma/SQLite repair는 read-only integrity와 repair preview까지만 제공한다.
 - Agent는 실제 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 아직 지원하지 않는다.
+- shell dry-run은 실행 엔진이 아니라 사전 정책 판단 기능이다.
 - Agent file action은 `AGENT_ALLOWED_ROOTS` 안에서만 read-only로 동작한다.
 - Agent file preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
 - Agent URL fetch는 `AGENT_WEB_FETCH_ENABLED=true`일 때만 동작하고 `AGENT_WEB_FETCH_MAX_BYTES` 이후 응답을 자른다.

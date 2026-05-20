@@ -271,6 +271,9 @@ local-ai agent-approve 1
 local-ai agent-reject 1
 local-ai agent-execute 1
 local-ai agent-shell
+local-ai roots
+local-ai shell-policy
+local-ai shell-dry-run "pwd"
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -296,6 +299,7 @@ local-ai assistant
 /search <검색어>
 /docs
 /stats
+/roots
 /index-preview <folder>
 /index <folder>
 /agent <지시>
@@ -306,6 +310,11 @@ local-ai assistant
 /approve <id>
 /execute <id>
 /results <id>
+/shell-policy
+/shell-dry-run <command>
+/summary
+/status
+/next
 /quit
 ```
 
@@ -348,6 +357,8 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
+- `GET /project/shell-policy`
+- `POST /project/shell-dry-run`
 
 ```bash
 export LOCAL_API_KEY=change-me
@@ -366,11 +377,30 @@ curl -X POST http://127.0.0.1:8000/ask \
 ```bash
 curl http://127.0.0.1:8000/project/status
 curl http://127.0.0.1:8000/project/next
+curl -H "X-API-Key: change-me" http://127.0.0.1:8000/project/shell-policy
 local-ai status
 local-ai next
 ```
 
-`local-ai status`는 완료 차수와 현재 차수를 함께 보여주고, `local-ai next`는 다음에 Codex가 계속 진행하기 좋은 안전 작업만 요약합니다. shell 실행, 파일 수정/삭제, 브라우저 interaction, 배포, fine-tuning 실행은 여전히 별도 승인 전 보류 항목으로 표시됩니다.
+`local-ai status`는 완료 차수와 현재 차수를 함께 보여주고, `local-ai next`는 다음에 Codex가 계속 진행하기 좋은 안전 작업만 요약합니다. `project/status`와 `project/next`는 조회 전용 continuation endpoint이고, shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호됩니다. shell 실행, 파일 수정/삭제, 브라우저 interaction, 배포, fine-tuning 실행은 여전히 별도 승인 전 보류 항목으로 표시됩니다.
+
+## Local Assistant Automation
+
+`local-ai assistant`는 세션 안에서 짧은 요약과 온보딩 상태를 확인할 수 있습니다.
+
+- `/summary`: 현재 assistant 세션의 질문 수, 명령 수, 최근 질문, 사용한 source를 메모리 안에서 요약합니다. 파일 저장이나 fine-tuning은 수행하지 않습니다.
+- `/roots`: `AGENT_ALLOWED_ROOTS` 기준으로 Agent가 read-only 접근할 수 있는 root와 존재 여부를 보여줍니다.
+- `/shell-policy`: shell dry-run allowlist와 blocked token을 보여줍니다.
+- `/shell-dry-run <command>`: 실제 shell 실행 없이 명령이 허용 후보인지 정책 판단만 반환합니다.
+- `/status`, `/next`: 차수와 다음 안전 작업을 REPL 안에서 확인합니다.
+
+CLI에서도 같은 내용을 확인할 수 있습니다.
+
+```bash
+local-ai roots
+local-ai shell-policy
+local-ai shell-dry-run "pwd"
+```
 
 ## Rate Limit
 

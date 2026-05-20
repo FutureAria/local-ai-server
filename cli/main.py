@@ -100,6 +100,93 @@ def _print_recommended_next_model(model: dict) -> None:
     typer.echo(f"- User action required: {model['user_action_required']}")
 
 
+def _assistant_help() -> str:
+    return "\n".join(
+        [
+            "일반 문장: /ask-with-docs로 문서 기반 답변",
+            "/ask <질문>",
+            "/search <검색어>",
+            "/docs",
+            "/stats",
+            "/roots",
+            "/index-preview <folder>",
+            "/index <folder>",
+            "/agent <지시>",
+            "/runs",
+            "/run <id>",
+            "/actions <id>",
+            "/dry-run <id>",
+            "/approve <id>",
+            "/execute <id>",
+            "/results <id>",
+            "/shell-policy",
+            "/shell-dry-run <command>",
+            "/summary",
+            "/status",
+            "/next",
+            "/quit",
+        ]
+    )
+
+
+def _agent_help() -> str:
+    return "\n".join(
+        [
+            "일반 문장: agent plan 생성",
+            "/runs",
+            "/run <id>",
+            "/actions <id>",
+            "/dry-run <id>",
+            "/approve <id>",
+            "/reject <id>",
+            "/execute <id>",
+            "/results <id>",
+            "/status",
+            "/next",
+            "/quit",
+        ]
+    )
+
+
+def _allowed_roots_payload() -> dict:
+    raw_value = os.getenv("AGENT_ALLOWED_ROOTS", ".")
+    roots = []
+    for raw_root in raw_value.split(","):
+        raw_root = raw_root.strip()
+        if not raw_root:
+            continue
+        path = Path(raw_root).expanduser()
+        roots.append(
+            {
+                "raw": raw_root,
+                "resolved": str(path.resolve()),
+                "exists": path.exists(),
+                "is_dir": path.is_dir(),
+            }
+        )
+    return {
+        "agent_allowed_roots": raw_value,
+        "roots": roots,
+        "note": "AGENT_EXECUTION_ENABLED=true일 때 file agent action은 이 root 안에서만 read-only로 동작합니다.",
+    }
+
+
+def _assistant_session_summary(session_events: list[dict]) -> dict:
+    questions = [event for event in session_events if event["type"] == "question"]
+    commands = [event for event in session_events if event["type"] == "command"]
+    sources = []
+    for event in questions:
+        for source in event.get("sources", []):
+            sources.append(source)
+    return {
+        "questions_count": len(questions),
+        "commands_count": len(commands),
+        "recent_questions": [event["text"] for event in questions[-5:]],
+        "sources_seen": sources[-10:],
+        "note": "현재 세션 메모리 요약입니다. 파일 저장이나 모델 fine-tuning은 수행하지 않습니다.",
+    }
+
+
 @app.command()
 def health() -> None:
     with httpx.Client(timeout=30.0) as client:
@@ -133,6 +220,21 @@ def project_next() -> None:
     for task in payload.get("safe_next_tasks", []):
         typer.echo(f"- {task}")
     _print_recommended_next_model(payload["recommended_next_model"])
+
+
+@app.command("roots")
+def roots() -> None:
+    _print_json(_allowed_roots_payload())
+
+
+@app.command("shell-policy")
+def shell_policy() -> None:
+    _print_json(_request_json("get", "/project/shell-policy", headers=_headers()))
+
+
+@app.command("shell-dry-run")
+def shell_dry_run(command: str) -> None:
+    _print_json(_request_json("post", "/project/shell-dry-run", json={"command": command}, headers=_headers()))
 
 
 @app.command()
@@ -320,22 +422,7 @@ def agent_shell() -> None:
         if command in {"/quit", "/exit", "quit", "exit"}:
             break
         if command == "/help":
-            typer.echo(
-                "\n".join(
-                    [
-                        "일반 문장: agent plan 생성",
-                        "/runs",
-                        "/run <id>",
-                        "/actions <id>",
-                        "/dry-run <id>",
-                        "/approve <id>",
-                        "/reject <id>",
-                        "/execute <id>",
-                        "/results <id>",
-                        "/quit",
-                    ]
-                )
-            )
+            typer.echo(_agent_help())
             continue
 
         try:
@@ -353,6 +440,10 @@ def _agent_shell_dispatch(command: str) -> dict | list:
 
     if name == "/runs":
         return _request_json("get", "/agent/runs", headers=_headers())
+    if name == "/status":
+        return _request_json("get", "/project/status")
+    if name == "/next":
+        return _request_json("get", "/project/next")
     if name in {"/run", "/actions", "/dry-run", "/approve", "/reject", "/execute", "/results"}:
         if not value.isdigit():
             raise ValueError(f"{name} 명령에는 숫자 run_id가 필요합니다.")
@@ -378,6 +469,7 @@ def _agent_shell_dispatch(command: str) -> dict | list:
 @app.command("assistant")
 def assistant(top_k: int = 5, temperature: float = 0.2) -> None:
     typer.echo("local-ai assistant. 일반 질문은 내 문서 기준으로 답하고, /help로 명령을 봅니다.")
+    session_events: list[dict] = []
     while True:
         try:
             command = typer.prompt("assistant")
@@ -391,28 +483,10 @@ def assistant(top_k: int = 5, temperature: float = 0.2) -> None:
         if command in {"/quit", "/exit", "quit", "exit"}:
             break
         if command == "/help":
-            typer.echo(
-                "\n".join(
-                    [
-                        "일반 문장: /ask-with-docs로 문서 기반 답변",
-                        "/ask <질문>",
-                        "/search <검색어>",
-                        "/docs",
-                        "/stats",
-                        "/index-preview <folder>",
-                        "/index <folder>",
-                        "/agent <지시>",
-                        "/runs",
-                        "/run <id>",
-                        "/actions <id>",
-                        "/dry-run <id>",
-                        "/approve <id>",
-                        "/execute <id>",
-                        "/results <id>",
-                        "/quit",
-                    ]
-                )
-            )
+            typer.echo(_assistant_help())
+            continue
+        if command == "/summary":
+            _print_json(_assistant_session_summary(session_events))
             continue
 
         try:
@@ -421,8 +495,17 @@ def assistant(top_k: int = 5, temperature: float = 0.2) -> None:
             typer.echo(str(exc), err=True)
             continue
         if isinstance(payload, dict) and "answer" in payload:
+            session_events.append(
+                {
+                    "type": "question",
+                    "text": command.removeprefix("/ask ").strip() if command.startswith("/ask ") else command,
+                    "request_id": payload.get("request_id"),
+                    "sources": payload.get("sources", []),
+                }
+            )
             _print_assistant_answer(payload)
         else:
+            session_events.append({"type": "command", "text": command})
             _print_json(payload)
 
 
@@ -435,6 +518,18 @@ def _assistant_dispatch(command: str, top_k: int, temperature: float) -> dict | 
         return _request_json("get", "/documents")
     if name == "/stats":
         return _request_json("get", "/documents/stats")
+    if name == "/roots":
+        return _allowed_roots_payload()
+    if name == "/status":
+        return _request_json("get", "/project/status")
+    if name == "/next":
+        return _request_json("get", "/project/next")
+    if name == "/shell-policy":
+        return _request_json("get", "/project/shell-policy", headers=_headers())
+    if name == "/shell-dry-run":
+        if not value:
+            raise ValueError("/shell-dry-run 명령에는 command가 필요합니다.")
+        return _request_json("post", "/project/shell-dry-run", json={"command": value}, headers=_headers())
     if name == "/runs":
         return _request_json("get", "/agent/runs", headers=_headers())
     if name == "/search":
