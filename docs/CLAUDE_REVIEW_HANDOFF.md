@@ -78,7 +78,7 @@ git status
 
 ## 현재 검증 상태
 
-- `.venv/bin/pytest`: `115 passed`
+- `.venv/bin/pytest`: `117 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `git status`: 현재 폴더가 Git 저장소가 아니라 실패할 수 있음
 - 실제 로컬 Ollama 검증 이력은 `docs/WORKLOG.md`에 기록됨

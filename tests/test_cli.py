@@ -31,6 +31,29 @@ class FakeClient:
 
     def get(self, url: str, **kwargs) -> FakeResponse:
         self.calls.append({"method": "GET", "url": url, **kwargs})
+        if url.endswith("/project/status") or url.endswith("/project/next"):
+            return FakeResponse(
+                {
+                    "current_phase": {
+                        "phase": 4,
+                        "title": "Safer automation loop",
+                        "status": "next",
+                        "summary": "Continue safe polish.",
+                    },
+                    "completed_phases": [
+                        {"phase": 1, "title": "FastAPI local RAG server", "status": "done", "summary": "done"}
+                    ],
+                    "safe_next_tasks": ["Add assistant session summaries"],
+                    "blocked_until_review": ["Unrestricted shell execution"],
+                    "recommended_next_model": {
+                        "recommended_ai": "Codex",
+                        "recommended_model": "Codex GPT-5.5",
+                        "reason": "safe implementation",
+                        "next_task": "Add assistant session summaries",
+                        "user_action_required": "없음",
+                    },
+                }
+            )
         return FakeResponse({"method": "GET"})
 
     def post(self, url: str, **kwargs) -> FakeResponse:
@@ -71,6 +94,23 @@ def test_cli_ask_sends_server_url_payload_and_api_key(monkeypatch) -> None:
             "json": {"question": "안녕", "temperature": 0.4},
             "headers": {"X-API-Key": "secret"},
         }
+    ]
+
+
+def test_cli_status_and_next_show_phase(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+
+    status_result = CliRunner().invoke(cli_main.app, ["status"])
+    next_result = CliRunner().invoke(cli_main.app, ["next"])
+
+    assert status_result.exit_code == 0
+    assert next_result.exit_code == 0
+    assert "현재 차수: 4차" in status_result.output
+    assert "Recommended Next Model" in status_result.output
+    assert "다음 차수: 4차" in next_result.output
+    assert calls == [
+        {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
+        {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
     ]
 
 

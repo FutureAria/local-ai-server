@@ -243,3 +243,18 @@ def test_document_chunks_endpoint_contract_with_mock() -> None:
     app.dependency_overrides.clear()
     assert response.status_code == 200
     assert response.json()["chunks"][0]["content"] == "chunk"
+
+
+def test_project_status_contract() -> None:
+    client = TestClient(app)
+
+    status_response = client.get("/project/status")
+    next_response = client.get("/project/next")
+
+    assert status_response.status_code == 200
+    status_body = status_response.json()
+    assert status_body["project"] == "local-ai-server"
+    assert status_body["current_phase"]["phase"] == 4
+    assert status_body["recommended_next_model"]["recommended_ai"] == "Codex"
+    assert next_response.status_code == 200
+    assert next_response.json()["recommended_next_model"]["recommended_model"] == "Codex GPT-5.5"

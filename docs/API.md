@@ -35,6 +35,8 @@ X-API-Key: <LOCAL_API_KEY>
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
+- `GET /project/status`
+- `GET /project/next`
 
 조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
@@ -72,6 +74,24 @@ Ollama server와 모델 준비 상태를 확인한다.
 
 ```bash
 curl http://127.0.0.1:8000/health/ollama
+```
+
+## Project Status
+
+### `GET /project/status`
+
+현재 완료 차수, 다음 안전 작업, 보류 중인 고위험 작업, Recommended Next Model을 반환한다.
+
+```bash
+curl http://127.0.0.1:8000/project/status
+```
+
+### `GET /project/next`
+
+다음에 이어갈 안전 작업과 Recommended Next Model만 요약해 반환한다.
+
+```bash
+curl http://127.0.0.1:8000/project/next
 ```
 
 ## Ask
@@ -431,6 +451,8 @@ CLI는 위 API를 HTTP로 호출한다. CLI 내부에 비즈니스 로직을 중
 ```bash
 local-ai health
 local-ai doctor
+local-ai status
+local-ai next
 local-ai assist "질문"
 local-ai assistant
 local-ai ask "질문"

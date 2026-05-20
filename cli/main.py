@@ -70,6 +70,36 @@ def _print_assistant_answer(payload: dict | list) -> None:
             )
 
 
+def _print_project_status(payload: dict) -> None:
+    current = payload["current_phase"]
+    typer.echo(f"현재 차수: {current['phase']}차 - {current['title']} ({current['status']})")
+    typer.echo(f"요약: {current['summary']}")
+    completed = payload.get("completed_phases", [])
+    if completed:
+        typer.echo("\n완료 차수:")
+        for phase in completed:
+            typer.echo(f"- {phase['phase']}차: {phase['title']}")
+    typer.echo("\n다음 안전 작업:")
+    for task in payload.get("safe_next_tasks", []):
+        typer.echo(f"- {task}")
+    blocked = payload.get("blocked_until_review", [])
+    if blocked:
+        typer.echo("\n리뷰/승인 전 보류:")
+        for item in blocked:
+            typer.echo(f"- {item}")
+    _print_recommended_next_model(payload["recommended_next_model"])
+
+
+def _print_recommended_next_model(model: dict) -> None:
+    typer.echo("\n## Recommended Next Model")
+    typer.echo("")
+    typer.echo(f"- Recommended AI: {model['recommended_ai']}")
+    typer.echo(f"- Recommended model: {model['recommended_model']}")
+    typer.echo(f"- Reason: {model['reason']}")
+    typer.echo(f"- Next task: {model['next_task']}")
+    typer.echo(f"- User action required: {model['user_action_required']}")
+
+
 @app.command()
 def health() -> None:
     with httpx.Client(timeout=30.0) as client:
@@ -80,6 +110,29 @@ def health() -> None:
 def doctor() -> None:
     with httpx.Client(timeout=30.0) as client:
         _print_response(client.get(f"{_base_url()}/health/ollama"))
+
+
+@app.command("status")
+def project_status() -> None:
+    payload = _request_json("get", "/project/status")
+    if not isinstance(payload, dict):
+        _print_json(payload)
+        return
+    _print_project_status(payload)
+
+
+@app.command("next")
+def project_next() -> None:
+    payload = _request_json("get", "/project/next")
+    if not isinstance(payload, dict):
+        _print_json(payload)
+        return
+    current = payload["current_phase"]
+    typer.echo(f"다음 차수: {current['phase']}차 - {current['title']}")
+    typer.echo("\n다음 안전 작업:")
+    for task in payload.get("safe_next_tasks", []):
+        typer.echo(f"- {task}")
+    _print_recommended_next_model(payload["recommended_next_model"])
 
 
 @app.command()

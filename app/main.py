@@ -3,7 +3,7 @@ from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 
-from app.api import agent, ask, chat_logs, documents, feedback, health, search
+from app.api import agent, ask, chat_logs, documents, feedback, health, project, search
 from app.db.database import init_db
 
 
@@ -22,6 +22,7 @@ def create_app() -> FastAPI:
     app.include_router(search.router)
     app.include_router(feedback.router)
     app.include_router(agent.router)
+    app.include_router(project.router)
     return app
 
 

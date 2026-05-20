@@ -240,6 +240,8 @@ CLI는 FastAPI 백엔드를 호출합니다. 비즈니스 로직을 CLI에 중�
 ```bash
 local-ai health
 local-ai doctor
+local-ai status
+local-ai next
 local-ai stats
 local-ai integrity
 local-ai repair-preview
@@ -356,6 +358,19 @@ curl -X POST http://127.0.0.1:8000/ask \
 ```
 
 보안 운영 기준과 GitHub 공개 전 체크리스트는 [SECURITY.md](SECURITY.md)에 정리되어 있습니다.
+
+## Continuation Status
+
+작업이 끝날 때마다 차수, 다음 안전 작업, Recommended Next Model을 확인할 수 있습니다.
+
+```bash
+curl http://127.0.0.1:8000/project/status
+curl http://127.0.0.1:8000/project/next
+local-ai status
+local-ai next
+```
+
+`local-ai status`는 완료 차수와 현재 차수를 함께 보여주고, `local-ai next`는 다음에 Codex가 계속 진행하기 좋은 안전 작업만 요약합니다. shell 실행, 파일 수정/삭제, 브라우저 interaction, 배포, fine-tuning 실행은 여전히 별도 승인 전 보류 항목으로 표시됩니다.
 
 ## Rate Limit
 
