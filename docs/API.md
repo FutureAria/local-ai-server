@@ -232,7 +232,7 @@ curl http://127.0.0.1:8000/assistant/config
 
 ### `GET /assistant/ui-contract`
 
-브라우저 UI가 따라야 할 시작 순서, 메시지 흐름, 응답 타입, 차단 기능을 한 번에 조회한다.
+브라우저 UI가 따라야 할 시작 순서, refresh endpoint, 메시지 흐름, 응답 타입, 차단 기능을 한 번에 조회한다.
 
 ```bash
 curl http://127.0.0.1:8000/assistant/ui-contract
@@ -241,6 +241,7 @@ curl http://127.0.0.1:8000/assistant/ui-contract
 응답 핵심 필드:
 
 - `startup_sequence`
+- `refresh_endpoints`
 - `message_flow`
 - `response_types`
 - `blocked_actions`

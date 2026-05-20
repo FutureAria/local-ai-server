@@ -368,6 +368,7 @@
 ### Assistant startup snapshot
 
 - `GET /assistant/startup`를 추가해 UI 첫 로딩에 필요한 `ping`, `config`, `dashboard`, `ui_contract`를 read-only snapshot으로 한 번에 조회할 수 있게 했다.
+- `/assistant/ui-contract`의 `startup_sequence`를 `/assistant/startup` 우선 흐름으로 정리하고, 개별 조회 endpoint는 `refresh_endpoints`로 분리했다.
 - 이 endpoint는 상태/계약 조회만 수행하며 shell 실행, 파일 수정/삭제, 브라우저 조작을 활성화하지 않는다.
 - `local-ai assistant-startup` CLI 명령을 추가했다.
 - `/project/status` 차수를 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA 다음 단계로 갱신했다.

@@ -80,10 +80,16 @@ class AssistantService:
                 "note": "LOCAL_API_KEY 값은 API 응답에 포함하지 않습니다.",
             },
             "startup_sequence": [
-                {"step": 1, "method": "GET", "path": "/assistant/ping", "purpose": "server/auth quick check"},
-                {"step": 2, "method": "GET", "path": "/assistant/config", "purpose": "safe local settings"},
-                {"step": 3, "method": "GET", "path": "/assistant/dashboard", "purpose": "dashboard cards"},
-                {"step": 4, "method": "POST", "path": "/assistant/bootstrap", "purpose": "sessions and project root state"},
+                {"step": 1, "method": "GET", "path": "/assistant/startup", "purpose": "one-call UI hydration"},
+                {"step": 2, "method": "POST", "path": "/assistant/bootstrap", "purpose": "sessions and project root state"},
+                {"step": 3, "method": "POST", "path": "/assistant/action-preview", "purpose": "pre-send intent/risk check"},
+                {"step": 4, "method": "POST", "path": "/assistant/message", "purpose": "send confirmed message"},
+            ],
+            "refresh_endpoints": [
+                {"method": "GET", "path": "/assistant/ping", "purpose": "server/auth quick check"},
+                {"method": "GET", "path": "/assistant/config", "purpose": "safe local settings"},
+                {"method": "GET", "path": "/assistant/dashboard", "purpose": "dashboard cards"},
+                {"method": "GET", "path": "/assistant/sessions", "purpose": "session sidebar refresh"},
             ],
             "message_flow": [
                 {"step": 1, "method": "POST", "path": "/assistant/action-preview", "purpose": "intent/risk preview"},

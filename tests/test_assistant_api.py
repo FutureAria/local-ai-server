@@ -38,7 +38,8 @@ class FakeAssistantService:
             "version": "1",
             "protected": True,
             "auth": {"supported_headers": ["X-API-Key"], "secret_returned": False},
-            "startup_sequence": [{"step": 1, "method": "GET", "path": "/assistant/ping", "purpose": "check"}],
+            "startup_sequence": [{"step": 1, "method": "GET", "path": "/assistant/startup", "purpose": "hydrate"}],
+            "refresh_endpoints": [{"method": "GET", "path": "/assistant/ping", "purpose": "check"}],
             "message_flow": [{"step": 1, "method": "POST", "path": "/assistant/message", "purpose": "answer"}],
             "response_types": {"answer": "assistant answer bubble"},
             "safety": {"shell_execution": "disabled"},
@@ -293,7 +294,8 @@ def test_assistant_ui_contract_endpoint_with_mock() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["auth"]["secret_returned"] is False
-    assert body["startup_sequence"][0]["path"] == "/assistant/ping"
+    assert body["startup_sequence"][0]["path"] == "/assistant/startup"
+    assert body["refresh_endpoints"][0]["path"] == "/assistant/ping"
     assert "shell_execution" in body["blocked_actions"]
 
 
@@ -310,6 +312,7 @@ def test_assistant_startup_endpoint_with_mock() -> None:
     assert body["config"]["protected"] is True
     assert body["dashboard"]["cards"]["connection"]["status"] == "ready"
     assert body["ui_contract"]["auth"]["secret_returned"] is False
+    assert body["ui_contract"]["startup_sequence"][0]["path"] == "/assistant/startup"
     assert body["ui"]["display"] == "startup_snapshot"
 
 

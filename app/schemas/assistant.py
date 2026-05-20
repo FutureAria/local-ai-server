@@ -114,6 +114,7 @@ class AssistantUiContractResponse(BaseModel):
     protected: bool
     auth: dict
     startup_sequence: list[dict]
+    refresh_endpoints: list[dict]
     message_flow: list[dict]
     response_types: dict
     safety: dict
