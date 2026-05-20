@@ -120,7 +120,7 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
         {
             "method": "POST",
             "url": "http://server.test/assistant/message",
-            "json": {"message": "현재 상태 알려줘", "project_root": "/tmp/project", "mode": "status"},
+            "json": {"message": "현재 상태 알려줘", "project_root": "/tmp/project", "mode": "auto"},
             "headers": {"X-API-Key": "secret"},
         },
         {

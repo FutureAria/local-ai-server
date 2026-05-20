@@ -52,7 +52,8 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `198 passed` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
+| `.venv/bin/pytest` | `199 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -509,6 +510,19 @@
 - `tests/test_smoke_script.py`를 보강해 preflight 성공과 wrong-server 감지를 mock 기반으로 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_ui_qa_checklist.py tests/test_ui_connect_guide.py` 결과는 `10 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `198 passed, 1 warning`이다.
+
+### Assistant bridge smoke bugfix
+
+- 실제 `127.0.0.1:8010` 임시 서버에서 assistant bridge preflight와 smoke를 실행했다.
+- 서버는 임시 로컬 API key와 `/tmp` SQLite/Chroma/uploads 경로, `AGENT_ALLOWED_ROOTS=/Users/juyoung/local-ai-server`로 실행했다. 실제 secret 값은 문서에 기록하지 않았다.
+- `GET /assistant/sessions`에서 마지막 메시지 preview helper 누락으로 `500`이 발생하던 문제를 수정했다.
+- `scripts/smoke_test_api.py --assistant-bridge-only`가 `mode=auto`와 상태 질문으로 status intent를 확인하도록 계약을 맞췄다.
+- `tests/test_assistant_service.py`를 추가해 실제 service `list_sessions`가 `last_message_preview`를 반환하는지 검증한다.
+- 실제 smoke 결과:
+  - `--assistant-bridge-preflight`: `ok=true`
+  - `--assistant-bridge-only --project-root /Users/juyoung/local-ai-server`: `ok=true`, `endpoints_count=49`, `protected_endpoints_count=34`, `sessions_count=1`, `total_messages=2`
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_assistant_service.py` 결과는 `5 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `199 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

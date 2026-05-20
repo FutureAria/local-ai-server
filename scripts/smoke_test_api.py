@@ -219,7 +219,7 @@ def run_assistant_bridge_smoke_test(base_url: str, project_root: str | None = No
 
         message = client.post(
             f"{base_url}/assistant/message",
-            json={"message": "현재 상태 알려줘", "project_root": project_root, "mode": "status"},
+            json={"message": "현재 상태 알려줘", "project_root": project_root, "mode": "auto"},
             headers=headers,
         )
         _raise_for_status("assistant-message", message)

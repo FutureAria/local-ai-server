@@ -792,13 +792,13 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 
 `LOCAL_API_KEY`가 설정되어 있으면 smoke test도 자동으로 `X-API-Key` 헤더를 보냅니다. 이 스크립트는 테스트용 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가됩니다. 자동 삭제는 수행하지 않습니다.
 
-브라우저 조작 없이 Assistant UI bridge 계약만 확인하려면 아래처럼 실행합니다. 이 흐름은 업로드/RAG/Ollama 호출을 피하고 `assistant-startup → api-inventory → assistant-bootstrap → action-preview → assistant-message(status) → sessions → messages`만 확인합니다.
+브라우저 조작 없이 Assistant UI bridge 계약만 확인하려면 아래처럼 실행합니다. 이 흐름은 업로드/RAG/Ollama 호출을 피하고 `assistant-startup → api-inventory → assistant-bootstrap → action-preview → assistant-message(auto/status intent) → sessions → messages`만 확인합니다.
 
 ```bash
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 ```
 
-`--assistant-bridge-only`는 `/assistant/message`를 `mode=status`로 호출하므로 외부 LLM API나 Ollama 답변 생성은 사용하지 않습니다. 다만 assistant session/message 확인을 위해 SQLite에 세션과 메시지 기록은 추가됩니다.
+`--assistant-bridge-only`는 `/assistant/message`를 `mode=auto`와 상태 질문으로 호출해 status intent로 분기하므로 외부 LLM API나 Ollama 답변 생성은 사용하지 않습니다. 다만 assistant session/message 확인을 위해 SQLite에 세션과 메시지 기록은 추가됩니다.
 
 ## GitHub 공개 전 보안 점검
 

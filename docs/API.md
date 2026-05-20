@@ -854,7 +854,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 ```
 
-Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 순서로 호출한다. `/assistant/message`는 `mode=status`로 호출하므로 Ollama 답변 생성은 사용하지 않지만 SQLite에 assistant session/message 기록은 추가된다.
+Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 순서로 호출한다. `/assistant/message`는 `mode=auto`와 상태 질문으로 호출해 status intent로 분기하므로 Ollama 답변 생성은 사용하지 않지만 SQLite에 assistant session/message 기록은 추가된다.
 
 ## Local CI Check
 

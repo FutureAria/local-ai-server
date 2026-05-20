@@ -574,6 +574,13 @@ def _safety(shell_status: str = "blocked") -> dict:
     }
 
 
+def _preview(content: str, limit: int = 80) -> str:
+    compact = " ".join(content.split())
+    if len(compact) <= limit:
+        return compact
+    return compact[: max(0, limit - 3)].rstrip() + "..."
+
+
 def _ui(response_type: str, severity: str, primary_text: str) -> dict:
     return {
         "response_type": response_type,

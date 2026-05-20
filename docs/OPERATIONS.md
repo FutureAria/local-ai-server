@@ -152,7 +152,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 2. `GET /project/api-inventory`
 3. `POST /assistant/bootstrap`
 4. `POST /assistant/action-preview`
-5. `POST /assistant/message` with `mode=status`
+5. `POST /assistant/message` with `mode=auto` and a status question
 6. `GET /assistant/sessions`
 7. `GET /assistant/sessions/{session_id}/messages`
 
