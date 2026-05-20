@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.config import Settings, get_settings
 from app.db.models import AssistantMessage, AssistantSession
-from app.schemas.assistant import AssistantMessageRequest, ProjectRootValidateRequest
+from app.schemas.assistant import AssistantActionPreviewRequest, AssistantMessageRequest, ProjectRootValidateRequest
 from app.services.agent_service import AgentService
 from app.services.document_service import DocumentService
 from app.services.project_status_service import dry_run_shell_command, get_project_status, get_shell_policy
@@ -53,6 +53,7 @@ class AssistantService:
                 "ping": "GET /assistant/ping",
                 "config": "GET /assistant/config",
                 "dashboard": "GET /assistant/dashboard",
+                "action_preview": "POST /assistant/action-preview",
                 "bootstrap": "POST /assistant/bootstrap",
                 "status": "GET /assistant/status",
                 "message": "POST /assistant/message",
@@ -63,6 +64,26 @@ class AssistantService:
                 "validate_project_root": "POST /assistant/project-root/validate",
                 "shell_policy": "GET /project/shell-policy",
                 "shell_dry_run": "POST /project/shell-dry-run",
+            },
+        }
+
+    def action_preview(self, request: AssistantActionPreviewRequest) -> dict:
+        intent = request.mode if request.mode != "auto" else self._detect_intent(request.message)
+        needs = _intent_needs(intent, request.project_root)
+        risk_level = _intent_risk(intent)
+        return {
+            "intent": intent,
+            "recommended_endpoint": _intent_endpoint(intent),
+            "would_execute": False,
+            "requires_approval": intent in {"agent_plan", "shell_dry_run"},
+            "risk_level": risk_level,
+            "needs": needs,
+            "safety": _safety(),
+            "ui": {
+                "response_type": "action_preview",
+                "severity": "warning" if risk_level in {"medium", "high"} else "info",
+                "primary_text": f"{intent} preview",
+                "display": "panel",
             },
         }
 
@@ -551,6 +572,38 @@ def _root_summaries(value: str) -> list[dict]:
 
 def _csv_values(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _intent_endpoint(intent: str) -> str:
+    if intent == "ask":
+        return "POST /assistant/message"
+    if intent == "ask_with_docs":
+        return "POST /assistant/message"
+    if intent == "search":
+        return "POST /assistant/message"
+    if intent == "index_preview":
+        return "POST /assistant/message"
+    if intent == "shell_dry_run":
+        return "POST /assistant/message"
+    if intent == "agent_plan":
+        return "POST /assistant/message"
+    return "POST /assistant/message"
+
+
+def _intent_risk(intent: str) -> str:
+    if intent == "agent_plan":
+        return "high"
+    if intent == "shell_dry_run":
+        return "medium"
+    if intent == "index_preview":
+        return "low"
+    return "low"
+
+
+def _intent_needs(intent: str, project_root: str | None) -> list[str]:
+    if intent == "index_preview" and not project_root:
+        return ["project_root"]
+    return []
 
 
 def _is_relative_to(path: Path, root: Path) -> bool:

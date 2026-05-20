@@ -111,6 +111,23 @@ class AssistantBootstrapResponse(BaseModel):
     ui: dict
 
 
+class AssistantActionPreviewRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4000)
+    project_root: str | None = Field(default=None, max_length=1024)
+    mode: AssistantMode = "auto"
+
+
+class AssistantActionPreviewResponse(BaseModel):
+    intent: str
+    recommended_endpoint: str
+    would_execute: bool
+    requires_approval: bool
+    risk_level: str
+    needs: list[str]
+    safety: dict
+    ui: dict
+
+
 class AssistantMessageItem(BaseModel):
     id: int
     role: str

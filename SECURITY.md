@@ -38,6 +38,7 @@
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `POST /assistant/action-preview`
 - `GET /assistant/ping`
 - `GET /assistant/config`
 - `GET /assistant/status`
@@ -113,6 +114,7 @@
 - 파일 preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
 - `/project/shell-policy`는 shell dry-run allowlist와 blocked token을 조회한다.
 - `/project/shell-dry-run`은 입력 명령을 실행하지 않고 `would_execute=false`인 정책 판단만 반환한다.
+- `/assistant/action-preview`는 intent와 위험도만 preview하고 DB 저장, Ollama 호출, Chroma 검색, shell 실행, browser interaction을 수행하지 않는다.
 - `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/bootstrap`은 UI 초기화/상태 조회용이지만 사용자 환경과 세션 요약을 다루므로 보호 endpoint로 둔다.
 - `/assistant/config`는 `LOCAL_API_KEY` 값을 반환하지 않고 보호 여부만 반환한다.
 - `/assistant/sessions/{session_id}/messages`는 사용자 대화 기록을 반환하므로 보호 endpoint로 둔다.

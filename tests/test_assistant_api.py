@@ -25,8 +25,22 @@ class FakeAssistantService:
                 "ping": "GET /assistant/ping",
                 "config": "GET /assistant/config",
                 "dashboard": "GET /assistant/dashboard",
+                "action_preview": "POST /assistant/action-preview",
                 "message": "POST /assistant/message",
             },
+        }
+
+    def action_preview(self, request):
+        intent = request.mode if request.mode != "auto" else "agent_plan"
+        return {
+            "intent": intent,
+            "recommended_endpoint": "POST /assistant/message",
+            "would_execute": False,
+            "requires_approval": intent == "agent_plan",
+            "risk_level": "high" if intent == "agent_plan" else "low",
+            "needs": [],
+            "safety": {"shell_execution": "disabled"},
+            "ui": {"response_type": "action_preview", "severity": "warning", "primary_text": intent, "display": "panel"},
         }
 
     def ping(self):
@@ -54,7 +68,7 @@ class FakeAssistantService:
     def status(self, db):
         return {
             "service": "local-ai-server",
-            "current_phase": {"phase": 11, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "current_phase": {"phase": 12, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
             "documents": {
                 "documents_count": 1,
                 "chunks_count": 2,
@@ -224,6 +238,21 @@ def test_assistant_capabilities_endpoint_with_mock() -> None:
     assert response.json()["safe_defaults"]["shell_execution"] == "disabled"
 
 
+def test_assistant_action_preview_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.post("/assistant/action-preview", json={"message": "브라우저 열어줘", "mode": "auto"})
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["intent"] == "agent_plan"
+    assert body["would_execute"] is False
+    assert body["requires_approval"] is True
+    assert body["ui"]["response_type"] == "action_preview"
+
+
 def test_assistant_ping_endpoint_with_mock() -> None:
     app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
     client = TestClient(app)
@@ -291,7 +320,7 @@ def test_assistant_bootstrap_endpoint_with_mock() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["capabilities"]["endpoints"]["message"] == "POST /assistant/message"
-    assert body["status"]["current_phase"]["phase"] == 11
+    assert body["status"]["current_phase"]["phase"] == 12
     assert body["project_root"]["safe_for_read_only_agent"] is True
     assert body["sessions"]["limit"] == 5
     assert body["ui"]["ready"] is True

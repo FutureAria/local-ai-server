@@ -38,6 +38,7 @@ class FakeSearchService:
         ("get", "/project/shell-policy", {}),
         ("post", "/project/shell-dry-run", {"json": {"command": "pwd"}}),
         ("get", "/assistant/capabilities", {}),
+        ("post", "/assistant/action-preview", {"json": {"message": "hello"}}),
         ("get", "/assistant/ping", {}),
         ("get", "/assistant/config", {}),
         ("get", "/assistant/status", {}),

@@ -39,6 +39,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `POST /assistant/action-preview`
 - `GET /assistant/ping`
 - `GET /assistant/config`
 - `GET /assistant/status`
@@ -173,6 +174,26 @@ curl http://127.0.0.1:8000/assistant/capabilities
 - `protected`
 - `safe_defaults`
 - `endpoints`
+
+### `POST /assistant/action-preview`
+
+메시지를 실제 처리하기 전에 intent, 추천 endpoint, 위험도, 필요한 입력값을 preview한다. 이 endpoint는 DB 저장, Ollama 호출, Chroma 검색, shell 실행, browser interaction을 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-preview \
+  -H "Content-Type: application/json" \
+  -d '{"message":"브라우저 열어줘","project_root":"/Users/juyoung/local-ai-server","mode":"auto"}'
+```
+
+응답 핵심 필드:
+
+- `intent`
+- `recommended_endpoint`
+- `would_execute=false`
+- `requires_approval`
+- `risk_level`
+- `needs`
+- `ui`
 
 ### `GET /assistant/ping`
 
@@ -715,6 +736,7 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-status

@@ -61,6 +61,12 @@ PROJECT_PHASES = [
     },
     {
         "phase": 11,
+        "title": "Assistant action preview",
+        "status": "done",
+        "summary": "Read-only intent preview endpoint and CLI command for UI preflight rendering.",
+    },
+    {
+        "phase": 12,
         "title": "Live browser UI QA",
         "status": "next",
         "summary": "Exercise the connected browser UI against the local assistant API and refine rendering details.",
@@ -68,6 +74,7 @@ PROJECT_PHASES = [
 ]
 
 SAFE_NEXT_TASKS = [
+    "Use POST /assistant/action-preview before sending messages that may become agent or shell dry-run requests.",
     "Use GET /assistant/sessions/{session_id}/messages for paged chat history rendering.",
     "Call GET /assistant/ping, GET /assistant/config, and GET /assistant/dashboard from the browser UI.",
     "Call POST /assistant/bootstrap from the browser UI startup flow and confirm token/project-root/session rendering.",

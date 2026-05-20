@@ -5,6 +5,8 @@ from app.api.dependencies import get_assistant_service, require_api_key
 from app.db.database import get_db
 from app.schemas.assistant import (
     AssistantCapabilitiesResponse,
+    AssistantActionPreviewRequest,
+    AssistantActionPreviewResponse,
     AssistantBootstrapRequest,
     AssistantBootstrapResponse,
     AssistantConfigResponse,
@@ -32,6 +34,14 @@ def assistant_capabilities(
     assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> dict:
     return assistant_service.capabilities()
+
+
+@router.post("/action-preview", response_model=AssistantActionPreviewResponse)
+def assistant_action_preview(
+    request: AssistantActionPreviewRequest,
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.action_preview(request)
 
 
 @router.get("/ping", response_model=AssistantPingResponse)

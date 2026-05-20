@@ -264,6 +264,12 @@ def assistant_dashboard() -> None:
     _print_json(_request_json("get", "/assistant/dashboard", headers=_headers()))
 
 
+@app.command("assistant-action-preview")
+def assistant_action_preview(message: str, project_root: str | None = None, mode: str = "auto") -> None:
+    payload = {"message": message, "project_root": project_root, "mode": mode}
+    _print_json(_request_json("post", "/assistant/action-preview", json=payload, headers=_headers()))
+
+
 @app.command("assistant-bootstrap")
 def assistant_bootstrap(project_root: str | None = None, include_sessions: bool = True, sessions_limit: int = 10) -> None:
     payload = {
