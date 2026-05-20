@@ -343,6 +343,21 @@ local-ai docs --source-type upload --file-type md --query backend
 curl "http://127.0.0.1:8000/documents?source_type=upload&file_type=md&query=backend"
 ```
 
+문서 저장소 상태와 정합성은 아래 read-only endpoint로 확인할 수 있습니다. `repair-preview`는 실제 수정 없이 필요한 조치 후보만 보여줍니다.
+
+- `GET /documents/stats`
+- `GET /documents/integrity`
+- `GET /documents/repair-preview`
+
+```bash
+curl http://127.0.0.1:8000/documents/stats
+curl http://127.0.0.1:8000/documents/integrity
+curl http://127.0.0.1:8000/documents/repair-preview
+local-ai stats
+local-ai integrity
+local-ai repair-preview
+```
+
 현재 환경에서 사용할 수 있는 문서 타입과 optional dependency 준비 상태는 다음 명령으로 확인합니다.
 
 ```bash
