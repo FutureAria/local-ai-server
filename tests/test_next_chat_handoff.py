@@ -19,6 +19,8 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert "git diff --check" in text
+    assert "message(auto/status intent)" in text
+    assert "message(status)" not in text
 
 
 def test_next_chat_handoff_links_release_and_ui_docs() -> None:

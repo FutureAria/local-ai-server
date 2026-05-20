@@ -547,6 +547,14 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_ui_qa_checklist.py tests/test_public_docs_contract.py` 결과는 `19 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `201 passed, 1 warning`이다.
 
+### UI smoke summary fields
+
+- `docs/UI_QA_CHECKLIST.md`의 API inventory 확인 항목을 실제 응답 필드인 `endpoints`, `requires_api_key`, `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count` 기준으로 수정했다.
+- assistant bridge smoke 확인 항목에 `sessions_count`, `total_messages`, `response_type=status`를 명시했다.
+- `docs/NEXT_CHAT_HANDOFF.md`의 assistant bridge smoke 흐름을 `message(auto/status intent)`로 갱신했다.
+- `tests/test_smoke_script.py`가 assistant bridge smoke 요약 출력의 `endpoints_count`, `protected_endpoints_count`, `sessions_count`, `total_messages`를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_ui_qa_checklist.py tests/test_next_chat_handoff.py` 결과는 `9 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

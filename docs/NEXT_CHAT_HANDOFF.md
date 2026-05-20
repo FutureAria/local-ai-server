@@ -259,7 +259,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
   - 보호 endpoint가 API key 누락 시 `401`을 반환함
   - rate limit 초과 시 `429`와 `Retry-After` header를 반환함
   - smoke script가 `health → upload → search → ask-with-docs → feedback → stats` 순서로 호출함
-  - assistant bridge smoke script가 `startup → api-inventory → bootstrap → action-preview → message(status) → sessions → messages` 순서로 호출함
+  - assistant bridge smoke script가 `startup → api-inventory → bootstrap → action-preview → message(auto/status intent) → sessions → messages` 순서로 호출함
   - public release check가 `.env`, SQLite, uploads, Chroma, secret 후보를 탐지하고 `.env.example`, `.gitkeep`는 허용함
   - `/agent/plan`이 browser/file/shell 요청을 preview-only high-risk action으로 분류함
   - `/agent/runs/{run_id}/approve`와 `/reject`가 상태만 바꾸고 실제 실행하지 않음

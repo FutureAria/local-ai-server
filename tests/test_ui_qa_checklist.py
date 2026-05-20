@@ -11,13 +11,21 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "POST /assistant/action-preview" in text
     assert "POST /assistant/message" in text
     assert "GET /assistant/sessions/{session_id}/messages" in text
-    assert "routes" in text
-    assert "protected" in text
+    assert "endpoints" in text
+    assert "requires_api_key" in text
+    assert "endpoints_count" in text
+    assert "protected_endpoints_count" in text
+    assert "public_endpoints_count" in text
+    assert "sessions_count" in text
+    assert "total_messages" in text
+    assert "response_type=status" in text
     assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server" in text
     assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight" in text
     assert "다른 서버가 사용 중" in text
     assert "type=agent_plan" in text
     assert "type=shell_dry_run" in text
+    assert "routes` 목록" not in text
+    assert "`protected` 값" not in text
 
 
 def test_ui_qa_checklist_documents_safety_stop_conditions() -> None:

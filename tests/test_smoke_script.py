@@ -137,6 +137,10 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
         },
     ]
     assert summary["steps"][4]["response_type"] == "status"
+    assert summary["steps"][1]["endpoints_count"] == 3
+    assert summary["steps"][1]["protected_endpoints_count"] == 2
+    assert summary["steps"][5]["sessions_count"] == 1
+    assert summary["steps"][6]["total_messages"] == 2
 
 
 def test_assistant_bridge_preflight_detects_wrong_server(monkeypatch) -> None:

@@ -42,8 +42,9 @@
 ## API Inventory
 
 - [ ] `GET /project/api-inventory` 호출이 `200`을 반환한다.
-- [ ] `routes` 목록에 `/assistant/startup`, `/assistant/message`, `/project/api-inventory`가 표시된다.
-- [ ] 각 route의 `methods`, `tags`, `protected` 값이 디버그/개발 화면에서 확인 가능하다.
+- [ ] `endpoints` 목록에 `/assistant/startup`, `/assistant/message`, `/project/api-inventory`가 표시된다.
+- [ ] 각 endpoint의 `methods`, `tags`, `requires_api_key` 값이 디버그/개발 화면에서 확인 가능하다.
+- [ ] summary 필드인 `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count`가 표시된다.
 - [ ] 이 화면은 read-only API 목록만 보여주며 shell 실행, 파일 수정, 브라우저 조작 버튼을 제공하지 않는다.
 
 ## Bootstrap
@@ -71,6 +72,7 @@
 
 - [ ] `GET /assistant/sessions`가 최근 세션 목록을 반환한다.
 - [ ] `GET /assistant/sessions/{session_id}/messages`가 paging 가능한 메시지 목록을 반환한다.
+- [ ] assistant bridge smoke 결과의 `sessions_count`, `total_messages`, `response_type=status`를 확인한다.
 - [ ] 긴 메시지 목록에서도 UI가 멈추지 않는다.
 - [ ] 없는 session id는 `404`로 표시되고, UI가 복구 가능한 에러 상태를 보여준다.
 
