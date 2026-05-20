@@ -35,6 +35,14 @@ class FakeClient:
 
     def post(self, url: str, **kwargs) -> FakeResponse:
         self.calls.append({"method": "POST", "url": url, **kwargs})
+        if url.endswith("/ask-with-docs"):
+            return FakeResponse(
+                {
+                    "answer": "문서 기준 답변",
+                    "request_id": "11",
+                    "sources": [{"document_id": 1, "filename": "note.md", "chunk_index": 0, "chunk_id": 3}],
+                }
+            )
         return FakeResponse({"method": "POST"})
 
 
@@ -61,6 +69,25 @@ def test_cli_ask_sends_server_url_payload_and_api_key(monkeypatch) -> None:
             "method": "POST",
             "url": "http://server.test/ask",
             "json": {"question": "안녕", "temperature": 0.4},
+            "headers": {"X-API-Key": "secret"},
+        }
+    ]
+
+
+def test_cli_assist_uses_ask_with_docs_and_prints_answer(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    result = CliRunner().invoke(cli_main.app, ["assist", "JWT 설명해줘", "--top-k", "3"])
+
+    assert result.exit_code == 0
+    assert "문서 기준 답변" in result.output
+    assert "sources:" in result.output
+    assert calls == [
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/ask-with-docs",
+            "json": {"question": "JWT 설명해줘", "top_k": 3, "temperature": 0.2},
             "headers": {"X-API-Key": "secret"},
         }
     ]
@@ -247,6 +274,44 @@ def test_cli_agent_shell_creates_plan_and_runs_commands(monkeypatch) -> None:
         {
             "method": "GET",
             "url": "http://127.0.0.1:8000/agent/runs/3/results",
+            "headers": {"X-API-Key": "secret"},
+        },
+    ]
+
+
+def test_cli_assistant_repl_routes_docs_and_questions(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant", "--top-k", "4"],
+        input="JWT 설명해줘\n/search JWT\n/docs\n/agent README 읽어줘\n/quit\n",
+    )
+
+    assert result.exit_code == 0
+    assert "문서 기준 답변" in result.output
+    assert calls == [
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/ask-with-docs",
+            "json": {"question": "JWT 설명해줘", "top_k": 4, "temperature": 0.2},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/search",
+            "json": {"query": "JWT", "top_k": 4},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/documents",
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/agent/plan",
+            "json": {"instruction": "README 읽어줘"},
             "headers": {"X-API-Key": "secret"},
         },
     ]

@@ -244,6 +244,8 @@ local-ai stats
 local-ai integrity
 local-ai repair-preview
 local-ai document-types
+local-ai assist "내 문서 기준으로 JWT 인증 흐름 설명해줘"
+local-ai assistant
 local-ai ask "Spring Boot에서 Controller와 Service 차이 설명해줘"
 local-ai upload ./notes/backend.md
 local-ai search "JWT"
@@ -277,6 +279,33 @@ export LOCAL_AI_SERVER_URL=http://127.0.0.1:8000
 ```
 
 `local-ai docs`는 문서 목록을 read-only로 조회합니다. 필요하면 `source_type`, `file_type`, filename/path 검색어로 좁힐 수 있습니다.
+
+`local-ai assist`는 `/ask-with-docs`를 호출해 내 문서 기준 답변을 사람이 읽기 좋은 형태로 출력합니다. `local-ai assistant`는 문서 질문, 검색, 폴더 색인, Agent dry-run을 한 자리에서 쓰는 통합 REPL입니다.
+
+```bash
+local-ai assist "내 문서 기준으로 JWT 인증 흐름 설명해줘"
+local-ai assistant
+```
+
+`local-ai assistant` 안에서는 일반 문장을 입력하면 문서 기반 답변을 받고, 아래 명령도 사용할 수 있습니다.
+
+```text
+/ask <질문>
+/search <검색어>
+/docs
+/stats
+/index-preview <folder>
+/index <folder>
+/agent <지시>
+/runs
+/run <id>
+/actions <id>
+/dry-run <id>
+/approve <id>
+/execute <id>
+/results <id>
+/quit
+```
 
 ```bash
 local-ai docs --source-type upload

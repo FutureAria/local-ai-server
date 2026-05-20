@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `113 passed` |
+| `.venv/bin/pytest` | `115 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -275,9 +275,10 @@
 - 2차 실행 엔진 A단계로 `/agent/runs/{run_id}/dry-run`, `/agent/runs/{run_id}/actions`를 추가했다.
 - dry-run은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 action별 정책 판단만 기록한다.
 - `local-ai agent-actions`, `local-ai agent-dry-run`, `local-ai agent-shell` CLI 명령을 추가했다.
+- 문서 기반 로컬 비서용 `local-ai assist`와 통합 REPL `local-ai assistant`를 추가했다.
 - `local-ai agent-plan`, `local-ai agent-runs`, `local-ai agent-run`, `local-ai agent-results`, `local-ai agent-approve`, `local-ai agent-reject`, `local-ai agent-execute` CLI 명령을 추가했다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가했고, `tests/test_security.py`와 `tests/test_cli.py`를 Agent endpoint/CLI까지 확장했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `113 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `115 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 
 ### 응답 형식 업데이트
 

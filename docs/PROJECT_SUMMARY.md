@@ -85,6 +85,8 @@ Agent:
 ```bash
 local-ai health
 local-ai doctor
+local-ai assist "질문"
+local-ai assistant
 local-ai ask "질문"
 local-ai ask-docs "질문"
 local-ai search "검색어"
@@ -136,7 +138,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `113 passed`
+- `.venv/bin/pytest`: `115 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능

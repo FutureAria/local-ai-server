@@ -431,6 +431,8 @@ CLI는 위 API를 HTTP로 호출한다. CLI 내부에 비즈니스 로직을 중
 ```bash
 local-ai health
 local-ai doctor
+local-ai assist "질문"
+local-ai assistant
 local-ai ask "질문"
 local-ai ask-docs "질문"
 local-ai search "검색어"

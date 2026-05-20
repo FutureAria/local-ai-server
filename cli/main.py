@@ -50,6 +50,26 @@ def _print_json(payload: dict | list) -> None:
     typer.echo(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+def _print_assistant_answer(payload: dict | list) -> None:
+    if not isinstance(payload, dict) or "answer" not in payload:
+        _print_json(payload)
+        return
+    typer.echo(payload["answer"])
+    request_id = payload.get("request_id")
+    sources = payload.get("sources") or []
+    if request_id:
+        typer.echo(f"\nrequest_id={request_id}")
+    if sources:
+        typer.echo("sources:")
+        for source in sources:
+            typer.echo(
+                f"- document_id={source.get('document_id')} "
+                f"filename={source.get('filename')} "
+                f"chunk_index={source.get('chunk_index')} "
+                f"chunk_id={source.get('chunk_id')}"
+            )
+
+
 @app.command()
 def health() -> None:
     with httpx.Client(timeout=30.0) as client:
@@ -74,6 +94,16 @@ def ask_docs(question: str, top_k: int = 5, temperature: float = 0.2) -> None:
     payload = {"question": question, "top_k": top_k, "temperature": temperature}
     with httpx.Client(timeout=120.0) as client:
         _print_response(client.post(f"{_base_url()}/ask-with-docs", json=payload, headers=_headers()))
+
+
+@app.command("assist")
+def assist(question: str, top_k: int = 5, temperature: float = 0.2, json_output: bool = False) -> None:
+    payload = {"question": question, "top_k": top_k, "temperature": temperature}
+    response = _request_json("post", "/ask-with-docs", json=payload, headers=_headers())
+    if json_output:
+        _print_json(response)
+    else:
+        _print_assistant_answer(response)
 
 
 @app.command()
@@ -290,6 +320,120 @@ def _agent_shell_dispatch(command: str) -> dict | list:
             return _request_json("get", f"/agent/runs/{run_id}/results", headers=_headers())
 
     return _request_json("post", "/agent/plan", json={"instruction": command}, headers=_headers())
+
+
+@app.command("assistant")
+def assistant(top_k: int = 5, temperature: float = 0.2) -> None:
+    typer.echo("local-ai assistant. 일반 질문은 내 문서 기준으로 답하고, /help로 명령을 봅니다.")
+    while True:
+        try:
+            command = typer.prompt("assistant")
+        except (EOFError, KeyboardInterrupt):
+            typer.echo()
+            break
+
+        command = command.strip()
+        if not command:
+            continue
+        if command in {"/quit", "/exit", "quit", "exit"}:
+            break
+        if command == "/help":
+            typer.echo(
+                "\n".join(
+                    [
+                        "일반 문장: /ask-with-docs로 문서 기반 답변",
+                        "/ask <질문>",
+                        "/search <검색어>",
+                        "/docs",
+                        "/stats",
+                        "/index-preview <folder>",
+                        "/index <folder>",
+                        "/agent <지시>",
+                        "/runs",
+                        "/run <id>",
+                        "/actions <id>",
+                        "/dry-run <id>",
+                        "/approve <id>",
+                        "/execute <id>",
+                        "/results <id>",
+                        "/quit",
+                    ]
+                )
+            )
+            continue
+
+        try:
+            payload = _assistant_dispatch(command, top_k=top_k, temperature=temperature)
+        except ValueError as exc:
+            typer.echo(str(exc), err=True)
+            continue
+        if isinstance(payload, dict) and "answer" in payload:
+            _print_assistant_answer(payload)
+        else:
+            _print_json(payload)
+
+
+def _assistant_dispatch(command: str, top_k: int, temperature: float) -> dict | list:
+    parts = command.split(maxsplit=1)
+    name = parts[0]
+    value = parts[1] if len(parts) > 1 else ""
+
+    if name == "/docs":
+        return _request_json("get", "/documents")
+    if name == "/stats":
+        return _request_json("get", "/documents/stats")
+    if name == "/runs":
+        return _request_json("get", "/agent/runs", headers=_headers())
+    if name == "/search":
+        if not value:
+            raise ValueError("/search 명령에는 검색어가 필요합니다.")
+        return _request_json("post", "/search", json={"query": value, "top_k": top_k}, headers=_headers())
+    if name == "/ask":
+        if not value:
+            raise ValueError("/ask 명령에는 질문이 필요합니다.")
+        return _request_json(
+            "post",
+            "/ask-with-docs",
+            json={"question": value, "top_k": top_k, "temperature": temperature},
+            headers=_headers(),
+        )
+    if name in {"/index-preview", "/index"}:
+        if not value:
+            raise ValueError(f"{name} 명령에는 folder path가 필요합니다.")
+        endpoint = "/documents/index-folder-preview" if name == "/index-preview" else "/documents/index-folder"
+        return _request_json(
+            "post",
+            endpoint,
+            json={"folder_path": value, "recursive": True},
+            headers=_headers(),
+        )
+    if name == "/agent":
+        if not value:
+            raise ValueError("/agent 명령에는 지시문이 필요합니다.")
+        return _request_json("post", "/agent/plan", json={"instruction": value}, headers=_headers())
+    if name in {"/run", "/actions", "/dry-run", "/approve", "/execute", "/results"}:
+        if not value.isdigit():
+            raise ValueError(f"{name} 명령에는 숫자 run_id가 필요합니다.")
+        run_id = int(value)
+        if name == "/run":
+            return _request_json("get", f"/agent/runs/{run_id}", headers=_headers())
+        if name == "/actions":
+            return _request_json("get", f"/agent/runs/{run_id}/actions", headers=_headers())
+        if name == "/dry-run":
+            return _request_json("post", f"/agent/runs/{run_id}/dry-run", headers=_headers())
+        if name == "/approve":
+            return _request_json("post", f"/agent/runs/{run_id}/approve", headers=_headers())
+        if name == "/execute":
+            return _request_json("post", f"/agent/runs/{run_id}/execute", headers=_headers())
+        if name == "/results":
+            return _request_json("get", f"/agent/runs/{run_id}/results", headers=_headers())
+
+    return _request_json(
+        "post",
+        "/ask-with-docs",
+        json={"question": command, "top_k": top_k, "temperature": temperature},
+        headers=_headers(),
+    )
 
 
 @app.command("agent-approve")
