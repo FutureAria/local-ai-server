@@ -244,9 +244,24 @@ def assistant_capabilities() -> None:
     _print_json(_request_json("get", "/assistant/capabilities", headers=_headers()))
 
 
+@app.command("assistant-ping")
+def assistant_ping() -> None:
+    _print_json(_request_json("get", "/assistant/ping", headers=_headers()))
+
+
+@app.command("assistant-config")
+def assistant_config() -> None:
+    _print_json(_request_json("get", "/assistant/config", headers=_headers()))
+
+
 @app.command("assistant-status")
 def assistant_status() -> None:
     _print_json(_request_json("get", "/assistant/status", headers=_headers()))
+
+
+@app.command("assistant-dashboard")
+def assistant_dashboard() -> None:
+    _print_json(_request_json("get", "/assistant/dashboard", headers=_headers()))
 
 
 @app.command("assistant-bootstrap")

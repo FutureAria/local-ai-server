@@ -50,6 +50,9 @@ class AssistantService:
                 "web_fetch_enabled": self.settings.agent_web_fetch_enabled,
             },
             "endpoints": {
+                "ping": "GET /assistant/ping",
+                "config": "GET /assistant/config",
+                "dashboard": "GET /assistant/dashboard",
                 "bootstrap": "POST /assistant/bootstrap",
                 "status": "GET /assistant/status",
                 "message": "POST /assistant/message",
@@ -59,6 +62,40 @@ class AssistantService:
                 "validate_project_root": "POST /assistant/project-root/validate",
                 "shell_policy": "GET /project/shell-policy",
                 "shell_dry_run": "POST /project/shell-dry-run",
+            },
+        }
+
+    def ping(self) -> dict:
+        return {
+            "status": "ok",
+            "service": self.settings.service_name,
+            "protected": bool(self.settings.local_api_key),
+            "local_only": True,
+            "ui_ready": True,
+        }
+
+    def config(self) -> dict:
+        return {
+            "service": self.settings.service_name,
+            "protected": bool(self.settings.local_api_key),
+            "local_only": True,
+            "cors_origins": _csv_values(self.settings.local_cors_origins),
+            "allowed_roots": _root_summaries(self.settings.agent_allowed_roots),
+            "models": {
+                "llm_provider": "ollama-local",
+                "llm_model": self.settings.ollama_llm_model,
+                "embedding_model": self.settings.ollama_embed_model,
+            },
+            "storage": {
+                "database": "sqlite-local",
+                "vector_store": "chroma-local",
+                "upload_dir": self.settings.upload_dir,
+                "chroma_path": self.settings.chroma_path,
+            },
+            "safety": _safety(),
+            "rate_limit": {
+                "enabled": self.settings.local_rate_limit_per_minute > 0,
+                "per_minute": self.settings.local_rate_limit_per_minute,
             },
         }
 
@@ -88,6 +125,32 @@ class AssistantService:
                 "messages_count": messages_count,
             },
             "safety": _safety(),
+        }
+
+    def dashboard(self, db: Session) -> dict:
+        status = self.status(db)
+        recent_sessions = self.list_sessions(db, limit=5, offset=0)["sessions"]
+        return {
+            "service": self.settings.service_name,
+            "current_phase": status["current_phase"],
+            "cards": {
+                "documents": status["documents"],
+                "integrity": status["integrity"],
+                "sessions": status["sessions"],
+                "connection": {
+                    "status": "ready",
+                    "protected": bool(self.settings.local_api_key),
+                    "local_only": True,
+                },
+            },
+            "recent_sessions": recent_sessions,
+            "safety": status["safety"],
+            "ui": {
+                "ready": True,
+                "badge": "DASHBOARD READY",
+                "message": "대시보드 상태를 조회했습니다.",
+                "recommended_refresh_seconds": 30,
+            },
         }
 
     def bootstrap(
@@ -441,6 +504,21 @@ def _allowed_roots(value: str) -> list[Path]:
         if raw_root:
             roots.append(Path(raw_root).expanduser().resolve())
     return roots or [Path(".").resolve()]
+
+
+def _root_summaries(value: str) -> list[dict]:
+    return [
+        {
+            "path": str(root),
+            "exists": root.exists(),
+            "is_dir": root.is_dir(),
+        }
+        for root in _allowed_roots(value)
+    ]
+
+
+def _csv_values(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 def _is_relative_to(path: Path, root: Path) -> bool:

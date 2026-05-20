@@ -38,7 +38,10 @@
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `GET /assistant/ping`
+- `GET /assistant/config`
 - `GET /assistant/status`
+- `GET /assistant/dashboard`
 - `POST /assistant/bootstrap`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
@@ -109,7 +112,8 @@
 - 파일 preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
 - `/project/shell-policy`는 shell dry-run allowlist와 blocked token을 조회한다.
 - `/project/shell-dry-run`은 입력 명령을 실행하지 않고 `would_execute=false`인 정책 판단만 반환한다.
-- `/assistant/bootstrap`은 UI 초기화용 상태와 세션 목록을 반환하지만 실제 실행 기능을 활성화하지 않는다.
+- `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/bootstrap`은 UI 초기화/상태 조회용이지만 사용자 환경과 세션 요약을 다루므로 보호 endpoint로 둔다.
+- `/assistant/config`는 `LOCAL_API_KEY` 값을 반환하지 않고 보호 여부만 반환한다.
 - `/assistant/message`는 UI 입력을 자동 분기하지만 폴더 색인은 preview-only, shell은 dry-run만 수행한다.
 - 실제 웹 이동, 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 수행하지 않는다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`다.

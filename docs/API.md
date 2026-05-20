@@ -39,7 +39,10 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `GET /assistant/ping`
+- `GET /assistant/config`
 - `GET /assistant/status`
+- `GET /assistant/dashboard`
 - `POST /assistant/bootstrap`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
@@ -170,6 +173,39 @@ curl http://127.0.0.1:8000/assistant/capabilities
 - `safe_defaults`
 - `endpoints`
 
+### `GET /assistant/ping`
+
+브라우저 UI가 서버 연결, 인증 header, 로컬 API ready 상태를 가볍게 확인한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/ping
+```
+
+응답 핵심 필드:
+
+- `status=ok`
+- `protected`
+- `local_only`
+- `ui_ready`
+
+### `GET /assistant/config`
+
+브라우저 UI가 사용할 수 있는 설정을 secret 없이 조회한다. `LOCAL_API_KEY` 값은 반환하지 않고 `protected` 여부만 반환한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/config
+```
+
+응답 핵심 필드:
+
+- `protected`
+- `cors_origins`
+- `allowed_roots`
+- `models`
+- `storage`
+- `safety`
+- `rate_limit`
+
 ### `GET /assistant/status`
 
 UI 첫 화면에서 필요한 현재 차수, 문서 저장소 요약, integrity 요약, assistant 세션 요약, 안전 상태를 한 번에 조회한다.
@@ -185,6 +221,24 @@ curl http://127.0.0.1:8000/assistant/status
 - `integrity`
 - `sessions`
 - `safety`
+
+### `GET /assistant/dashboard`
+
+UI 첫 화면 카드에 바로 쓰기 좋은 문서, 세션, integrity, 연결 상태와 최근 세션 목록을 반환한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/dashboard
+```
+
+응답 핵심 필드:
+
+- `current_phase`
+- `cards.documents`
+- `cards.integrity`
+- `cards.sessions`
+- `cards.connection`
+- `recent_sessions`
+- `ui`
 
 ### `POST /assistant/bootstrap`
 
@@ -644,7 +698,10 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-ping
+local-ai assistant-config
 local-ai assistant-status
+local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions

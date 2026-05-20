@@ -58,6 +58,35 @@ class AssistantStatusResponse(BaseModel):
     safety: dict
 
 
+class AssistantPingResponse(BaseModel):
+    status: str
+    service: str
+    protected: bool
+    local_only: bool
+    ui_ready: bool
+
+
+class AssistantConfigResponse(BaseModel):
+    service: str
+    protected: bool
+    local_only: bool
+    cors_origins: list[str]
+    allowed_roots: list[dict]
+    models: dict
+    storage: dict
+    safety: dict
+    rate_limit: dict
+
+
+class AssistantDashboardResponse(BaseModel):
+    service: str
+    current_phase: dict
+    cards: dict
+    recent_sessions: list[dict]
+    safety: dict
+    ui: dict
+
+
 class AssistantBootstrapRequest(BaseModel):
     project_root: str | None = Field(default=None, max_length=1024)
     include_sessions: bool = True

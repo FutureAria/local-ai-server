@@ -257,7 +257,7 @@ def test_project_status_contract() -> None:
     assert status_response.status_code == 200
     status_body = status_response.json()
     assert status_body["project"] == "local-ai-server"
-    assert status_body["current_phase"]["phase"] == 9
+    assert status_body["current_phase"]["phase"] == 10
     assert status_body["recommended_next_model"]["recommended_ai"] == "Codex"
     assert next_response.status_code == 200
     assert next_response.json()["recommended_next_model"]["recommended_model"] == "Codex GPT-5.5"

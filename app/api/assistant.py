@@ -7,8 +7,11 @@ from app.schemas.assistant import (
     AssistantCapabilitiesResponse,
     AssistantBootstrapRequest,
     AssistantBootstrapResponse,
+    AssistantConfigResponse,
+    AssistantDashboardResponse,
     AssistantMessageRequest,
     AssistantMessageResponse,
+    AssistantPingResponse,
     AssistantSessionCreateRequest,
     AssistantSessionListResponse,
     AssistantSessionResponse,
@@ -30,12 +33,34 @@ def assistant_capabilities(
     return assistant_service.capabilities()
 
 
+@router.get("/ping", response_model=AssistantPingResponse)
+def assistant_ping(
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.ping()
+
+
+@router.get("/config", response_model=AssistantConfigResponse)
+def assistant_config(
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.config()
+
+
 @router.get("/status", response_model=AssistantStatusResponse)
 def assistant_status(
     db: Session = Depends(get_db),
     assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> dict:
     return assistant_service.status(db)
+
+
+@router.get("/dashboard", response_model=AssistantDashboardResponse)
+def assistant_dashboard(
+    db: Session = Depends(get_db),
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.dashboard(db)
 
 
 @router.post("/bootstrap", response_model=AssistantBootstrapResponse)

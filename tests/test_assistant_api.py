@@ -21,13 +21,40 @@ class FakeAssistantService:
             "vector_store": "chroma-local",
             "storage": "sqlite-local",
             "safe_defaults": {"shell_execution": "disabled"},
-            "endpoints": {"message": "POST /assistant/message"},
+            "endpoints": {
+                "ping": "GET /assistant/ping",
+                "config": "GET /assistant/config",
+                "dashboard": "GET /assistant/dashboard",
+                "message": "POST /assistant/message",
+            },
+        }
+
+    def ping(self):
+        return {
+            "status": "ok",
+            "service": "local-ai-server",
+            "protected": True,
+            "local_only": True,
+            "ui_ready": True,
+        }
+
+    def config(self):
+        return {
+            "service": "local-ai-server",
+            "protected": True,
+            "local_only": True,
+            "cors_origins": ["http://127.0.0.1:5173"],
+            "allowed_roots": [{"path": "/tmp/project", "exists": True, "is_dir": True}],
+            "models": {"llm_provider": "ollama-local", "llm_model": "llama3.2", "embedding_model": "nomic-embed-text"},
+            "storage": {"database": "sqlite-local", "vector_store": "chroma-local"},
+            "safety": {"shell_execution": "disabled"},
+            "rate_limit": {"enabled": True, "per_minute": 120},
         }
 
     def status(self, db):
         return {
             "service": "local-ai-server",
-            "current_phase": {"phase": 9, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "current_phase": {"phase": 10, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
             "documents": {
                 "documents_count": 1,
                 "chunks_count": 2,
@@ -42,6 +69,21 @@ class FakeAssistantService:
             },
             "sessions": {"sessions_count": 1, "messages_count": 2},
             "safety": {"shell_execution": "disabled"},
+        }
+
+    def dashboard(self, db):
+        return {
+            "service": "local-ai-server",
+            "current_phase": self.status(db)["current_phase"],
+            "cards": {
+                "documents": self.status(db)["documents"],
+                "integrity": self.status(db)["integrity"],
+                "sessions": self.status(db)["sessions"],
+                "connection": {"status": "ready", "protected": True, "local_only": True},
+            },
+            "recent_sessions": self.list_sessions(db, limit=5, offset=0)["sessions"],
+            "safety": {"shell_execution": "disabled"},
+            "ui": {"ready": True, "badge": "DASHBOARD READY"},
         }
 
     def bootstrap(self, db, project_root=None, include_sessions=True, sessions_limit=10):
@@ -157,6 +199,33 @@ def test_assistant_capabilities_endpoint_with_mock() -> None:
     assert response.json()["safe_defaults"]["shell_execution"] == "disabled"
 
 
+def test_assistant_ping_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.get("/assistant/ping")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["ui_ready"] is True
+
+
+def test_assistant_config_endpoint_with_mock_does_not_return_secret() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.get("/assistant/config")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["protected"] is True
+    assert "local_api_key" not in body
+    assert body["allowed_roots"][0]["exists"] is True
+
+
 def test_assistant_status_endpoint_with_mock() -> None:
     app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
     client = TestClient(app)
@@ -168,6 +237,20 @@ def test_assistant_status_endpoint_with_mock() -> None:
     body = response.json()
     assert body["documents"]["documents_count"] == 1
     assert body["sessions"]["messages_count"] == 2
+
+
+def test_assistant_dashboard_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.get("/assistant/dashboard")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["cards"]["connection"]["status"] == "ready"
+    assert body["recent_sessions"][0]["session_id"] == "session-1"
+    assert body["ui"]["ready"] is True
 
 
 def test_assistant_bootstrap_endpoint_with_mock() -> None:
@@ -183,7 +266,7 @@ def test_assistant_bootstrap_endpoint_with_mock() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["capabilities"]["endpoints"]["message"] == "POST /assistant/message"
-    assert body["status"]["current_phase"]["phase"] == 9
+    assert body["status"]["current_phase"]["phase"] == 10
     assert body["project_root"]["safe_for_read_only_agent"] is True
     assert body["sessions"]["limit"] == 5
     assert body["ui"]["ready"] is True

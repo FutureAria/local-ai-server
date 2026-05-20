@@ -49,6 +49,12 @@ PROJECT_PHASES = [
     },
     {
         "phase": 9,
+        "title": "UI readiness helper APIs",
+        "status": "done",
+        "summary": "Assistant ping, config, and dashboard endpoints for local browser UI connection checks.",
+    },
+    {
+        "phase": 10,
         "title": "Live browser UI QA",
         "status": "next",
         "summary": "Exercise the connected browser UI against the local assistant API and refine rendering details.",
@@ -56,6 +62,7 @@ PROJECT_PHASES = [
 ]
 
 SAFE_NEXT_TASKS = [
+    "Call GET /assistant/ping, GET /assistant/config, and GET /assistant/dashboard from the browser UI.",
     "Call POST /assistant/bootstrap from the browser UI startup flow and confirm token/project-root/session rendering.",
     "Send a real browser UI message to POST /assistant/message and confirm CORS/auth/response rendering.",
     "Load GET /assistant/status in the UI and confirm dashboard rendering.",
