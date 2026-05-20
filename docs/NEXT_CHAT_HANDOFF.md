@@ -44,6 +44,7 @@ git status
 - `docs/API.md`
 - `docs/UI_BRIDGE_EXAMPLES.md`
 - `docs/UI_QA_CHECKLIST.md`
+- `docs/RELEASE_CHECKLIST.md`
 - `docs/PROJECT_SUMMARY.md`
 - `docs/CLAUDE_REVIEW_HANDOFF.md`
 - `docs/WORKLOG.md`
@@ -127,6 +128,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md`에 endpoint별 요청 예시, 응답 핵심 필드, 보호 endpoint, CLI 대응 관계가 정리되어 있음.
 - `docs/UI_BRIDGE_EXAMPLES.md`에 브라우저 UI 연동용 startup/ui-contract/message 예시 payload가 정리되어 있음.
 - `docs/UI_QA_CHECKLIST.md`에 브라우저 UI 수동 QA 기준과 stop condition이 정리되어 있음.
+- `docs/RELEASE_CHECKLIST.md`에 GitHub 공개 전 release checklist와 stop condition이 정리되어 있음.
 - `docs/OPERATIONS.md`에 로컬 운영 로그, 저장공간 점검, 백업, 수동 rotation 예시가 정리되어 있음.
 - `SECURITY.md`에 로컬 운영 보안 원칙, 공개 전 체크리스트, 고위험 작업 기준이 정리되어 있음.
 - README 앞부분에 개발 배경, 기술 선택 이유, 핵심 구현 포인트가 포트폴리오용으로 정리되어 있음.
@@ -186,9 +188,10 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `160 passed`
+  - `.venv/bin/pytest`: `161 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
+  - `git diff --check`: 성공
 
 ## 최근 테스트 보강
 

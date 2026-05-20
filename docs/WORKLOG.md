@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `160 passed` |
+| `.venv/bin/pytest` | `161 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -374,11 +374,12 @@
 - `docs/UI_QA_CHECKLIST.md`를 추가해 실제 브라우저 조작 없이 확인할 수 있는 수동 QA 기준과 stop condition을 문서화했다.
 - README에 브라우저 UI를 붙이는 기본 순서 `startup -> bootstrap -> action-preview -> message -> messages paging`를 추가했다.
 - README/API/PROJECT_SUMMARY 핵심 endpoint, CLI, 공개 문서 링크가 서로 맞는지 확인하는 public docs contract 테스트를 추가했다.
+- `docs/RELEASE_CHECKLIST.md`를 추가해 GitHub 공개 전 코드, 문서, 보안, 실행 경계, stop condition을 한 곳에서 확인할 수 있게 했다.
 - 이 endpoint는 상태/계약 조회만 수행하며 shell 실행, 파일 수정/삭제, 브라우저 조작을 활성화하지 않는다.
 - `local-ai assistant-startup` CLI 명령을 추가했다.
 - `/project/status` 차수를 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA 다음 단계로 갱신했다.
-- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `4 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `160 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `5 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `161 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 

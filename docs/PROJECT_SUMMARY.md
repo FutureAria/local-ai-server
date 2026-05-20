@@ -183,7 +183,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `160 passed`
+- `.venv/bin/pytest`: `161 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
@@ -241,6 +241,7 @@ optional dependency 설치 시 지원:
 - `docs/API.md`
 - `docs/UI_BRIDGE_EXAMPLES.md`
 - `docs/UI_QA_CHECKLIST.md`
+- `docs/RELEASE_CHECKLIST.md`
 - `docs/OPERATIONS.md`
 - `SECURITY.md`
 - `docs/WORKLOG.md`

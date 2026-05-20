@@ -37,6 +37,7 @@ PUBLIC_DOC_LINKS = [
     "docs/API.md",
     "docs/UI_BRIDGE_EXAMPLES.md",
     "docs/UI_QA_CHECKLIST.md",
+    "docs/RELEASE_CHECKLIST.md",
     "docs/PROJECT_SUMMARY.md",
     "docs/CLAUDE_REVIEW_HANDOFF.md",
     "docs/WORKLOG.md",
@@ -82,3 +83,36 @@ def test_public_docs_keep_safety_boundaries_visible() -> None:
     assert "read-only" in combined
     assert "브라우저 클릭" in combined or "browser interaction" in combined
     assert "파일 수정" in combined or "file_write_delete" in combined
+
+
+def test_release_checklist_covers_publication_gates() -> None:
+    checklist = Path("docs/RELEASE_CHECKLIST.md")
+    text = checklist.read_text(encoding="utf-8")
+
+    required_commands = [
+        ".venv/bin/pytest",
+        ".venv/bin/python -m compileall app cli scripts",
+        ".venv/bin/python scripts/public_release_check.py --root . --json",
+        "git diff --check",
+    ]
+    sensitive_paths = [
+        ".env",
+        "data/local_ai.sqlite3",
+        "data/chroma/",
+        "data/uploads/",
+        "data/logs/",
+        "data/*.jsonl",
+    ]
+    stop_conditions = [
+        "실제 외부 LLM API 활성화",
+        "실제 shell 실행 활성화",
+        "브라우저 interaction 자동화",
+        "파일 생성, 수정, 삭제 자동화",
+        "운영 배포",
+        "클라우드 또는 Oracle 리소스",
+    ]
+
+    assert checklist.exists()
+    for item in required_commands + sensitive_paths + stop_conditions:
+        assert item in text
+    assert "LOCAL_API_KEY=" not in text
