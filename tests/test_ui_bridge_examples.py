@@ -1,4 +1,27 @@
+import json
+import re
 from pathlib import Path
+
+from app.schemas.assistant import (
+    AssistantMessageRequest,
+    AssistantMessageResponse,
+    AssistantStartupResponse,
+    AssistantUiContractResponse,
+)
+
+
+def _json_block_after_heading(text: str, heading: str) -> dict:
+    pattern = rf"## `{re.escape(heading)}`.*?```json\n(.*?)\n```"
+    match = re.search(pattern, text, flags=re.S)
+    assert match, f"JSON block for {heading} not found"
+    return json.loads(match.group(1))
+
+
+def _json_block_after_label(text: str, label: str) -> dict:
+    pattern = rf"{re.escape(label)}:\n\n```json\n(.*?)\n```"
+    match = re.search(pattern, text, flags=re.S)
+    assert match, f"JSON block for {label} not found"
+    return json.loads(match.group(1))
 
 
 def test_ui_bridge_examples_document_core_contracts() -> None:
@@ -40,3 +63,12 @@ def test_ui_bridge_examples_do_not_include_real_secret_shape() -> None:
     assert "LOCAL_API_KEY=" not in text
     assert '"secret_returned": false' in text
     assert "Authorization: Bearer <LOCAL_API_KEY>" in text
+
+
+def test_ui_bridge_full_examples_match_assistant_schemas() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+
+    AssistantUiContractResponse.model_validate(_json_block_after_heading(text, "GET /assistant/ui-contract"))
+    AssistantStartupResponse.model_validate(_json_block_after_heading(text, "GET /assistant/startup"))
+    AssistantMessageRequest.model_validate(_json_block_after_label(text, "요청"))
+    AssistantMessageResponse.model_validate(_json_block_after_label(text, "응답"))

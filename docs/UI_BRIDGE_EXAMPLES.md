@@ -84,6 +84,26 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
       "purpose": "session sidebar refresh"
     }
   ],
+  "message_flow": [
+    {
+      "step": 1,
+      "method": "POST",
+      "path": "/assistant/action-preview",
+      "purpose": "preview intent, risk, and missing inputs"
+    },
+    {
+      "step": 2,
+      "method": "POST",
+      "path": "/assistant/message",
+      "purpose": "send confirmed message"
+    },
+    {
+      "step": 3,
+      "method": "GET",
+      "path": "/assistant/sessions/{session_id}/messages",
+      "purpose": "page message history"
+    }
+  ],
   "response_types": {
     "answer": "assistant answer bubble",
     "search_results": "search result panel",
@@ -99,6 +119,16 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
     "browser_interaction",
     "file_write_delete",
     "external_llm_api"
+  ],
+  "safety": {
+    "shell_execution": "disabled",
+    "browser_interaction": "blocked",
+    "file_write_delete": "blocked",
+    "external_llm_api": "not-used"
+  },
+  "notes": [
+    "UI contract is read-only.",
+    "Do not enable shell/browser/file-write actions from this response."
   ]
 }
 ```
@@ -182,6 +212,62 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
       "recommended_refresh_seconds": 30
     }
   },
+  "ui_contract": {
+    "service": "local-ai-server",
+    "version": "1",
+    "protected": true,
+    "auth": {
+      "supported_headers": [
+        "X-API-Key",
+        "Authorization: Bearer <LOCAL_API_KEY>"
+      ],
+      "secret_returned": false
+    },
+    "startup_sequence": [
+      {
+        "step": 1,
+        "method": "GET",
+        "path": "/assistant/startup"
+      }
+    ],
+    "refresh_endpoints": [
+      {
+        "method": "GET",
+        "path": "/assistant/dashboard"
+      }
+    ],
+    "message_flow": [
+      {
+        "step": 1,
+        "method": "POST",
+        "path": "/assistant/action-preview"
+      },
+      {
+        "step": 2,
+        "method": "POST",
+        "path": "/assistant/message"
+      }
+    ],
+    "response_types": {
+      "answer": "assistant answer bubble",
+      "agent_plan": "high-risk plan preview panel"
+    },
+    "safety": {
+      "shell_execution": "disabled",
+      "browser_interaction": "blocked",
+      "file_write_delete": "blocked",
+      "external_llm_api": "not-used"
+    },
+    "blocked_actions": [
+      "shell_execution",
+      "browser_interaction",
+      "file_write_delete",
+      "external_llm_api"
+    ],
+    "notes": [
+      "Startup embeds the same UI contract shape."
+    ]
+  },
   "recommended_calls": [
     {
       "method": "POST",
@@ -204,6 +290,12 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
     "badge": "STARTUP SNAPSHOT READY",
     "message": "UI 초기 렌더링에 필요한 read-only snapshot입니다.",
     "display": "startup_snapshot"
+  },
+  "safety": {
+    "shell_execution": "disabled",
+    "browser_interaction": "blocked",
+    "file_write_delete": "blocked",
+    "external_llm_api": "not-used"
   }
 }
 ```

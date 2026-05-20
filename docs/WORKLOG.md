@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `167 passed` |
+| `.venv/bin/pytest` | `168 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -394,7 +394,15 @@
 - README `Continuation Status` 섹션에 `GET /project/status`, `GET /project/next`, `GET /project/shell-policy`, `POST /project/shell-dry-run` endpoint와 CLI 대응을 명시했다.
 - `tests/test_public_docs_contract.py`를 확장해 assistant endpoint 전체, assistant CLI 전체, project continuation endpoint/CLI가 README, API 문서, PROJECT_SUMMARY에 모두 포함되는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `8 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `167 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `168 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### UI bridge schema example validation
+
+- `docs/UI_BRIDGE_EXAMPLES.md`의 `/assistant/ui-contract` 예시에 `message_flow`, `safety`, `notes`를 추가했다.
+- `docs/UI_BRIDGE_EXAMPLES.md`의 `/assistant/startup` 예시에 `ui_contract`와 top-level `safety`를 추가해 실제 `AssistantStartupResponse` schema와 맞췄다.
+- `tests/test_ui_bridge_examples.py`를 확장해 UI bridge 예시 JSON이 `AssistantUiContractResponse`, `AssistantStartupResponse`, `AssistantMessageRequest`, `AssistantMessageResponse`로 validate되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py` 결과는 `4 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `168 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 
