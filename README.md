@@ -2,16 +2,71 @@
 
 `local-ai-server`는 내 컴퓨터 또는 내 서버에서만 동작하는 백엔드 전용 로컬 AI 지식 서버입니다. 런타임에서 OpenAI, Claude, Gemini 같은 외부 LLM API를 사용하지 않고, Ollama local API만 호출합니다.
 
+## Quick Start
+
+Ollama는 보통 별도 터미널에서 먼저 실행합니다.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,documents]"
+
+ollama serve
+ollama pull llama3.2
+ollama pull nomic-embed-text
+
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+## Verification
+
+서버 없이 안전한 로컬 검증을 한 번에 실행하려면:
+
+```bash
+python scripts/local_ci_check.py --root .
+```
+
+서버 실행 후 assistant bridge API만 smoke test하려면:
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
+```
+
+문서 업로드, 검색, RAG smoke test까지 확인하려면 Ollama와 기본 모델이 필요합니다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
+```
+
+## Safe Boundaries
+
+- 런타임 LLM/embedding 호출은 Ollama local API만 사용합니다.
+- OpenAI, Claude, Gemini 외부 LLM API를 호출하지 않습니다.
+- LangChain과 cloud vector DB를 사용하지 않습니다.
+- 서버 실행 예시는 기본적으로 `127.0.0.1` bind를 권장합니다.
+- `LOCAL_API_KEY`가 설정되면 보호 endpoint는 `X-API-Key`를 요구합니다.
+- 브라우저 클릭/입력/전송 자동화는 구현하지 않습니다.
+- shell 관련 기능은 `shell dry-run` 정책 확인까지만 제공하며 실제 shell 실행은 활성화하지 않습니다.
+- 파일 생성/수정/삭제 자동화는 구현 범위 밖입니다.
+- 운영 배포, 클라우드/Oracle 리소스 생성/변경은 이 프로젝트의 현재 범위 밖입니다.
+
+## Key Docs
+
+- 전체 API 계약: [docs/API.md](docs/API.md)
+- 최종 요약: [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)
+- 로컬 운영 Runbook: [docs/OPERATIONS.md](docs/OPERATIONS.md)
+- GitHub 공개 전 체크리스트: [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
+- 공개 상태 요약: [docs/PUBLIC_RELEASE_SUMMARY.md](docs/PUBLIC_RELEASE_SUMMARY.md)
+- 브라우저 UI 연동 예시 payload: [docs/UI_BRIDGE_EXAMPLES.md](docs/UI_BRIDGE_EXAMPLES.md)
+- 브라우저 UI 수동 QA 기준: [docs/UI_QA_CHECKLIST.md](docs/UI_QA_CHECKLIST.md)
+- 문서 정합성 리뷰 handoff: [docs/CLAUDE_REVIEW_HANDOFF.md](docs/CLAUDE_REVIEW_HANDOFF.md)
+- 작업 기록: [docs/WORKLOG.md](docs/WORKLOG.md)
+- 다음 작업 인계: [docs/NEXT_CHAT_HANDOFF.md](docs/NEXT_CHAT_HANDOFF.md)
+- 보안 기준: [SECURITY.md](SECURITY.md)
+
 ## 개발 배경
 
 개인 문서 기반 Q&A를 만들 때 외부 LLM API로 문서 내용이 전송되는 구조는 비용, 개인정보, 재현성 측면에서 부담이 있습니다. 이 프로젝트는 로컬 모델과 로컬 저장소만으로 문서 업로드, 색인, 검색, RAG 답변, 피드백 수집, SFT 데이터 export까지 이어지는 백엔드 흐름을 검증하기 위해 만들었습니다.
-
-최종 요약은 [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)에 별도로 정리되어 있습니다.
-문서 정합성 리뷰가 필요하면 [docs/CLAUDE_REVIEW_HANDOFF.md](docs/CLAUDE_REVIEW_HANDOFF.md)를 사용하면 됩니다.
-브라우저 UI 연동 예시 payload는 [docs/UI_BRIDGE_EXAMPLES.md](docs/UI_BRIDGE_EXAMPLES.md)에 정리되어 있습니다.
-브라우저 UI 수동 QA 기준은 [docs/UI_QA_CHECKLIST.md](docs/UI_QA_CHECKLIST.md)에 정리되어 있습니다.
-GitHub 공개 전 체크리스트는 [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)에 정리되어 있습니다.
-공개 상태 요약은 [docs/PUBLIC_RELEASE_SUMMARY.md](docs/PUBLIC_RELEASE_SUMMARY.md)에 정리되어 있습니다.
 
 포트폴리오 관점의 핵심 목표는 다음과 같습니다.
 

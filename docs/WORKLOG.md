@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `184 passed` |
+| `.venv/bin/pytest` | `189 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -466,6 +466,14 @@
 - `tests/test_operations_runbook.py`를 추가해 runbook 명령 순서와 위험 작업 제외 문구가 유지되는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_operations_runbook.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `13 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `184 passed, 1 warning`이다.
+
+### README quick start polish
+
+- README 상단에 `Quick Start`, `Verification`, `Safe Boundaries`, `Key Docs`를 추가해 첫 진입자가 실행 방법, 검증 명령, 안전 경계를 바로 확인할 수 있게 했다.
+- 기존 README 앞부분의 흩어진 문서 링크를 `Key Docs` 목록으로 정리했다.
+- `tests/test_readme_quick_start.py`를 추가해 README 상단 onboarding 섹션, 핵심 명령, 안전 경계, 공개 문서 링크가 유지되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `18 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `189 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
