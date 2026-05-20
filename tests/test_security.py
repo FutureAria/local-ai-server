@@ -31,6 +31,7 @@ class FakeSearchService:
         ("get", "/agent/runs/1", {}),
         ("post", "/agent/runs/1/approve", {}),
         ("post", "/agent/runs/1/reject", {}),
+        ("post", "/agent/runs/1/execute", {}),
     ],
 )
 def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str, path: str, kwargs: dict) -> None:

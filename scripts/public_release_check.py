@@ -1,6 +1,7 @@
 import argparse
 import json
 import re
+import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -66,12 +67,39 @@ def run_public_release_check(root: Path) -> dict:
 
 
 def _iter_files(root: Path):
+    git_files = _git_visible_files(root)
+    if git_files is not None:
+        for relative in git_files:
+            path = root / relative
+            if path.is_file():
+                yield path
+        return
+
     for path in root.rglob("*"):
         if not path.is_file():
             continue
         if any(part in DEFAULT_EXCLUDED_DIRS for part in path.relative_to(root).parts):
             continue
         yield path
+
+
+def _git_visible_files(root: Path) -> list[Path] | None:
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "--cached", "--others", "--exclude-standard"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return None
+
+    files = []
+    for line in result.stdout.splitlines():
+        if line.strip():
+            files.append(Path(line.strip()))
+    return files
 
 
 def _check_sensitive_path(relative: str) -> Finding | None:

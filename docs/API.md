@@ -31,6 +31,7 @@ X-API-Key: <LOCAL_API_KEY>
 - `GET /agent/runs/{run_id}`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
+- `POST /agent/runs/{run_id}/execute`
 
 조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
@@ -378,6 +379,22 @@ agent plan을 거절 상태로 바꾼다.
 curl -X POST http://127.0.0.1:8000/agent/runs/1/reject
 ```
 
+### `POST /agent/runs/{run_id}/execute`
+
+승인된 agent run만 실행 시도한다. 기본값 `AGENT_EXECUTION_ENABLED=false`에서는 실제 실행을 차단하고 `blocked` 결과를 기록한다.
+
+`AGENT_EXECUTION_ENABLED=true` 상태의 v1 실행 엔진은 아래만 지원한다.
+
+- 허용 root 안의 파일/폴더 read-only metadata/list 조회
+- `AGENT_WEB_FETCH_ENABLED=true`이고 명시 URL이 있는 경우 read-only URL fetch
+- URL fetch 응답은 `AGENT_WEB_FETCH_MAX_BYTES` 이후 truncate
+
+브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/runs/1/execute
+```
+
 ## CLI 대응
 
 CLI는 위 API를 HTTP로 호출한다. CLI 내부에 비즈니스 로직을 중복 구현하지 않는다.
@@ -405,5 +422,6 @@ local-ai agent-runs
 local-ai agent-run 1
 local-ai agent-approve 1
 local-ai agent-reject 1
+local-ai agent-execute 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```

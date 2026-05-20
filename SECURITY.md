@@ -31,6 +31,7 @@
 - `GET /agent/runs/{run_id}`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
+- `POST /agent/runs/{run_id}/execute`
 
 주의:
 
@@ -84,8 +85,14 @@
 - `/agent/plan`은 preview-only 계획 생성만 수행한다.
 - `/agent/runs/{run_id}/approve`는 승인 상태만 기록하고 실제 실행은 수행하지 않는다.
 - `/agent/runs/{run_id}/reject`는 거절 상태만 기록한다.
-- 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 수행하지 않는다.
+- `/agent/runs/{run_id}/execute`는 승인된 run만 실행 시도한다.
+- `AGENT_EXECUTION_ENABLED=false` 기본값에서는 실제 실행을 차단한다.
+- `AGENT_EXECUTION_ENABLED=true`에서도 v1 실행 엔진은 허용 root 안의 파일/폴더 read-only 조회와 명시 URL read-only fetch만 지원한다.
+- 실제 웹 이동, 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 수행하지 않는다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`다.
+- `AGENT_ALLOWED_ROOTS`는 파일/폴더 agent action이 접근할 수 있는 root를 제한한다.
+- `AGENT_WEB_FETCH_ENABLED`는 명시 URL read-only fetch를 별도로 제어한다.
+- `AGENT_WEB_FETCH_MAX_BYTES`는 URL fetch 응답을 지정한 바이트 이후 truncate한다.
 - agent plan 기록은 사용자 요청 내용을 포함할 수 있으므로 `/agent/*` endpoint는 `LOCAL_API_KEY`가 설정된 경우 보호된다.
 - 실제 browser/file/shell 실행 기능을 활성화하려면 별도 보안 리뷰와 사용자 승인이 필요하다.
 

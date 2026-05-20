@@ -262,6 +262,7 @@ local-ai agent-runs --limit 20 --offset 0
 local-ai agent-run 1
 local-ai agent-approve 1
 local-ai agent-reject 1
+local-ai agent-execute 1
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -345,9 +346,19 @@ local-ai agent-runs
 local-ai agent-run 1
 local-ai agent-approve 1
 local-ai agent-reject 1
+local-ai agent-execute 1
 ```
 
-현재 이 API는 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행을 수행하지 않습니다. 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 비활성 상태를 반환합니다. `agent-approve`는 상태를 `approved_pending_execution`으로 바꾸지만 실행은 하지 않습니다. `AGENT_EXECUTION_ENABLED` 기본값은 `false`입니다.
+현재 이 API는 요청을 `browser`, `web_search`, `file`, `shell`, `rag` action 후보로 분류하고 위험도, 승인 필요 여부, 실행 상태를 반환합니다. `agent-approve`는 상태를 `approved_pending_execution`으로 바꾸고, `agent-execute`는 승인된 run만 실행 시도합니다.
+
+기본값에서는 `AGENT_EXECUTION_ENABLED=false`라 모든 실제 실행이 차단됩니다. `true`로 바꿔도 현재 v1 실행 엔진은 허용 root 안의 파일/폴더 read-only 조회와 명시 URL read-only fetch만 지원합니다. 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 아직 수행하지 않습니다.
+
+```bash
+export AGENT_EXECUTION_ENABLED=true
+export AGENT_ALLOWED_ROOTS=/Users/me/project,/Users/me/notes
+export AGENT_WEB_FETCH_ENABLED=false
+export AGENT_WEB_FETCH_MAX_BYTES=100000
+```
 
 ## SFT Export
 
@@ -548,6 +559,7 @@ ollama pull nomic-embed-text
 - HTML/HTM은 표준 라이브러리 기반 텍스트 추출을 지원하지만, JavaScript 렌더링 결과나 동적 페이지 크롤링은 지원하지 않습니다.
 - Chroma와 SQLite 동기화 복구는 read-only 점검과 repair preview까지만 지원합니다. 실제 repair/rebuild는 아직 수행하지 않습니다.
 - 실행형 Agent는 preview-only 계획 단계입니다. 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 아직 수행하지 않습니다.
+- 실행 엔진 v1은 승인된 run에 대해 허용 root 안의 파일/폴더 read-only 조회만 지원합니다. 웹 fetch는 `AGENT_WEB_FETCH_ENABLED=true`와 명시 URL이 있을 때만 read-only로 동작하며, `AGENT_WEB_FETCH_MAX_BYTES` 이후 응답을 자릅니다.
 - embedding은 batch 처리되고 preview에서 예상 batch 수를 볼 수 있지만, 매우 큰 문서의 실시간 진행률 표시는 아직 없습니다.
 - 자동 로그 rotation은 아직 구현하지 않았고, 운영 로그 정책은 문서로만 제공합니다.
 - 인증은 로컬 API key 수준이며, 다중 사용자 권한 관리는 없습니다.

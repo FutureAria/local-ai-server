@@ -10,3 +10,7 @@ def test_config_defaults() -> None:
     assert settings.embedding_batch_size == 8
     assert settings.embedding_max_retries == 2
     assert settings.local_rate_limit_per_minute == 120
+    assert settings.agent_execution_enabled is False
+    assert settings.agent_allowed_roots == "."
+    assert settings.agent_web_fetch_enabled is False
+    assert settings.agent_web_fetch_max_bytes == 100_000

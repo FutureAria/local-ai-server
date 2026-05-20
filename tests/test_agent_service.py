@@ -60,3 +60,86 @@ def test_agent_service_approve_and_reject_state_transitions(tmp_path) -> None:
         assert approved.execution_enabled == 0
         assert rejected is not None
         assert rejected.status == "rejected"
+
+
+def test_agent_service_execute_blocks_when_execution_disabled(tmp_path) -> None:
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(settings=Settings(AGENT_EXECUTION_ENABLED=False))
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, "폴더 './' 열어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        assert executed.status == "blocked"
+        assert detail["execution_results"][0]["status"] == "blocked"
+        assert "AGENT_EXECUTION_ENABLED=false" in detail["execution_results"][0]["message"]
+
+
+def test_agent_service_execute_lists_allowed_folder_read_only(tmp_path) -> None:
+    allowed = tmp_path / "allowed"
+    allowed.mkdir()
+    (allowed / "note.md").write_text("# Note", encoding="utf-8")
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(
+        settings=Settings(
+            AGENT_EXECUTION_ENABLED=True,
+            AGENT_ALLOWED_ROOTS=str(allowed),
+        )
+    )
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, f"폴더 '{allowed}' 열어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        assert executed.status == "completed"
+        assert detail["execution_results"][0]["status"] == "completed"
+        assert detail["execution_results"][0]["items"] == [{"name": "note.md", "type": "file"}]
+
+
+def test_agent_service_execute_blocks_file_outside_allowed_root(tmp_path) -> None:
+    allowed = tmp_path / "allowed"
+    outside = tmp_path / "outside"
+    allowed.mkdir()
+    outside.mkdir()
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(
+        settings=Settings(
+            AGENT_EXECUTION_ENABLED=True,
+            AGENT_ALLOWED_ROOTS=str(allowed),
+        )
+    )
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, f"폴더 '{outside}' 열어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        assert executed.status == "blocked"
+        assert "허용된 root 밖" in detail["execution_results"][0]["message"]
+
+
+def test_agent_service_execute_blocks_web_fetch_by_default(tmp_path) -> None:
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(settings=Settings(AGENT_EXECUTION_ENABLED=True, AGENT_WEB_FETCH_ENABLED=False))
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, "https://example.com 웹 페이지 열어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        assert executed.status == "blocked"
+        assert "AGENT_WEB_FETCH_ENABLED=false" in detail["execution_results"][0]["message"]

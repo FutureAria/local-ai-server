@@ -130,7 +130,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/CLAUDE_REVIEW_HANDOFF.md`에 Claude Sonnet 문서 정합성 리뷰용 입력과 출력 형식이 정리되어 있음.
 - `data/logs/`는 운영 로그용 디렉터리이며 로그 파일은 Git 제외 대상임.
 - RAG guard가 추가되어 문서 밖 코드/링크/보안 세부사항/추측성 표현을 감지하면 fallback 답변으로 대체함.
-- 실행형 Agent preview-only 계획 API가 추가됨. 실제 웹 이동, 브라우저 클릭, 폴더 열기, 파일 수정, shell 실행은 수행하지 않음.
+- 실행형 Agent 승인/실행 엔진 v1 API가 추가됨. 기본값에서는 실제 실행을 차단하고, enabled 상태에서도 허용 root 안의 파일/폴더 read-only 조회와 명시 URL read-only fetch만 지원함.
 
 ## 금지사항
 
@@ -182,7 +182,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `91 passed, 1 warning`
+  - `.venv/bin/pytest`: `98 passed, 1 warning`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `python scripts/public_release_check.py --root . --json`: 현재 로컬 DB/Chroma/uploads 파일을 공개 전 제외 대상 finding으로 탐지함
 
@@ -205,3 +205,6 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
   - public release check가 `.env`, SQLite, uploads, Chroma, secret 후보를 탐지하고 `.env.example`, `.gitkeep`는 허용함
   - `/agent/plan`이 browser/file/shell 요청을 preview-only high-risk action으로 분류함
   - `/agent/runs/{run_id}/approve`와 `/reject`가 상태만 바꾸고 실제 실행하지 않음
+  - `/agent/runs/{run_id}/execute`가 승인된 run만 실행 시도하고, 기본값에서 blocked 결과를 기록함
+  - `AGENT_ALLOWED_ROOTS` 밖의 파일/폴더 접근은 blocked 처리함
+  - `AGENT_WEB_FETCH_MAX_BYTES` 이후 URL fetch 응답은 truncate함

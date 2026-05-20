@@ -43,3 +43,4 @@ class AgentRunSummary(BaseModel):
 class AgentRunDetail(AgentRunSummary):
     instruction: str
     actions: list[AgentAction]
+    execution_results: list[dict] = Field(default_factory=list)

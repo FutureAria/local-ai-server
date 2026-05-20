@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     local_api_key: str | None = Field(default=None, alias="LOCAL_API_KEY")
     local_rate_limit_per_minute: int = Field(default=120, ge=0, alias="LOCAL_RATE_LIMIT_PER_MINUTE")
     agent_execution_enabled: bool = Field(default=False, alias="AGENT_EXECUTION_ENABLED")
+    agent_allowed_roots: str = Field(default=".", alias="AGENT_ALLOWED_ROOTS")
+    agent_web_fetch_enabled: bool = Field(default=False, alias="AGENT_WEB_FETCH_ENABLED")
+    agent_web_fetch_max_bytes: int = Field(default=100_000, ge=1, alias="AGENT_WEB_FETCH_MAX_BYTES")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

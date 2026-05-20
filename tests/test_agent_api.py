@@ -52,6 +52,9 @@ class FakeAgentService:
     def reject_run(self, db, run_id: int):
         return {"id": run_id, "status": "rejected"} if run_id == 1 else None
 
+    def execute_run(self, db, run_id: int):
+        return {"id": run_id, "status": "blocked"} if run_id == 1 else None
+
     def to_detail(self, run) -> dict:
         return {
             **self.to_summary(run),
@@ -68,6 +71,16 @@ class FakeAgentService:
                     "reason": "preview only",
                 }
             ],
+            "execution_results": [
+                {
+                    "tool": "browser",
+                    "action": "open_preview",
+                    "status": "blocked",
+                    "message": "blocked",
+                }
+            ]
+            if run.get("status") == "blocked"
+            else [],
         }
 
 
@@ -114,4 +127,18 @@ def test_agent_approve_and_reject_endpoints_with_mock() -> None:
     assert approve_response.json()["status"] == "approved_pending_execution"
     assert reject_response.status_code == 200
     assert reject_response.json()["status"] == "rejected"
+    assert missing_response.status_code == 404
+
+
+def test_agent_execute_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_agent_service] = lambda: FakeAgentService()
+    client = TestClient(app)
+
+    response = client.post("/agent/runs/1/execute")
+    missing_response = client.post("/agent/runs/999/execute")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    assert response.json()["status"] == "blocked"
+    assert response.json()["execution_results"][0]["status"] == "blocked"
     assert missing_response.status_code == 404

@@ -200,6 +200,12 @@ def agent_reject(run_id: int) -> None:
         _print_response(client.post(f"{_base_url()}/agent/runs/{run_id}/reject", headers=_headers()))
 
 
+@app.command("agent-execute")
+def agent_execute(run_id: int) -> None:
+    with httpx.Client(timeout=60.0) as client:
+        _print_response(client.post(f"{_base_url()}/agent/runs/{run_id}/execute", headers=_headers()))
+
+
 @app.command("integrity")
 def integrity() -> None:
     with httpx.Client(timeout=30.0) as client:
