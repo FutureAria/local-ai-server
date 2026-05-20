@@ -46,6 +46,7 @@ class FakeSearchService:
         ("post", "/assistant/sessions", {"json": {"title": "Demo"}}),
         ("get", "/assistant/sessions", {}),
         ("get", "/assistant/sessions/session-1", {}),
+        ("get", "/assistant/sessions/session-1/messages", {}),
         ("post", "/assistant/message", {"json": {"message": "hello"}}),
         ("post", "/assistant/project-root/validate", {"json": {"project_root": "/tmp/project"}}),
     ],

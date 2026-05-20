@@ -49,6 +49,14 @@ class AssistantSessionListResponse(BaseModel):
     offset: int
 
 
+class AssistantMessageListResponse(BaseModel):
+    session_id: str
+    total_messages: int
+    limit: int
+    offset: int
+    messages: list["AssistantMessageItem"]
+
+
 class AssistantStatusResponse(BaseModel):
     service: str
     current_phase: dict

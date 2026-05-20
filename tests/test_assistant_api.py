@@ -54,7 +54,7 @@ class FakeAssistantService:
     def status(self, db):
         return {
             "service": "local-ai-server",
-            "current_phase": {"phase": 10, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "current_phase": {"phase": 11, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
             "documents": {
                 "documents_count": 1,
                 "chunks_count": 2,
@@ -137,9 +137,7 @@ class FakeAssistantService:
             "offset": offset,
         }
 
-    def get_session(self, db, session_id: str):
-        if session_id != "session-1":
-            return None
+    def _session(self):
         return SimpleNamespace(
             id="session-1",
             title="Demo",
@@ -157,6 +155,33 @@ class FakeAssistantService:
                 )
             ],
         )
+
+    def get_session(self, db, session_id: str):
+        if session_id != "session-1":
+            return None
+        return self._session()
+
+    def list_session_messages(self, db, session_id: str, limit: int = 50, offset: int = 0):
+        if session_id != "session-1":
+            return None
+        messages = self._session().messages[offset : offset + limit]
+        return {
+            "session_id": session_id,
+            "total_messages": 1,
+            "limit": limit,
+            "offset": offset,
+            "messages": [
+                {
+                    "id": message.id,
+                    "role": message.role,
+                    "content": message.content,
+                    "message_type": message.message_type,
+                    "payload": None,
+                    "created_at": message.created_at,
+                }
+                for message in messages
+            ],
+        }
 
     async def handle_message(self, db, request):
         return {
@@ -266,7 +291,7 @@ def test_assistant_bootstrap_endpoint_with_mock() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["capabilities"]["endpoints"]["message"] == "POST /assistant/message"
-    assert body["status"]["current_phase"]["phase"] == 10
+    assert body["status"]["current_phase"]["phase"] == 11
     assert body["project_root"]["safe_for_read_only_agent"] is True
     assert body["sessions"]["limit"] == 5
     assert body["ui"]["ready"] is True
@@ -282,7 +307,9 @@ def test_assistant_session_endpoints_with_mock() -> None:
     )
     list_response = client.get("/assistant/sessions?limit=5&offset=0")
     get_response = client.get("/assistant/sessions/session-1")
+    messages_response = client.get("/assistant/sessions/session-1/messages?limit=10&offset=0")
     missing_response = client.get("/assistant/sessions/missing")
+    missing_messages_response = client.get("/assistant/sessions/missing/messages")
 
     app.dependency_overrides.clear()
     assert create_response.status_code == 200
@@ -291,7 +318,11 @@ def test_assistant_session_endpoints_with_mock() -> None:
     assert list_response.json()["sessions"][0]["messages_count"] == 1
     assert get_response.status_code == 200
     assert get_response.json()["messages"][0]["content"] == "JWT"
+    assert messages_response.status_code == 200
+    assert messages_response.json()["total_messages"] == 1
+    assert messages_response.json()["messages"][0]["content"] == "JWT"
     assert missing_response.status_code == 404
+    assert missing_messages_response.status_code == 404
 
 
 def test_assistant_message_endpoint_with_mock() -> None:

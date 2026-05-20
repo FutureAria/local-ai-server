@@ -282,6 +282,7 @@ local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
+local-ai assistant-messages session-1 --limit 50 --offset 0
 local-ai assistant-message "내 문서 기준으로 JWT 설명해줘" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai export-sft --output data/sft_dataset.jsonl
@@ -378,6 +379,7 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
+- `GET /assistant/sessions/{session_id}/messages`
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
 
@@ -480,6 +482,7 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 - `POST /assistant/sessions`: 대화 세션 생성
 - `GET /assistant/sessions`: 최근 대화 세션 목록 조회
 - `GET /assistant/sessions/{session_id}`: 세션 기록 조회
+- `GET /assistant/sessions/{session_id}/messages`: UI 대화 기록 paging 조회
 - `POST /assistant/message`: 입력 메시지를 RAG/search/index preview/agent plan/shell dry-run으로 안전 분기
 - `POST /assistant/project-root/validate`: 화면에 입력한 project root 검증
 

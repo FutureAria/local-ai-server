@@ -292,6 +292,18 @@ def assistant_sessions(limit: int = 20, offset: int = 0) -> None:
     )
 
 
+@app.command("assistant-messages")
+def assistant_messages(session_id: str, limit: int = 50, offset: int = 0) -> None:
+    _print_json(
+        _request_json(
+            "get",
+            f"/assistant/sessions/{session_id}/messages",
+            params={"limit": limit, "offset": offset},
+            headers=_headers(),
+        )
+    )
+
+
 @app.command("assistant-message")
 def assistant_message(
     message: str,

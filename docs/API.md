@@ -47,6 +47,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
+- `GET /assistant/sessions/{session_id}/messages`
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
 
@@ -298,6 +299,22 @@ assistant 세션과 메시지 기록을 조회한다.
 ```bash
 curl http://127.0.0.1:8000/assistant/sessions/<session_id>
 ```
+
+### `GET /assistant/sessions/{session_id}/messages`
+
+assistant 세션 메시지를 paging으로 조회한다. UI에서 긴 대화 기록을 렌더링할 때 사용한다.
+
+```bash
+curl "http://127.0.0.1:8000/assistant/sessions/<session_id>/messages?limit=50&offset=0"
+```
+
+응답 핵심 필드:
+
+- `session_id`
+- `total_messages`
+- `limit`
+- `offset`
+- `messages`
 
 ### `POST /assistant/message`
 
@@ -705,6 +722,7 @@ local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
+local-ai assistant-messages session-1 --limit 50 --offset 0
 local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai assist "질문"

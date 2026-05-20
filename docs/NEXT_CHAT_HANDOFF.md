@@ -5,7 +5,7 @@
 - Recommended AI: Codex
 - Recommended model: Codex GPT-5.5
 - Reason: 로컬 전용 FastAPI/Ollama/SQLite/Chroma 백엔드 구현과 검증은 Codex가 안전하게 계속 처리 가능
-- Next task: 브라우저 UI에서 `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions` 실제 렌더링 QA
+- Next task: 브라우저 UI에서 `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages` 실제 렌더링 QA
 - User action required: 없음. 단, 시스템 의존성 설치, 파일 삭제, 운영 배포, 외부 LLM API 활성화는 사용자 승인 전 진행 불가
 
 ## 프로젝트 루트
@@ -165,13 +165,14 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 4. `POST /assistant/bootstrap` 호출과 project root/session/UI 힌트 렌더링 확인
 5. 브라우저 UI에서 `POST /assistant/message` 실제 메시지 전송과 `ui` 힌트 렌더링 확인
 6. `GET /assistant/sessions` 최근 대화 목록 표시 확인
-7. 실제 사용자 `.md` 또는 `.txt` 문서 업로드 검증
-8. `/search` 실제 embedding + Chroma 검색 재확인
-9. `/ask-with-docs` 실제 RAG 답변 품질 확인
-10. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
-11. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 재생성 명령 설계
-12. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
-13. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
+7. `GET /assistant/sessions/{session_id}/messages` 긴 대화 기록 paging 표시 확인
+8. 실제 사용자 `.md` 또는 `.txt` 문서 업로드 검증
+9. `/search` 실제 embedding + Chroma 검색 재확인
+10. `/ask-with-docs` 실제 RAG 답변 품질 확인
+11. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
+12. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 재생성 명령 설계
+13. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
+14. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
 
 ## 최근 Codex self-check
 
@@ -179,7 +180,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `143 passed`
+  - `.venv/bin/pytest`: `144 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 
@@ -203,7 +204,8 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `/assistant/bootstrap`와 `local-ai assistant-bootstrap`을 추가했다.
 - `/assistant/message` 응답에 `ui.response_type`, `ui.severity`, `ui.primary_text`, `ui.display` 힌트를 추가했다.
 - `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`와 대응 CLI를 추가했다.
-- `/project/status`는 9차 UI readiness helper APIs 완료, 10차 Live browser UI QA를 다음 단계로 표시한다.
+- `/assistant/sessions/{session_id}/messages`와 `local-ai assistant-messages`를 추가했다.
+- `/project/status`는 10차 Assistant message paging 완료, 11차 Live browser UI QA를 다음 단계로 표시한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함

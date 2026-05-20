@@ -59,6 +59,7 @@ class AssistantService:
                 "create_session": "POST /assistant/sessions",
                 "list_sessions": "GET /assistant/sessions",
                 "get_session": "GET /assistant/sessions/{session_id}",
+                "list_session_messages": "GET /assistant/sessions/{session_id}/messages",
                 "validate_project_root": "POST /assistant/project-root/validate",
                 "shell_policy": "GET /project/shell-policy",
                 "shell_dry_run": "POST /project/shell-dry-run",
@@ -242,6 +243,26 @@ class AssistantService:
             .options(selectinload(AssistantSession.messages))
         )
         return db.scalars(stmt).first()
+
+    def list_session_messages(self, db: Session, session_id: str, limit: int = 50, offset: int = 0) -> dict | None:
+        session_exists = db.scalar(select(func.count(AssistantSession.id)).where(AssistantSession.id == session_id)) or 0
+        if session_exists == 0:
+            return None
+        total = db.scalar(select(func.count(AssistantMessage.id)).where(AssistantMessage.session_id == session_id)) or 0
+        stmt = (
+            select(AssistantMessage)
+            .where(AssistantMessage.session_id == session_id)
+            .order_by(AssistantMessage.created_at, AssistantMessage.id)
+            .limit(limit)
+            .offset(offset)
+        )
+        return {
+            "session_id": session_id,
+            "total_messages": total,
+            "limit": limit,
+            "offset": offset,
+            "messages": [_message_to_item(message) for message in db.scalars(stmt).all()],
+        }
 
     async def handle_message(self, db: Session, request: AssistantMessageRequest) -> dict:
         session = self._get_or_create_session(db, request)
@@ -431,6 +452,17 @@ def session_to_response(session: AssistantSession) -> dict:
             }
             for message in messages
         ],
+    }
+
+
+def _message_to_item(message: AssistantMessage) -> dict:
+    return {
+        "id": message.id,
+        "role": message.role,
+        "content": message.content,
+        "message_type": message.message_type,
+        "payload": json.loads(message.payload_json) if message.payload_json else None,
+        "created_at": message.created_at,
     }
 
 

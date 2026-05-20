@@ -9,6 +9,7 @@ from app.schemas.assistant import (
     AssistantBootstrapResponse,
     AssistantConfigResponse,
     AssistantDashboardResponse,
+    AssistantMessageListResponse,
     AssistantMessageRequest,
     AssistantMessageResponse,
     AssistantPingResponse,
@@ -107,6 +108,20 @@ def get_assistant_session(
     if session is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="assistant session을 찾을 수 없습니다.")
     return session_to_response(session)
+
+
+@router.get("/sessions/{session_id}/messages", response_model=AssistantMessageListResponse)
+def list_assistant_session_messages(
+    session_id: str,
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    messages = assistant_service.list_session_messages(db, session_id, limit=limit, offset=offset)
+    if messages is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="assistant session을 찾을 수 없습니다.")
+    return messages
 
 
 @router.post("/message", response_model=AssistantMessageResponse)

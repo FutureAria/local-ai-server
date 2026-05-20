@@ -88,6 +88,7 @@ local-ai assistant-status
 local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
+local-ai assistant-messages session-1 --limit 50 --offset 0
 local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/local-ai-server
 ```
 
