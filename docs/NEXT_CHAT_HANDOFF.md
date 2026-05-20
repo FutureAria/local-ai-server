@@ -206,7 +206,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `196 passed`
+  - `.venv/bin/pytest`: `198 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -223,6 +223,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_readme_quick_start.py`를 추가해 README 상단 Quick Start, Verification, Safe Boundaries, Key Docs 계약을 검증한다.
 - `tests/test_ui_connect_guide.py`를 추가해 UI 연결값, startup flow, 안전 경계 문서 계약을 검증한다.
 - `tests/test_ui_contract_cheatsheet.py`를 추가해 UI field cheatsheet의 endpoint, response type, safety/error 계약을 검증한다.
+- `scripts/smoke_test_api.py --assistant-bridge-preflight`와 관련 테스트를 추가해 wrong-server base URL을 read-only로 감지한다.
 - `tests/test_public_release_check.py`를 추가해 공개 전 read-only 보안 점검 스크립트를 검증한다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가해 Agent preview plan 생성과 조회 API를 검증한다.
 - assistant REPL에 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run <command>`를 추가했다.

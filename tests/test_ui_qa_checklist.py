@@ -14,6 +14,7 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "routes" in text
     assert "protected" in text
     assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server" in text
+    assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight" in text
     assert "다른 서버가 사용 중" in text
     assert "type=agent_plan" in text
     assert "type=shell_dry_run" in text

@@ -27,6 +27,40 @@ def _raise_for_status(step: str, response: httpx.Response) -> None:
         raise RuntimeError(f"{step} failed: HTTP {response.status_code} {response.text}") from exc
 
 
+def run_assistant_bridge_preflight(base_url: str, timeout: float = 30.0) -> dict:
+    base_url = base_url.rstrip("/")
+    headers = _headers()
+    summary: dict = {"base_url": base_url, "mode": "assistant-bridge-preflight", "steps": []}
+
+    with httpx.Client(timeout=timeout) as client:
+        for step, method, path, request_headers in [
+            ("health", "GET", "/health", {}),
+            ("assistant-startup", "GET", "/assistant/startup", headers),
+            ("api-inventory", "GET", "/project/api-inventory", {}),
+        ]:
+            response = client.get(f"{base_url}{path}", headers=request_headers)
+            step_result = {"step": step, "method": method, "path": path, "status": response.status_code}
+            if response.status_code == 404 and step == "assistant-startup":
+                step_result["hint"] = (
+                    "/health responded but /assistant/startup returned 404. "
+                    "Another server may be using this base URL."
+                )
+            summary["steps"].append(step_result)
+
+    statuses = {step["step"]: step["status"] for step in summary["steps"]}
+    summary["ok"] = (
+        statuses.get("health") == 200
+        and statuses.get("assistant-startup") == 200
+        and statuses.get("api-inventory") == 200
+    )
+    if not summary["ok"]:
+        summary["hint"] = (
+            "Start local-ai-server on this base URL, or pass a different --base-url "
+            "such as http://127.0.0.1:8010."
+        )
+    return summary
+
+
 def run_smoke_test(base_url: str, timeout: float = 120.0) -> dict:
     base_url = base_url.rstrip("/")
     headers = _headers()
@@ -240,12 +274,19 @@ def main() -> None:
         help="Run only the assistant/project API bridge smoke flow. This avoids upload/RAG but creates an assistant session/message.",
     )
     parser.add_argument(
+        "--assistant-bridge-preflight",
+        action="store_true",
+        help="Read-only check for /health, /assistant/startup, and /project/api-inventory before running UI smoke.",
+    )
+    parser.add_argument(
         "--include-assistant-bridge",
         action="store_true",
         help="Run the document RAG smoke flow and then the assistant/project API bridge smoke flow.",
     )
     args = parser.parse_args()
-    if args.assistant_bridge_only:
+    if args.assistant_bridge_preflight:
+        result = run_assistant_bridge_preflight(args.base_url)
+    elif args.assistant_bridge_only:
         result = run_assistant_bridge_smoke_test(args.base_url, project_root=args.project_root)
     else:
         result = run_smoke_test(args.base_url)

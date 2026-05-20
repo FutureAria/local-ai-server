@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `196 passed` |
+| `.venv/bin/pytest` | `198 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -502,9 +502,13 @@
 ### UI smoke preflight docs
 
 - 현재 세션에서 `127.0.0.1:8000`은 응답 중이었지만 `/assistant/startup`이 `404`를 반환해 assistant bridge smoke test는 실행하지 않았다.
+- `scripts/smoke_test_api.py --assistant-bridge-preflight`를 추가해 `/health`, `/assistant/startup`, `/project/api-inventory`를 read-only로 점검하고 다른 서버가 base URL을 사용 중인 상황을 명확히 표시한다.
 - `docs/UI_QA_CHECKLIST.md`에 backend identity preflight를 추가해 `/health` 성공만으로 같은 서버라고 판단하지 않고 `/assistant/startup`, `/project/api-inventory`까지 확인하도록 했다.
-- `docs/UI_CONNECT_GUIDE.md` troubleshooting에 `/health`는 성공하지만 `/assistant/startup`이 `404`인 경우 다른 서버가 `127.0.0.1:8000`을 사용 중일 수 있다고 명시했다.
+- `docs/UI_CONNECT_GUIDE.md` troubleshooting에 `/health`는 성공하지만 `/assistant/startup`이 `404`인 경우 다른 서버가 `127.0.0.1:8000`을 사용 중일 수 있다고 명시하고, `8010` 대체 포트 검증 예시를 추가했다.
 - `tests/test_ui_qa_checklist.py`, `tests/test_ui_connect_guide.py`를 보강해 assistant bridge smoke command와 포트 점유 경고가 유지되는지 검증한다.
+- `tests/test_smoke_script.py`를 보강해 preflight 성공과 wrong-server 감지를 mock 기반으로 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_ui_qa_checklist.py tests/test_ui_connect_guide.py` 결과는 `10 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `198 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

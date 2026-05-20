@@ -31,6 +31,8 @@ def test_ui_connect_guide_documents_startup_flow() -> None:
         "POST /assistant/message",
         "GET /assistant/sessions/{session_id}/messages",
         "GET /project/api-inventory",
+        "--assistant-bridge-preflight",
+        "http://127.0.0.1:8010",
     ]:
         assert endpoint in text
 

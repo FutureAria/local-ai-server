@@ -137,3 +137,49 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
         },
     ]
     assert summary["steps"][4]["response_type"] == "status"
+
+
+def test_assistant_bridge_preflight_detects_wrong_server(monkeypatch) -> None:
+    calls: list[dict] = []
+
+    class WrongServerClient(FakeClient):
+        def get(self, url: str, **kwargs) -> FakeResponse:
+            self.calls.append({"method": "GET", "url": url, **kwargs})
+            if url.endswith("/health"):
+                return FakeResponse(200, {"status": "ok", "agent": "other"})
+            if url.endswith("/assistant/startup"):
+                return FakeResponse(404, {"detail": "Not Found"})
+            if url.endswith("/project/api-inventory"):
+                return FakeResponse(404, {"detail": "Not Found"})
+            return FakeResponse(404, {"detail": "Not Found"})
+
+    def client_factory(timeout: float) -> WrongServerClient:
+        return WrongServerClient(calls)
+
+    monkeypatch.setattr(smoke.httpx, "Client", client_factory)
+
+    summary = smoke.run_assistant_bridge_preflight("http://server.test/")
+
+    assert summary["ok"] is False
+    assert [step["step"] for step in summary["steps"]] == [
+        "health",
+        "assistant-startup",
+        "api-inventory",
+    ]
+    assert summary["steps"][1]["status"] == 404
+    assert "Another server may be using this base URL" in summary["steps"][1]["hint"]
+    assert "different --base-url" in summary["hint"]
+
+
+def test_assistant_bridge_preflight_passes_for_expected_server(monkeypatch) -> None:
+    calls: list[dict] = []
+
+    def client_factory(timeout: float) -> FakeClient:
+        return FakeClient(calls)
+
+    monkeypatch.setattr(smoke.httpx, "Client", client_factory)
+
+    summary = smoke.run_assistant_bridge_preflight("http://server.test/")
+
+    assert summary["ok"] is True
+    assert [step["status"] for step in summary["steps"]] == [200, 200, 200]

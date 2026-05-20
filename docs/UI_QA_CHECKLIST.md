@@ -25,6 +25,7 @@
 - [ ] `GET /assistant/startup` 호출이 `200`을 반환한다.
 - [ ] `GET /project/api-inventory` 호출이 `200`을 반환한다.
 - [ ] `/health`는 성공하지만 `/assistant/startup`이 `404`이면 `127.0.0.1:8000`을 다른 서버가 사용 중일 수 있으므로 smoke test를 중단한다.
+- [ ] `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight`가 `ok=true`를 반환한다.
 - [ ] `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server`로 브라우저 조작 없이 assistant bridge API 흐름만 확인할 수 있다.
 
 ## Startup
@@ -95,6 +96,8 @@ curl http://127.0.0.1:8000/assistant/startup \
 
 curl http://127.0.0.1:8000/project/api-inventory \
   -H "Authorization: Bearer <LOCAL_API_KEY>"
+
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight
 
 curl -X POST http://127.0.0.1:8000/assistant/action-preview \
   -H "Authorization: Bearer <LOCAL_API_KEY>" \

@@ -55,6 +55,20 @@ curl http://127.0.0.1:8000/project/api-inventory \
   -H "Authorization: Bearer <LOCAL_API_KEY>"
 ```
 
+브라우저 UI를 열기 전에는 read-only preflight를 먼저 실행한다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight
+```
+
+`8000` 포트를 다른 서버가 쓰고 있으면 `local-ai-server`를 다른 포트로 띄운 뒤 같은 `--base-url`만 바꿔 실행한다.
+
+```bash
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8010
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8010 --assistant-bridge-preflight
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8010 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
+```
+
 ## 최소 요청 예시
 
 ```bash
