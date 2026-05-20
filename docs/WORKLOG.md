@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `161 passed` |
+| `.venv/bin/pytest` | `164 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -379,7 +379,15 @@
 - `local-ai assistant-startup` CLI 명령을 추가했다.
 - `/project/status` 차수를 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `5 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `161 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `164 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### Next chat handoff safety polish
+
+- `docs/NEXT_CHAT_HANDOFF.md`의 다음 작업을 실제 브라우저 조작으로 오해되지 않도록 API 계약/문서 QA 보강 중심으로 수정했다.
+- Codex가 바로 할 수 있는 안전 작업과 사용자 수동 확인 또는 별도 승인 후에만 진행할 작업을 분리했다.
+- `tests/test_next_chat_handoff.py`를 추가해 handoff 문서가 브라우저 조작 없이 진행하는 안전 작업, 최신 검증 gate, UI/release 문서 링크를 유지하는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_public_docs_contract.py tests/test_ui_qa_checklist.py tests/test_readme_ui_bridge.py` 결과는 `11 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `164 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 

@@ -5,8 +5,8 @@
 - Recommended AI: Codex
 - Recommended model: Codex GPT-5.5
 - Reason: 로컬 전용 FastAPI/Ollama/SQLite/Chroma 백엔드 구현과 검증은 Codex가 안전하게 계속 처리 가능
-- Next task: 브라우저 UI에서 `/assistant/startup`, `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages` 실제 렌더링 QA
-- User action required: 없음. 단, 시스템 의존성 설치, 파일 삭제, 운영 배포, 외부 LLM API 활성화는 사용자 승인 전 진행 불가
+- Next task: 브라우저 조작 없이 `/assistant/startup`, `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages` API 계약과 문서 QA 기준 보강
+- User action required: 없음. 단, 실제 브라우저 렌더링 확인, 메시지 전송, 시스템 의존성 설치, 파일 삭제, 운영 배포, 외부 LLM API 활성화는 사용자 승인 또는 수동 확인 전 진행 불가
 
 ## 프로젝트 루트
 
@@ -17,7 +17,7 @@ ls
 git status
 ```
 
-주의: 현재 폴더는 Git 저장소가 아닐 수 있다. `git status`가 실패하면 그 사실을 보고하고 계속 진행한다.
+주의: 이 handoff 작성 시점의 프로젝트 루트는 Git 저장소다. 다른 환경에서 `git status`가 실패하면 그 사실을 보고하고 계속 진행한다.
 
 ## 현재 상태
 
@@ -165,22 +165,30 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 
 ## 다음 추천 작업
 
-1. `docs/UI_QA_CHECKLIST.md` 기준으로 브라우저 UI 시작 시 `GET /assistant/startup` 호출 확인
-2. 필요 시 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`를 개별 refresh endpoint로 호출
-3. `GET /assistant/ui-contract`로 시작 순서, 메시지 흐름, 응답 타입, 차단 기능 계약 표시 확인
-4. `GET /assistant/dashboard`로 대시보드 문서/세션/integrity/연결 카드 표시 확인
-5. 메시지 전송 전 `POST /assistant/action-preview`로 intent/위험도/필요 입력값 표시 확인
-6. `POST /assistant/bootstrap` 호출과 project root/session/UI 힌트 렌더링 확인
-7. 브라우저 UI에서 `POST /assistant/message` 실제 메시지 전송과 `ui` 힌트 렌더링 확인
-8. `GET /assistant/sessions` 최근 대화 목록 표시 확인
-9. `GET /assistant/sessions/{session_id}/messages` 긴 대화 기록 paging 표시 확인
-10. 실제 사용자 `.md` 또는 `.txt` 문서 업로드 검증
-11. `/search` 실제 embedding + Chroma 검색 재확인
-12. `/ask-with-docs` 실제 RAG 답변 품질 확인
-13. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
-14. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 재생성 명령 설계
-15. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
-16. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
+Codex가 바로 이어서 할 수 있는 안전 작업:
+
+1. `docs/UI_QA_CHECKLIST.md`와 `docs/UI_BRIDGE_EXAMPLES.md`의 endpoint/response field 정합성 점검
+2. `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 assistant endpoint와 CLI 목록 교차 검증
+3. `tests/test_public_docs_contract.py`, `tests/test_ui_qa_checklist.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 보강
+4. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
+5. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
+
+사용자 수동 확인 또는 별도 승인 후에만 진행할 작업:
+
+1. `docs/UI_QA_CHECKLIST.md` 기준으로 실제 브라우저 UI에서 `GET /assistant/startup` 렌더링 확인
+2. UI에서 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard` 개별 refresh 동작 확인
+3. UI에서 `GET /assistant/ui-contract` 시작 순서, 메시지 흐름, 응답 타입, 차단 기능 계약 표시 확인
+4. UI에서 `POST /assistant/bootstrap` project root/session/UI 힌트 렌더링 확인
+5. UI에서 `POST /assistant/action-preview` 위험도/필요 입력값 표시 확인
+6. UI에서 `POST /assistant/message` 실제 메시지 전송과 `ui` 힌트 렌더링 확인
+7. UI에서 `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 대화 목록과 paging 확인
+8. 실제 사용자 `.md` 또는 `.txt` 문서 업로드 검증
+9. `/search` 실제 embedding + Chroma 검색 재확인
+10. `/ask-with-docs` 실제 RAG 답변 품질 확인
+11. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
+12. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 재생성 명령 설계
+13. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
+14. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
 
 ## 최근 Codex self-check
 
@@ -188,7 +196,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `161 passed`
+  - `.venv/bin/pytest`: `164 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -218,6 +226,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `/assistant/ui-contract`와 `local-ai assistant-ui-contract`를 추가했다.
 - `/assistant/startup`와 `local-ai assistant-startup`을 추가했다.
 - `/project/status`는 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA를 다음 단계로 표시한다.
+- `tests/test_next_chat_handoff.py`를 추가해 이 handoff가 브라우저 조작 없이 가능한 Codex 작업과 사용자 수동 확인 작업을 분리하는지 검증한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함
