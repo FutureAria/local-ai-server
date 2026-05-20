@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `201 passed` |
+| `.venv/bin/pytest` | `202 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -563,6 +563,14 @@
 - shell은 dry-run only, 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 외부 LLM API/cloud vector DB는 금지 또는 범위 밖으로 명시했다.
 - `tests/test_readme_quick_start.py`, `tests/test_portfolio_docs_contract.py`를 보강해 공개 문서의 safe boundary matrix가 유지되도록 했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_public_release_summary.py` 결과는 `17 passed, 1 warning`이다.
+
+### Public release final self-check wording
+
+- `docs/PUBLIC_RELEASE_SUMMARY.md`에 `기능 경계 요약` 표를 추가해 공개 가능한 기능, 조건부 read-only 기능, 금지 기능을 구분했다.
+- `docs/RELEASE_CHECKLIST.md` 실행 경계에 Agent execution v1의 조건부 read-only 범위와 폴더 UI 열기 미지원 항목을 추가했다.
+- `tests/test_public_release_summary.py`를 보강해 공개 요약과 릴리즈 체크리스트가 기능 경계 self-check 문구를 계속 포함하도록 했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_security_docs_contract.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py` 결과는 `16 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `202 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

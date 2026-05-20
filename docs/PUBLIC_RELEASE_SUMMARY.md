@@ -28,6 +28,18 @@
 - Feedback 저장과 SFT JSONL export
 - API, 보안, 운영, QA, handoff 문서
 
+## 기능 경계 요약
+
+| 구분 | 공개 설명 |
+|---|---|
+| 문서 업로드/검색/RAG | 구현됨. 로컬 Ollama, SQLite, Chroma 기준으로 동작한다. |
+| Assistant UI bridge | 구현됨. API 계약과 smoke test를 제공하지만 프론트엔드는 포함하지 않는다. |
+| Agent plan/approval | 구현됨. 요청을 action 후보, 위험도, 승인 상태로 기록한다. |
+| Agent read-only execution v1 | 조건부 기능. 기본값은 차단이며, 활성화해도 허용 root 폴더 목록 조회, 텍스트 파일 preview, 명시 URL 단건 read-only fetch만 지원한다. |
+| shell | dry-run only. 실제 shell 실행은 지원하지 않는다. |
+| 브라우저/파일/배포 | 지원하지 않음. 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포는 범위 밖이다. |
+| 외부 LLM API/cloud vector DB | 사용하지 않음. 런타임 AI 호출은 Ollama local API only다. |
+
 ## 공개하지 않는 로컬 데이터
 
 - `.env`
@@ -53,7 +65,7 @@ python scripts/local_ci_check.py --root .
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `201 passed`
+- `.venv/bin/pytest`: `202 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
@@ -73,5 +85,6 @@ python scripts/local_ci_check.py --root .
 - [ ] `docs/RELEASE_CHECKLIST.md` 확인
 - [ ] `SECURITY.md` 확인
 - [ ] `README.md`의 배포 상태가 로컬 실행 기준으로 표시되어 있는지 확인
+- [ ] README와 Project Summary의 기능 경계 표가 현재 구현과 맞는지 확인
 - [ ] `python scripts/public_release_check.py --root . --json` 결과 확인
 - [ ] 민감 파일이 staging되지 않았는지 `git status --short`로 확인

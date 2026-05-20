@@ -58,8 +58,11 @@ python scripts/local_ci_check.py --root .
 ## 5. 실행 경계
 
 - [ ] Agent 기본값은 실제 실행 비활성이다.
+- [ ] Agent execution v1은 조건부 read-only 기능이며 기본값은 차단이라고 설명되어 있다.
+- [ ] Agent execution v1은 허용 root 폴더 목록 조회, 텍스트 파일 preview, 명시 URL 단건 read-only fetch만 지원한다고 설명되어 있다.
 - [ ] shell은 dry-run 정책 판단만 제공한다고 설명되어 있다.
 - [ ] browser click/fill/submit 자동화는 지원하지 않는다고 설명되어 있다.
+- [ ] 폴더 UI 열기는 지원하지 않는다고 설명되어 있다.
 - [ ] 파일 수정/삭제 자동화는 지원하지 않는다고 설명되어 있다.
 - [ ] repair/delete/rebuild 실제 실행은 사용자 승인 전 하지 않는다고 설명되어 있다.
 - [ ] 폴더 색인 preview는 실제 저장 없이 동작한다고 설명되어 있다.
