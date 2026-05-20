@@ -3,6 +3,7 @@
 `local-ai-server`는 FastAPI 기반 로컬 전용 API 서버다. 런타임 LLM과 embedding 호출은 Ollama local API만 사용한다.
 
 브라우저 UI 연동용 예시 payload는 [UI_BRIDGE_EXAMPLES.md](UI_BRIDGE_EXAMPLES.md)에 별도로 정리되어 있다.
+브라우저 UI 수동 QA 기준은 [UI_QA_CHECKLIST.md](UI_QA_CHECKLIST.md)에 별도로 정리되어 있다.
 
 기본 실행 주소:
 

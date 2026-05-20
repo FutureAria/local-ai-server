@@ -43,6 +43,7 @@ git status
 - `README.md`
 - `docs/API.md`
 - `docs/UI_BRIDGE_EXAMPLES.md`
+- `docs/UI_QA_CHECKLIST.md`
 - `docs/PROJECT_SUMMARY.md`
 - `docs/CLAUDE_REVIEW_HANDOFF.md`
 - `docs/WORKLOG.md`
@@ -125,6 +126,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `GET /feedback`와 `local-ai feedbacks`로 feedback 목록 조회 가능. `rating`, `chat_log_id` 필터 지원.
 - `docs/API.md`에 endpoint별 요청 예시, 응답 핵심 필드, 보호 endpoint, CLI 대응 관계가 정리되어 있음.
 - `docs/UI_BRIDGE_EXAMPLES.md`에 브라우저 UI 연동용 startup/ui-contract/message 예시 payload가 정리되어 있음.
+- `docs/UI_QA_CHECKLIST.md`에 브라우저 UI 수동 QA 기준과 stop condition이 정리되어 있음.
 - `docs/OPERATIONS.md`에 로컬 운영 로그, 저장공간 점검, 백업, 수동 rotation 예시가 정리되어 있음.
 - `SECURITY.md`에 로컬 운영 보안 원칙, 공개 전 체크리스트, 고위험 작업 기준이 정리되어 있음.
 - README 앞부분에 개발 배경, 기술 선택 이유, 핵심 구현 포인트가 포트폴리오용으로 정리되어 있음.
@@ -161,7 +163,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 
 ## 다음 추천 작업
 
-1. 브라우저 UI 시작 시 `GET /assistant/startup` 호출로 token/header/server 연결, 안전 설정, dashboard, UI 계약 snapshot 확인
+1. `docs/UI_QA_CHECKLIST.md` 기준으로 브라우저 UI 시작 시 `GET /assistant/startup` 호출 확인
 2. 필요 시 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`를 개별 refresh endpoint로 호출
 3. `GET /assistant/ui-contract`로 시작 순서, 메시지 흐름, 응답 타입, 차단 기능 계약 표시 확인
 4. `GET /assistant/dashboard`로 대시보드 문서/세션/integrity/연결 카드 표시 확인
@@ -184,7 +186,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `152 passed`
+  - `.venv/bin/pytest`: `154 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 
