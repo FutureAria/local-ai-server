@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -99,6 +100,41 @@ PUBLIC_DOC_LINKS = [
     "SECURITY.md",
 ]
 
+PUBLIC_MARKDOWN_FILES = [
+    Path("README.md"),
+    Path("SECURITY.md"),
+    Path("docs/API.md"),
+    Path("docs/PROJECT_SUMMARY.md"),
+    Path("docs/OPERATIONS.md"),
+    Path("docs/RELEASE_CHECKLIST.md"),
+    Path("docs/PUBLIC_RELEASE_SUMMARY.md"),
+    Path("docs/UI_CONNECT_GUIDE.md"),
+    Path("docs/UI_CONTRACT_CHEATSHEET.md"),
+    Path("docs/UI_BRIDGE_EXAMPLES.md"),
+    Path("docs/UI_QA_CHECKLIST.md"),
+    Path("docs/CLAUDE_REVIEW_HANDOFF.md"),
+    Path("docs/WORKLOG.md"),
+    Path("docs/NEXT_CHAT_HANDOFF.md"),
+]
+
+MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+
+
+def _link_target_exists(source: Path, raw_target: str) -> bool:
+    target = raw_target.strip()
+    if target.startswith(("http://", "https://", "mailto:", "#")):
+        return True
+    if target.startswith("<") and target.endswith(">"):
+        target = target[1:-1]
+
+    target = target.split("#", 1)[0]
+    if not target:
+        return True
+
+    target_path = Path(target)
+    resolved = target_path if target_path.is_absolute() else source.parent / target_path
+    return resolved.exists()
+
 
 def test_public_doc_links_exist_and_are_referenced() -> None:
     readme = DOCS["readme"].read_text(encoding="utf-8")
@@ -107,6 +143,20 @@ def test_public_doc_links_exist_and_are_referenced() -> None:
     for link in PUBLIC_DOC_LINKS:
         assert Path(link).exists(), f"{link} should exist"
         assert link in readme or link in summary, f"{link} should be referenced in public docs"
+
+
+def test_public_markdown_links_resolve_to_files() -> None:
+    broken_links = []
+
+    for source in PUBLIC_MARKDOWN_FILES:
+        text = source.read_text(encoding="utf-8")
+        for match in MARKDOWN_LINK_RE.finditer(text):
+            raw_target = match.group(1)
+            if not _link_target_exists(source, raw_target):
+                line_no = text[: match.start()].count("\n") + 1
+                broken_links.append(f"{source}:{line_no} -> {raw_target}")
+
+    assert not broken_links
 
 
 def test_core_endpoints_are_documented_in_public_docs() -> None:

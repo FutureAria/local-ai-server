@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `202 passed` |
+| `.venv/bin/pytest` | `203 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -570,7 +570,15 @@
 - `docs/RELEASE_CHECKLIST.md` 실행 경계에 Agent execution v1의 조건부 read-only 범위와 폴더 UI 열기 미지원 항목을 추가했다.
 - `tests/test_public_release_summary.py`를 보강해 공개 요약과 릴리즈 체크리스트가 기능 경계 self-check 문구를 계속 포함하도록 했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_security_docs_contract.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py` 결과는 `16 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `202 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 당시 내부 `pytest` 결과는 `202 passed, 1 warning`이다.
+
+### Public markdown link self-check
+
+- `tests/test_public_docs_contract.py`에 공개 Markdown 문서의 상대 링크가 실제 파일로 해석되는지 검증하는 테스트를 추가했다.
+- README 루트 기준 링크와 `docs/*.md` 내부 상대 링크를 각각 source file 기준으로 해석한다.
+- external URL, mailto, page anchor는 파일 존재 검증 대상에서 제외한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `17 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `203 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
