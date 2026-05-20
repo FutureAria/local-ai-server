@@ -41,6 +41,18 @@ def get_agent_run(
     return agent_service.to_detail(run)
 
 
+@router.get("/runs/{run_id}/results", dependencies=[Depends(require_api_key)])
+def get_agent_run_results(
+    run_id: int,
+    db: Session = Depends(get_db),
+    agent_service: AgentService = Depends(get_agent_service),
+) -> list[dict]:
+    results = agent_service.get_results(db, run_id)
+    if results is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="agent run을 찾을 수 없습니다.")
+    return results
+
+
 @router.post("/runs/{run_id}/approve", response_model=AgentRunDetail, dependencies=[Depends(require_api_key)])
 def approve_agent_run(
     run_id: int,

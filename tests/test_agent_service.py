@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.config import Settings
 from app.db.database import Base
 from app.db.models import AgentRun
-from app.services.agent_service import AgentService
+from app.services.agent_service import AgentService, _extract_html_summary
 
 
 def test_agent_service_creates_high_risk_preview_plan_for_browser_and_file(tmp_path) -> None:
@@ -101,7 +101,86 @@ def test_agent_service_execute_lists_allowed_folder_read_only(tmp_path) -> None:
 
         assert executed.status == "completed"
         assert detail["execution_results"][0]["status"] == "completed"
-        assert detail["execution_results"][0]["items"] == [{"name": "note.md", "type": "file"}]
+        assert detail["execution_results"][0]["items"] == [{"name": "note.md", "type": "file", "sensitive": False}]
+
+
+def test_agent_service_execute_previews_allowed_text_file_read_only(tmp_path) -> None:
+    allowed = tmp_path / "allowed"
+    allowed.mkdir()
+    note = allowed / "note.md"
+    note.write_text("# Note\nJWT memo", encoding="utf-8")
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(
+        settings=Settings(
+            AGENT_EXECUTION_ENABLED=True,
+            AGENT_ALLOWED_ROOTS=str(allowed),
+        )
+    )
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, f"파일 '{note}' 읽어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        result = detail["execution_results"][0]
+        assert executed.status == "completed"
+        assert result["status"] == "completed"
+        assert result["content_preview"] == "# Note\nJWT memo"
+        assert result["line_count"] == 2
+
+
+def test_agent_service_blocks_sensitive_file_preview(tmp_path) -> None:
+    allowed = tmp_path / "allowed"
+    allowed.mkdir()
+    env_file = allowed / ".env"
+    env_file.write_text("TOKEN=secret", encoding="utf-8")
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(
+        settings=Settings(
+            AGENT_EXECUTION_ENABLED=True,
+            AGENT_ALLOWED_ROOTS=str(allowed),
+        )
+    )
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, f"파일 '{env_file}' 읽어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        assert executed.status == "blocked"
+        assert "민감 파일" in detail["execution_results"][0]["message"]
+
+
+def test_agent_service_blocks_large_file_preview(tmp_path) -> None:
+    allowed = tmp_path / "allowed"
+    allowed.mkdir()
+    large_file = allowed / "large.md"
+    large_file.write_text("x" * 20, encoding="utf-8")
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+    service = AgentService(
+        settings=Settings(
+            AGENT_EXECUTION_ENABLED=True,
+            AGENT_ALLOWED_ROOTS=str(allowed),
+            AGENT_FILE_PREVIEW_MAX_BYTES=10,
+        )
+    )
+
+    with TestingSessionLocal() as db:
+        run = service.create_plan(db, f"파일 '{large_file}' 읽어줘")
+        service.approve_run(db, run.id)
+        executed = service.execute_run(db, run.id)
+        detail = service.to_detail(executed)
+
+        assert executed.status == "blocked"
+        assert "AGENT_FILE_PREVIEW_MAX_BYTES" in detail["execution_results"][0]["message"]
 
 
 def test_agent_service_execute_blocks_file_outside_allowed_root(tmp_path) -> None:
@@ -143,3 +222,20 @@ def test_agent_service_execute_blocks_web_fetch_by_default(tmp_path) -> None:
 
         assert executed.status == "blocked"
         assert "AGENT_WEB_FETCH_ENABLED=false" in detail["execution_results"][0]["message"]
+
+
+def test_agent_html_summary_extracts_title_text_and_links() -> None:
+    summary = _extract_html_summary(
+        """
+        <html>
+          <head><title>Local Docs</title><script>ignore()</script></head>
+          <body><h1>JWT</h1><p>Authentication flow</p><a href="/next">Next</a></body>
+        </html>
+        """,
+        "https://example.com/base",
+    )
+
+    assert summary["title"] == "Local Docs"
+    assert "JWT" in summary["text_preview"]
+    assert "Authentication flow" in summary["text_preview"]
+    assert summary["links"] == [{"url": "https://example.com/next", "text": ""}]

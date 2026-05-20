@@ -29,6 +29,7 @@
 - `POST /agent/plan`
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
+- `GET /agent/runs/{run_id}/results`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
@@ -87,14 +88,16 @@
 - `/agent/runs/{run_id}/reject`는 거절 상태만 기록한다.
 - `/agent/runs/{run_id}/execute`는 승인된 run만 실행 시도한다.
 - `AGENT_EXECUTION_ENABLED=false` 기본값에서는 실제 실행을 차단한다.
-- `AGENT_EXECUTION_ENABLED=true`에서도 v1 실행 엔진은 허용 root 안의 파일/폴더 read-only 조회와 명시 URL read-only fetch만 지원한다.
+- `AGENT_EXECUTION_ENABLED=true`에서도 v1 실행 엔진은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원한다.
+- 파일 preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
 - 실제 웹 이동, 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 수행하지 않는다.
 - `AGENT_EXECUTION_ENABLED` 기본값은 `false`다.
 - `AGENT_ALLOWED_ROOTS`는 파일/폴더 agent action이 접근할 수 있는 root를 제한한다.
 - `AGENT_WEB_FETCH_ENABLED`는 명시 URL read-only fetch를 별도로 제어한다.
 - `AGENT_WEB_FETCH_MAX_BYTES`는 URL fetch 응답을 지정한 바이트 이후 truncate한다.
+- `AGENT_FILE_PREVIEW_MAX_BYTES`와 `AGENT_FILE_PREVIEW_EXTENSIONS`는 파일 내용 preview 범위를 제한한다.
 - agent plan 기록은 사용자 요청 내용을 포함할 수 있으므로 `/agent/*` endpoint는 `LOCAL_API_KEY`가 설정된 경우 보호된다.
-- 실제 browser/file/shell 실행 기능을 활성화하려면 별도 보안 리뷰와 사용자 승인이 필요하다.
+- 브라우저 클릭, 파일 수정, shell 실행 같은 고위험 실행 기능을 활성화하려면 별도 보안 리뷰와 사용자 승인이 필요하다.
 
 ## 공개 전 체크리스트
 
@@ -122,7 +125,7 @@ python scripts/public_release_check.py --root .
 아래 작업은 사용자 승인 없이 진행하지 않는다.
 
 - 실제 repair/delete/rebuild 실행
-- 실제 browser/file/shell agent 실행
+- 브라우저 interaction, 파일 수정, shell agent 실행
 - 외부 LLM API 활성화
 - 외부 URL 크롤링
 - 브라우저 click/fill/submit interaction 추가

@@ -14,3 +14,5 @@ def test_config_defaults() -> None:
     assert settings.agent_allowed_roots == "."
     assert settings.agent_web_fetch_enabled is False
     assert settings.agent_web_fetch_max_bytes == 100_000
+    assert settings.agent_file_preview_max_bytes == 50_000
+    assert ".md" in settings.agent_file_preview_extensions

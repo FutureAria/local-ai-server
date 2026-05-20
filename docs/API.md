@@ -29,6 +29,7 @@ X-API-Key: <LOCAL_API_KEY>
 - `POST /agent/plan`
 - `GET /agent/runs`
 - `GET /agent/runs/{run_id}`
+- `GET /agent/runs/{run_id}/results`
 - `POST /agent/runs/{run_id}/approve`
 - `POST /agent/runs/{run_id}/reject`
 - `POST /agent/runs/{run_id}/execute`
@@ -324,7 +325,7 @@ curl "http://127.0.0.1:8000/feedback?rating=bad&limit=20&offset=0"
 curl "http://127.0.0.1:8000/feedback?chat_log_id=1&limit=20&offset=0"
 ```
 
-## Agent Preview
+## Agent
 
 ### `POST /agent/plan`
 
@@ -365,7 +366,7 @@ curl http://127.0.0.1:8000/agent/runs/1
 
 ### `POST /agent/runs/{run_id}/approve`
 
-agent plan을 승인 상태로 바꾼다. 상태는 `approved_pending_execution`이 되지만 실제 실행은 수행하지 않는다.
+agent plan을 승인 상태로 바꾼다. 상태는 `approved_pending_execution`이 되며, 실제 실행은 별도 `execute` 호출에서만 시도한다.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/agent/runs/1/approve
@@ -385,7 +386,9 @@ curl -X POST http://127.0.0.1:8000/agent/runs/1/reject
 
 `AGENT_EXECUTION_ENABLED=true` 상태의 v1 실행 엔진은 아래만 지원한다.
 
-- 허용 root 안의 파일/폴더 read-only metadata/list 조회
+- 허용 root 안의 폴더 read-only list 조회
+- 허용 root 안의 텍스트 파일 read-only content preview
+- 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자 차단
 - `AGENT_WEB_FETCH_ENABLED=true`이고 명시 URL이 있는 경우 read-only URL fetch
 - URL fetch 응답은 `AGENT_WEB_FETCH_MAX_BYTES` 이후 truncate
 
@@ -393,6 +396,14 @@ curl -X POST http://127.0.0.1:8000/agent/runs/1/reject
 
 ```bash
 curl -X POST http://127.0.0.1:8000/agent/runs/1/execute
+```
+
+### `GET /agent/runs/{run_id}/results`
+
+agent 실행 결과만 조회한다. 실행 전이면 빈 배열을 반환한다.
+
+```bash
+curl http://127.0.0.1:8000/agent/runs/1/results
 ```
 
 ## CLI 대응
@@ -420,6 +431,7 @@ local-ai feedbacks
 local-ai agent-plan "GitHub 웹 열어줘"
 local-ai agent-runs
 local-ai agent-run 1
+local-ai agent-results 1
 local-ai agent-approve 1
 local-ai agent-reject 1
 local-ai agent-execute 1

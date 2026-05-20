@@ -46,6 +46,9 @@ class FakeAgentService:
     def get_run(self, db, run_id: int):
         return {"id": run_id} if run_id == 1 else None
 
+    def get_results(self, db, run_id: int):
+        return [{"status": "completed"}] if run_id == 1 else None
+
     def approve_run(self, db, run_id: int):
         return {"id": run_id, "status": "approved_pending_execution"} if run_id == 1 else None
 
@@ -111,6 +114,19 @@ def test_agent_runs_endpoints_with_mock() -> None:
     assert list_response.json()[0]["status"] == "planned"
     assert detail_response.status_code == 200
     assert detail_response.json()["actions"][0]["action"] == "open_preview"
+    assert missing_response.status_code == 404
+
+
+def test_agent_results_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_agent_service] = lambda: FakeAgentService()
+    client = TestClient(app)
+
+    response = client.get("/agent/runs/1/results")
+    missing_response = client.get("/agent/runs/999/results")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    assert response.json() == [{"status": "completed"}]
     assert missing_response.status_code == 404
 
 

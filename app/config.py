@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     agent_allowed_roots: str = Field(default=".", alias="AGENT_ALLOWED_ROOTS")
     agent_web_fetch_enabled: bool = Field(default=False, alias="AGENT_WEB_FETCH_ENABLED")
     agent_web_fetch_max_bytes: int = Field(default=100_000, ge=1, alias="AGENT_WEB_FETCH_MAX_BYTES")
+    agent_file_preview_max_bytes: int = Field(default=50_000, ge=1, alias="AGENT_FILE_PREVIEW_MAX_BYTES")
+    agent_file_preview_extensions: str = Field(
+        default=".txt,.md,.py,.json,.yaml,.yml,.toml,.csv,.html,.htm,.log",
+        alias="AGENT_FILE_PREVIEW_EXTENSIONS",
+    )
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

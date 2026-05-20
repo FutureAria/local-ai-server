@@ -13,6 +13,8 @@
 - `AGENT_ALLOWED_ROOTS`는 agent 파일/폴더 action의 read-only 접근 root를 제한한다.
 - `AGENT_WEB_FETCH_ENABLED`는 명시 URL read-only fetch를 별도로 제어한다.
 - `AGENT_WEB_FETCH_MAX_BYTES`는 URL fetch 응답을 지정한 바이트 이후 truncate한다.
+- `AGENT_FILE_PREVIEW_MAX_BYTES`는 파일 내용 preview 크기를 제한한다.
+- `AGENT_FILE_PREVIEW_EXTENSIONS`는 내용 preview가 가능한 텍스트 확장자를 제한한다.
 - `.env`, API key, DB password, 개인 문서 원문, 운영 로그 파일은 Git에 올리지 않는다.
 - 원본 색인 대상 폴더의 파일은 수정하거나 삭제하지 않는다.
 

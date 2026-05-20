@@ -1,7 +1,8 @@
 import json
 import re
+from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import httpx
 
@@ -10,6 +11,19 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.db.models import AgentRun
+
+SENSITIVE_FILE_NAMES = {
+    ".env",
+    ".env.local",
+    ".env.production",
+    ".netrc",
+    "id_rsa",
+    "id_dsa",
+    "id_ecdsa",
+    "id_ed25519",
+}
+SENSITIVE_SUFFIXES = {".key", ".pem", ".p12", ".pfx", ".crt", ".cer"}
+SENSITIVE_PATH_PARTS = {".ssh", ".gnupg", ".aws", ".config/gcloud"}
 
 
 class AgentService:
@@ -78,6 +92,7 @@ class AgentService:
         all_completed = True
         for action in plan["actions"]:
             result = self._execute_action(action)
+            result["action_index"] = len(results)
             results.append(result)
             if result["status"] != "completed":
                 all_completed = False
@@ -119,6 +134,13 @@ class AgentService:
             "actions": plan["actions"],
             "execution_results": plan.get("execution_results", []),
         }
+
+    def get_results(self, db: Session, run_id: int) -> list[dict] | None:
+        run = self.get_run(db, run_id)
+        if run is None:
+            return None
+        plan = json.loads(run.plan_json)
+        return plan.get("execution_results", [])
 
     def _plan_actions(self, instruction: str) -> list[dict]:
         lowered = instruction.lower()
@@ -227,10 +249,19 @@ class AgentService:
         if not resolved_path.exists():
             return _blocked_result(action, "요청한 파일/폴더가 존재하지 않습니다.")
 
+        if _is_sensitive_path(resolved_path):
+            return _blocked_result(action, "민감 파일 또는 민감 폴더로 보이는 경로는 read-only preview에서도 차단했습니다.")
+
         if resolved_path.is_dir():
             items = []
             for child in sorted(resolved_path.iterdir(), key=lambda item: item.name.lower())[:50]:
-                items.append({"name": child.name, "type": "dir" if child.is_dir() else "file"})
+                items.append(
+                    {
+                        "name": child.name,
+                        "type": "dir" if child.is_dir() else "file",
+                        "sensitive": _is_sensitive_path(child),
+                    }
+                )
             return {
                 "tool": action["tool"],
                 "action": action["action"],
@@ -240,13 +271,37 @@ class AgentService:
                 "items": items,
             }
 
+        extension = resolved_path.suffix.lower()
+        allowed_extensions = _csv_set(self.settings.agent_file_preview_extensions)
+        if extension not in allowed_extensions:
+            return _blocked_result(action, f"파일 preview가 허용되지 않은 확장자입니다: {extension or '(no extension)'}")
+
+        size_bytes = resolved_path.stat().st_size
+        if size_bytes > self.settings.agent_file_preview_max_bytes:
+            return _blocked_result(action, "파일이 AGENT_FILE_PREVIEW_MAX_BYTES보다 커서 내용 preview를 차단했습니다.")
+
+        try:
+            raw = resolved_path.read_bytes()
+        except OSError as exc:
+            return _blocked_result(action, f"파일을 읽을 수 없습니다: {exc}")
+        if _looks_binary(raw):
+            return _blocked_result(action, "binary 파일로 보여 내용 preview를 차단했습니다.")
+        try:
+            content = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            return _blocked_result(action, "UTF-8 텍스트 파일만 preview할 수 있습니다.")
+
         return {
             "tool": action["tool"],
             "action": action["action"],
             "status": "completed",
-            "message": "허용된 root 안의 파일 metadata를 read-only로 조회했습니다.",
+            "message": "허용된 root 안의 파일 내용을 read-only로 preview했습니다.",
             "path": str(resolved_path),
-            "size_bytes": resolved_path.stat().st_size,
+            "extension": extension,
+            "size_bytes": size_bytes,
+            "line_count": content.count("\n") + (1 if content else 0),
+            "content_preview": content[:2000],
+            "truncated": len(content) > 2000,
         }
 
     def _execute_web_action(self, action: dict) -> dict:
@@ -281,8 +336,17 @@ class AgentService:
             return _blocked_result(action, f"웹 fetch 실패: {exc}")
 
         text_preview = ""
+        title = ""
+        links: list[dict] = []
         if "text" in content_type or "html" in content_type:
-            text_preview = body.decode(response.encoding or "utf-8", errors="replace")[:1000]
+            decoded = body.decode(response.encoding or "utf-8", errors="replace")
+            if "html" in content_type:
+                html_summary = _extract_html_summary(decoded, final_url)
+                title = html_summary["title"]
+                links = html_summary["links"]
+                text_preview = html_summary["text_preview"]
+            else:
+                text_preview = decoded[:1000]
 
         return {
             "tool": action["tool"],
@@ -294,6 +358,8 @@ class AgentService:
             "content_type": content_type,
             "bytes_read": len(body),
             "truncated": truncated,
+            "title": title,
+            "links": links,
             "text_preview": text_preview,
         }
 
@@ -335,6 +401,31 @@ def _allowed_roots(value: str) -> list[Path]:
     return roots or [Path(".").resolve()]
 
 
+def _csv_set(value: str) -> set[str]:
+    return {item.strip().lower() for item in value.split(",") if item.strip()}
+
+
+def _is_sensitive_path(path: Path) -> bool:
+    name = path.name.lower()
+    suffix = path.suffix.lower()
+    lowered_parts = [part.lower() for part in path.parts]
+    if name in SENSITIVE_FILE_NAMES or suffix in SENSITIVE_SUFFIXES:
+        return True
+    if any(part in SENSITIVE_PATH_PARTS for part in lowered_parts):
+        return True
+    return any(keyword in name for keyword in ["secret", "token", "credential", "password", "passwd"])
+
+
+def _looks_binary(raw: bytes) -> bool:
+    if not raw:
+        return False
+    sample = raw[:2048]
+    if b"\x00" in sample:
+        return True
+    control_bytes = sum(1 for byte in sample if byte < 9 or (13 < byte < 32))
+    return control_bytes / len(sample) > 0.10
+
+
 def _is_relative_to(path: Path, root: Path) -> bool:
     try:
         path.relative_to(root)
@@ -354,3 +445,61 @@ def _extract_path(text: str) -> str | None:
         return quoted.group(1)
     path_like = re.search(r"((?:~|\.)?/[\w가-힣 ._~\-/]+|(?:\.{1,2}/[\w가-힣 ._~\-/]+))", text)
     return path_like.group(1).strip() if path_like else None
+
+
+class _HTMLSummaryParser(HTMLParser):
+    def __init__(self, base_url: str) -> None:
+        super().__init__(convert_charrefs=True)
+        self.base_url = base_url
+        self.title = ""
+        self.links: list[dict] = []
+        self._parts: list[str] = []
+        self._ignored_depth = 0
+        self._in_title = False
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        normalized = tag.lower()
+        if normalized in {"script", "style", "noscript", "svg"}:
+            self._ignored_depth += 1
+        if normalized == "title":
+            self._in_title = True
+        if normalized == "a":
+            href = dict(attrs).get("href")
+            if href and len(self.links) < 20:
+                self.links.append({"url": urljoin(self.base_url, href), "text": ""})
+        if normalized in {"p", "br", "div", "section", "article", "li", "tr", "h1", "h2", "h3", "h4", "h5", "h6"}:
+            self._parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        normalized = tag.lower()
+        if normalized in {"script", "style", "noscript", "svg"} and self._ignored_depth:
+            self._ignored_depth -= 1
+        if normalized == "title":
+            self._in_title = False
+        if normalized in {"p", "div", "section", "article", "li", "tr", "h1", "h2", "h3", "h4", "h5", "h6"}:
+            self._parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        text = " ".join(data.split())
+        if not text:
+            return
+        if self._in_title and not self.title:
+            self.title = text
+        if self._ignored_depth:
+            return
+        self._parts.append(text)
+
+    def summary(self) -> dict:
+        lines = [" ".join(line.split()) for line in "".join(self._parts).splitlines()]
+        text = "\n".join(line for line in lines if line).strip()
+        return {"title": self.title, "text_preview": text[:1000], "links": self.links}
+
+
+def _extract_html_summary(html: str, base_url: str) -> dict:
+    parser = _HTMLSummaryParser(base_url)
+    try:
+        parser.feed(html)
+        parser.close()
+    except Exception:
+        return {"title": "", "text_preview": html[:1000], "links": []}
+    return parser.summary()

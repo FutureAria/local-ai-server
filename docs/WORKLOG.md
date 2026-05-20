@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `98 passed` |
+| `.venv/bin/pytest` | `105 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -265,15 +265,16 @@
 - `scripts/public_release_check.py`를 추가해 GitHub 공개 전 로컬 데이터와 secret 후보를 read-only로 점검할 수 있게 했다.
 - `tests/test_public_release_check.py`를 추가해 `.env`, SQLite, `.env.example`, `.gitkeep` 처리 기준을 검증했다.
 - 현재 실제 워크스페이스에서 `python scripts/public_release_check.py --root . --json`는 로컬 SQLite, Chroma, uploads 파일을 공개 전 제외 대상 finding으로 탐지한다. 삭제는 수행하지 않았다.
-- 실행형 Agent preview-only 계획 API를 추가했다. `/agent/plan`, `/agent/runs`, `/agent/runs/{run_id}`는 요청을 위험도와 승인 필요 action으로 분류/저장/조회하지만 실제 browser/file/shell 실행은 수행하지 않는다.
+- 실행형 Agent 계획 API를 추가했다. `/agent/plan`, `/agent/runs`, `/agent/runs/{run_id}`는 요청을 위험도와 승인 필요 action으로 분류/저장/조회한다.
 - agent plan 승인/거절 상태 전환 API `/agent/runs/{run_id}/approve`, `/agent/runs/{run_id}/reject`를 추가했다. 승인되어도 실제 실행은 수행하지 않는다.
 - agent 실행 엔진 v1과 `/agent/runs/{run_id}/execute`를 추가했다.
 - `AGENT_EXECUTION_ENABLED=false` 기본값에서는 실제 실행을 차단한다.
-- `AGENT_EXECUTION_ENABLED=true`에서도 v1 실행 엔진은 허용 root 안의 파일/폴더 read-only 조회와 명시 URL read-only fetch만 지원한다.
+- `AGENT_EXECUTION_ENABLED=true`에서도 v1 실행 엔진은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원한다.
+- file preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
 - `AGENT_WEB_FETCH_MAX_BYTES`로 URL fetch 응답 크기를 제한한다.
-- `local-ai agent-plan`, `local-ai agent-runs`, `local-ai agent-run`, `local-ai agent-approve`, `local-ai agent-reject`, `local-ai agent-execute` CLI 명령을 추가했다.
+- `local-ai agent-plan`, `local-ai agent-runs`, `local-ai agent-run`, `local-ai agent-results`, `local-ai agent-approve`, `local-ai agent-reject`, `local-ai agent-execute` CLI 명령을 추가했다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가했고, `tests/test_security.py`와 `tests/test_cli.py`를 Agent endpoint/CLI까지 확장했다.
-- self-check 이후 `.venv/bin/pytest` 결과는 `98 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
+- self-check 이후 `.venv/bin/pytest` 결과는 `105 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`도 성공했다.
 
 ### 응답 형식 업데이트
 
