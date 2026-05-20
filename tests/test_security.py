@@ -43,6 +43,7 @@ class FakeSearchService:
         ("get", "/assistant/config", {}),
         ("get", "/assistant/status", {}),
         ("get", "/assistant/dashboard", {}),
+        ("get", "/assistant/startup", {}),
         ("get", "/assistant/ui-contract", {}),
         ("post", "/assistant/bootstrap", {"json": {}}),
         ("post", "/assistant/sessions", {"json": {"title": "Demo"}}),

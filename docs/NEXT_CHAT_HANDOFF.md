@@ -5,7 +5,7 @@
 - Recommended AI: Codex
 - Recommended model: Codex GPT-5.5
 - Reason: 로컬 전용 FastAPI/Ollama/SQLite/Chroma 백엔드 구현과 검증은 Codex가 안전하게 계속 처리 가능
-- Next task: 브라우저 UI에서 `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages` 실제 렌더링 QA
+- Next task: 브라우저 UI에서 `/assistant/startup`, `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages` 실제 렌더링 QA
 - User action required: 없음. 단, 시스템 의존성 설치, 파일 삭제, 운영 배포, 외부 LLM API 활성화는 사용자 승인 전 진행 불가
 
 ## 프로젝트 루트
@@ -159,8 +159,8 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 
 ## 다음 추천 작업
 
-1. 브라우저 UI 시작 시 `GET /assistant/ping` 호출로 token/header/server 연결 상태 확인
-2. `GET /assistant/config`로 secret 없이 CORS, allowed roots, 모델명, 안전 상태 렌더링 확인
+1. 브라우저 UI 시작 시 `GET /assistant/startup` 호출로 token/header/server 연결, 안전 설정, dashboard, UI 계약 snapshot 확인
+2. 필요 시 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`를 개별 refresh endpoint로 호출
 3. `GET /assistant/ui-contract`로 시작 순서, 메시지 흐름, 응답 타입, 차단 기능 계약 표시 확인
 4. `GET /assistant/dashboard`로 대시보드 문서/세션/integrity/연결 카드 표시 확인
 5. 메시지 전송 전 `POST /assistant/action-preview`로 intent/위험도/필요 입력값 표시 확인
@@ -182,7 +182,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `148 passed`
+  - `.venv/bin/pytest`: `150 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 
@@ -209,7 +209,8 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `/assistant/sessions/{session_id}/messages`와 `local-ai assistant-messages`를 추가했다.
 - `/assistant/action-preview`와 `local-ai assistant-action-preview`를 추가했다.
 - `/assistant/ui-contract`와 `local-ai assistant-ui-contract`를 추가했다.
-- `/project/status`는 12차 Assistant UI contract 완료, 13차 Live browser UI QA를 다음 단계로 표시한다.
+- `/assistant/startup`와 `local-ai assistant-startup`을 추가했다.
+- `/project/status`는 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA를 다음 단계로 표시한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함

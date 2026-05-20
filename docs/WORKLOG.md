@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `148 passed` |
+| `.venv/bin/pytest` | `150 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -364,6 +364,15 @@
 - `/project/status` 차수를 12차 Assistant UI contract 완료, 13차 Live browser UI QA 다음 단계로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `72 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `148 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+
+### Assistant startup snapshot
+
+- `GET /assistant/startup`를 추가해 UI 첫 로딩에 필요한 `ping`, `config`, `dashboard`, `ui_contract`를 read-only snapshot으로 한 번에 조회할 수 있게 했다.
+- 이 endpoint는 상태/계약 조회만 수행하며 shell 실행, 파일 수정/삭제, 브라우저 조작을 활성화하지 않는다.
+- `local-ai assistant-startup` CLI 명령을 추가했다.
+- `/project/status` 차수를 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA 다음 단계로 갱신했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_assistant_api.py tests/test_cli.py tests/test_security.py tests/test_api_contracts.py` 결과는 `74 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `150 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
 
 ### 응답 형식 업데이트
 

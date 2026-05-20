@@ -18,6 +18,7 @@ from app.schemas.assistant import (
     AssistantSessionCreateRequest,
     AssistantSessionListResponse,
     AssistantSessionResponse,
+    AssistantStartupResponse,
     AssistantStatusResponse,
     AssistantUiContractResponse,
     ProjectRootValidateRequest,
@@ -50,6 +51,14 @@ def assistant_ui_contract(
     assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> dict:
     return assistant_service.ui_contract()
+
+
+@router.get("/startup", response_model=AssistantStartupResponse)
+def assistant_startup(
+    db: Session = Depends(get_db),
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.startup(db)
 
 
 @router.get("/ping", response_model=AssistantPingResponse)

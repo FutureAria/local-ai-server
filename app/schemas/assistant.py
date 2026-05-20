@@ -95,6 +95,19 @@ class AssistantDashboardResponse(BaseModel):
     ui: dict
 
 
+class AssistantStartupResponse(BaseModel):
+    service: str
+    protected: bool
+    local_only: bool
+    ping: dict
+    config: dict
+    dashboard: dict
+    ui_contract: dict
+    recommended_calls: list[dict]
+    safety: dict
+    ui: dict
+
+
 class AssistantUiContractResponse(BaseModel):
     service: str
     version: str

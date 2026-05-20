@@ -43,6 +43,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `GET /assistant/ping`
 - `GET /assistant/config`
 - `GET /assistant/ui-contract`
+- `GET /assistant/startup`
 - `GET /assistant/status`
 - `GET /assistant/dashboard`
 - `POST /assistant/bootstrap`
@@ -244,6 +245,23 @@ curl http://127.0.0.1:8000/assistant/ui-contract
 - `response_types`
 - `blocked_actions`
 - `auth.secret_returned=false`
+
+### `GET /assistant/startup`
+
+브라우저 UI의 첫 로딩에 필요한 `ping`, `config`, `dashboard`, `ui_contract`를 read-only snapshot으로 한 번에 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/startup
+```
+
+응답 핵심 필드:
+
+- `ping`
+- `config`
+- `dashboard`
+- `ui_contract`
+- `recommended_calls`
+- `ui`
 
 ### `GET /assistant/status`
 
@@ -757,6 +775,7 @@ local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-ui-contract
+local-ai assistant-startup
 local-ai assistant-status
 local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server

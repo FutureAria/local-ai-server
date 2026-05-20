@@ -73,6 +73,12 @@ PROJECT_PHASES = [
     },
     {
         "phase": 13,
+        "title": "Assistant startup snapshot",
+        "status": "done",
+        "summary": "Read-only startup snapshot endpoint and CLI command for one-call browser UI initialization.",
+    },
+    {
+        "phase": 14,
         "title": "Live browser UI QA",
         "status": "next",
         "summary": "Exercise the connected browser UI against the local assistant API and refine rendering details.",
@@ -80,6 +86,7 @@ PROJECT_PHASES = [
 ]
 
 SAFE_NEXT_TASKS = [
+    "Call GET /assistant/startup from the browser UI to hydrate ping/config/dashboard/ui-contract in one request.",
     "Use GET /assistant/ui-contract as the browser UI integration checklist.",
     "Use POST /assistant/action-preview before sending messages that may become agent or shell dry-run requests.",
     "Use GET /assistant/sessions/{session_id}/messages for paged chat history rendering.",

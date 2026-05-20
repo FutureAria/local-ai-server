@@ -86,6 +86,7 @@ local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-ui-contract
+local-ai assistant-startup
 local-ai assistant-status
 local-ai assistant-dashboard
 local-ai assistant-bootstrap --project-root /Users/juyoung/local-ai-server

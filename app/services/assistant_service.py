@@ -53,6 +53,7 @@ class AssistantService:
                 "ping": "GET /assistant/ping",
                 "config": "GET /assistant/config",
                 "dashboard": "GET /assistant/dashboard",
+                "startup": "GET /assistant/startup",
                 "ui_contract": "GET /assistant/ui-contract",
                 "action_preview": "POST /assistant/action-preview",
                 "bootstrap": "POST /assistant/bootstrap",
@@ -106,6 +107,34 @@ class AssistantService:
                 "실제 shell 실행, 파일 수정/삭제, 브라우저 조작은 활성화하지 않습니다.",
                 "런타임 LLM과 embedding은 Ollama local API만 사용합니다.",
             ],
+        }
+
+    def startup(self, db: Session) -> dict:
+        ping = self.ping()
+        config = self.config()
+        dashboard = self.dashboard(db)
+        ui_contract = self.ui_contract()
+        return {
+            "service": self.settings.service_name,
+            "protected": bool(self.settings.local_api_key),
+            "local_only": True,
+            "ping": ping,
+            "config": config,
+            "dashboard": dashboard,
+            "ui_contract": ui_contract,
+            "recommended_calls": [
+                {"method": "POST", "path": "/assistant/bootstrap", "when": "project_root is available"},
+                {"method": "POST", "path": "/assistant/action-preview", "when": "before sending user text"},
+                {"method": "POST", "path": "/assistant/message", "when": "user confirms message send"},
+                {"method": "GET", "path": "/assistant/sessions/{session_id}/messages", "when": "open chat history"},
+            ],
+            "safety": _safety(),
+            "ui": {
+                "ready": True,
+                "badge": "STARTUP SNAPSHOT READY",
+                "message": "UI 초기 렌더링에 필요한 read-only snapshot입니다.",
+                "display": "startup_snapshot",
+            },
         }
 
     def action_preview(self, request: AssistantActionPreviewRequest) -> dict:

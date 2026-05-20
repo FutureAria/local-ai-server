@@ -25,6 +25,7 @@ class FakeAssistantService:
                 "ping": "GET /assistant/ping",
                 "config": "GET /assistant/config",
                 "dashboard": "GET /assistant/dashboard",
+                "startup": "GET /assistant/startup",
                 "ui_contract": "GET /assistant/ui-contract",
                 "action_preview": "POST /assistant/action-preview",
                 "message": "POST /assistant/message",
@@ -43,6 +44,20 @@ class FakeAssistantService:
             "safety": {"shell_execution": "disabled"},
             "blocked_actions": ["shell_execution"],
             "notes": ["read-only contract"],
+        }
+
+    def startup(self, db):
+        return {
+            "service": "local-ai-server",
+            "protected": True,
+            "local_only": True,
+            "ping": self.ping(),
+            "config": self.config(),
+            "dashboard": self.dashboard(db),
+            "ui_contract": self.ui_contract(),
+            "recommended_calls": [{"method": "POST", "path": "/assistant/bootstrap", "when": "startup"}],
+            "safety": {"shell_execution": "disabled"},
+            "ui": {"ready": True, "badge": "STARTUP SNAPSHOT READY", "display": "startup_snapshot"},
         }
 
     def action_preview(self, request):
@@ -83,7 +98,7 @@ class FakeAssistantService:
     def status(self, db):
         return {
             "service": "local-ai-server",
-            "current_phase": {"phase": 13, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "current_phase": {"phase": 14, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
             "documents": {
                 "documents_count": 1,
                 "chunks_count": 2,
@@ -282,6 +297,22 @@ def test_assistant_ui_contract_endpoint_with_mock() -> None:
     assert "shell_execution" in body["blocked_actions"]
 
 
+def test_assistant_startup_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.get("/assistant/startup")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["ping"]["status"] == "ok"
+    assert body["config"]["protected"] is True
+    assert body["dashboard"]["cards"]["connection"]["status"] == "ready"
+    assert body["ui_contract"]["auth"]["secret_returned"] is False
+    assert body["ui"]["display"] == "startup_snapshot"
+
+
 def test_assistant_ping_endpoint_with_mock() -> None:
     app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
     client = TestClient(app)
@@ -349,7 +380,7 @@ def test_assistant_bootstrap_endpoint_with_mock() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["capabilities"]["endpoints"]["message"] == "POST /assistant/message"
-    assert body["status"]["current_phase"]["phase"] == 13
+    assert body["status"]["current_phase"]["phase"] == 14
     assert body["project_root"]["safe_for_read_only_agent"] is True
     assert body["sessions"]["limit"] == 5
     assert body["ui"]["ready"] is True

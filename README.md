@@ -278,6 +278,7 @@ local-ai assistant-capabilities
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-ui-contract
+local-ai assistant-startup
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-status
 local-ai assistant-dashboard
@@ -377,6 +378,7 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `GET /assistant/ping`
 - `GET /assistant/config`
 - `GET /assistant/ui-contract`
+- `GET /assistant/startup`
 - `GET /assistant/status`
 - `GET /assistant/dashboard`
 - `POST /assistant/bootstrap`
@@ -440,7 +442,7 @@ local-ai shell-dry-run "pwd"
 
 ## UI Bridge Assistant API
 
-브라우저 기반 로컬 비서 UI는 `/assistant/ping`으로 연결/token 상태를 빠르게 확인하고, `/assistant/config`로 secret 없이 안전 설정을 읽고, `/assistant/dashboard`로 첫 화면 카드를 구성할 수 있습니다. 시작 시에는 `/assistant/bootstrap`으로 기능, 상태, project root 검증, 최근 세션 목록, UI 힌트를 한 번에 받을 수 있습니다. 실제 메시지는 기능별 endpoint를 직접 조합하지 않고 `/assistant/message` 하나로 보낼 수 있습니다.
+브라우저 기반 로컬 비서 UI는 `/assistant/ping`으로 연결/token 상태를 빠르게 확인하고, `/assistant/config`로 secret 없이 안전 설정을 읽고, `/assistant/dashboard`로 첫 화면 카드를 구성할 수 있습니다. 시작 시에는 `/assistant/startup`으로 `ping`, `config`, `dashboard`, `ui_contract`를 한 번에 읽을 수 있고, project root가 준비되면 `/assistant/bootstrap`으로 기능, 상태, project root 검증, 최근 세션 목록, UI 힌트를 받을 수 있습니다. 실제 메시지는 기능별 endpoint를 직접 조합하지 않고 `/assistant/message` 하나로 보낼 수 있습니다.
 
 ```bash
 curl http://127.0.0.1:8000/assistant/ping \
@@ -450,6 +452,9 @@ curl http://127.0.0.1:8000/assistant/config \
   -H "Authorization: Bearer change-me"
 
 curl http://127.0.0.1:8000/assistant/dashboard \
+  -H "Authorization: Bearer change-me"
+
+curl http://127.0.0.1:8000/assistant/startup \
   -H "Authorization: Bearer change-me"
 ```
 
@@ -482,6 +487,7 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 - `GET /assistant/ping`: UI 연결, token, 로컬 API ready 상태 빠른 확인
 - `GET /assistant/config`: secret 없이 CORS, allowed roots, 모델명, 저장소, 안전 설정 확인
 - `GET /assistant/ui-contract`: UI 시작 순서, 메시지 흐름, 응답 타입, 차단 기능 계약 요약
+- `GET /assistant/startup`: UI 초기 렌더링용 ping/config/dashboard/ui-contract read-only snapshot
 - `GET /assistant/status`: UI 첫 화면용 문서/세션/integrity/안전 상태 요약
 - `GET /assistant/dashboard`: UI 카드용 문서/세션/integrity/연결 상태와 최근 세션 요약
 - `POST /assistant/bootstrap`: UI 초기화용 capabilities/status/project root/sessions/UI 힌트 통합 응답
