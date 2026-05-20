@@ -48,6 +48,14 @@ Ask/Search:
 - `POST /ask-with-docs`
 - `POST /search`
 
+Assistant:
+
+- `GET /assistant/capabilities`
+- `POST /assistant/sessions`
+- `GET /assistant/sessions/{session_id}`
+- `POST /assistant/message`
+- `POST /assistant/project-root/validate`
+
 Documents:
 
 - `POST /documents/upload`
@@ -98,6 +106,10 @@ local-ai next
 local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
+local-ai assistant-capabilities
+local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai assist "질문"
 local-ai assistant
 local-ai ask "질문"
@@ -151,7 +163,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `121 passed`
+- `.venv/bin/pytest`: `131 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
@@ -159,6 +171,7 @@ python -m compileall app cli scripts
 - `local-ai agent-approve 1`: agent plan 승인 상태 기록 가능. 실제 실행은 하지 않음
 - `local-ai agent-execute 1`: 승인된 run 실행 시도 가능. 기본 설정에서는 고위험 실행을 차단함
 - `local-ai assistant` 내부 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run pwd`: 로컬 비서 세션과 안전 정책 확인 가능
+- `local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server`: UI bridge와 같은 `/assistant/message` 호출 가능
 
 ## 구현된 문서 타입
 
@@ -189,6 +202,7 @@ optional dependency 설치 시 지원:
 - 실행형 Agent는 계획, dry-run, 승인, 실행 엔진 v1 단계이며 기본값에서는 실제 실행 비활성
 - 실행 엔진 v1은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원
 - shell dry-run은 allowlist/blocked token 기반 정책 판단만 제공하며 실제 명령을 실행하지 않음
+- assistant message API는 UI 입력을 안전하게 RAG/search/index preview/agent plan/shell dry-run으로 분기
 - `.env`, SQLite DB, Chroma index, 업로드 파일, 로그 파일, SFT export 파일은 Git 제외
 - 질문/답변/문서 원문/API key를 운영 로그에 남기지 않는 것을 권장
 - 실제 repair/delete/rebuild, 외부 크롤링, 시스템 의존성 설치, 운영 배포는 사용자 승인 전 진행하지 않음

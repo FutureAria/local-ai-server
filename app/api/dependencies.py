@@ -4,6 +4,7 @@ from fastapi import Header, HTTPException, Request, status
 
 from app.config import get_settings
 from app.services.agent_service import AgentService
+from app.services.assistant_service import AssistantService
 from app.services.document_service import DocumentService
 from app.services.feedback_service import FeedbackService
 from app.services.rate_limiter import InMemoryRateLimiter, rate_limit_identity
@@ -20,6 +21,7 @@ _search_service: SearchService | None = None
 _rag_service: RagService | None = None
 _feedback_service: FeedbackService | None = None
 _agent_service: AgentService | None = None
+_assistant_service: AssistantService | None = None
 
 
 def require_api_key(
@@ -106,3 +108,16 @@ def get_agent_service() -> AgentService:
         if _agent_service is None:
             _agent_service = AgentService()
         return _agent_service
+
+
+def get_assistant_service() -> AssistantService:
+    global _assistant_service
+    with _service_lock:
+        if _assistant_service is None:
+            _assistant_service = AssistantService(
+                rag_service=get_rag_service(),
+                search_service=get_search_service(),
+                document_service=get_document_service(),
+                agent_service=get_agent_service(),
+            )
+        return _assistant_service

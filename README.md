@@ -274,6 +274,10 @@ local-ai agent-shell
 local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
+local-ai assistant-capabilities
+local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-message "내 문서 기준으로 JWT 설명해줘" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai export-sft --output data/sft_dataset.jsonl
 ```
 
@@ -359,6 +363,11 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `POST /agent/runs/{run_id}/execute`
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
+- `GET /assistant/capabilities`
+- `POST /assistant/sessions`
+- `GET /assistant/sessions/{session_id}`
+- `POST /assistant/message`
+- `POST /assistant/project-root/validate`
 
 ```bash
 export LOCAL_API_KEY=change-me
@@ -410,6 +419,31 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 ```
+
+## UI Bridge Assistant API
+
+브라우저 기반 로컬 비서 UI는 기능별 endpoint를 직접 조합하지 않고 `/assistant/message` 하나로 메시지를 보낼 수 있습니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/message \
+  -H "Authorization: Bearer change-me" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message":"내 문서 기준으로 JWT 설명해줘",
+    "project_root":"/Users/juyoung/local-ai-server",
+    "mode":"auto"
+  }'
+```
+
+지원 endpoint:
+
+- `GET /assistant/capabilities`: UI가 사용할 수 있는 기능과 안전 기본값 확인
+- `POST /assistant/sessions`: 대화 세션 생성
+- `GET /assistant/sessions/{session_id}`: 세션 기록 조회
+- `POST /assistant/message`: 입력 메시지를 RAG/search/index preview/agent plan/shell dry-run으로 안전 분기
+- `POST /assistant/project-root/validate`: 화면에 입력한 project root 검증
+
+`/assistant/message`는 폴더 색인은 preview까지만 수행하고, shell은 dry-run 정책 판단만 반환합니다. 브라우저 클릭, 파일 수정/삭제, 실제 shell 실행은 하지 않습니다.
 
 ## Rate Limit
 

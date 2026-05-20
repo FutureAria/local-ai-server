@@ -37,6 +37,11 @@ class FakeSearchService:
         ("post", "/agent/runs/1/execute", {}),
         ("get", "/project/shell-policy", {}),
         ("post", "/project/shell-dry-run", {"json": {"command": "pwd"}}),
+        ("get", "/assistant/capabilities", {}),
+        ("post", "/assistant/sessions", {"json": {"title": "Demo"}}),
+        ("get", "/assistant/sessions/session-1", {}),
+        ("post", "/assistant/message", {"json": {"message": "hello"}}),
+        ("post", "/assistant/project-root/validate", {"json": {"project_root": "/tmp/project"}}),
     ],
 )
 def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str, path: str, kwargs: dict) -> None:

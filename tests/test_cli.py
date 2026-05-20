@@ -35,27 +35,29 @@ class FakeClient:
             return FakeResponse(
                 {
                     "current_phase": {
-                        "phase": 5,
-                        "title": "Manual local QA and operations polish",
+                        "phase": 6,
+                        "title": "Manual local UI integration QA",
                         "status": "next",
-                        "summary": "Validate local docs.",
+                        "summary": "Connect the browser UI.",
                     },
                     "completed_phases": [
                         {"phase": 1, "title": "FastAPI local RAG server", "status": "done", "summary": "done"}
                     ],
-                    "safe_next_tasks": ["Run real local document QA"],
+                    "safe_next_tasks": ["Connect UI to assistant message API"],
                     "blocked_until_review": ["Unrestricted shell execution"],
                     "recommended_next_model": {
                         "recommended_ai": "Codex",
                         "recommended_model": "Codex GPT-5.5",
                         "reason": "safe implementation",
-                        "next_task": "Run real local document QA",
+                        "next_task": "Connect UI to assistant message API",
                         "user_action_required": "없음",
                     },
                 }
             )
         if url.endswith("/project/shell-policy"):
             return FakeResponse({"mode": "dry-run-only", "allowed_commands": [], "blocked_tokens": []})
+        if url.endswith("/assistant/capabilities"):
+            return FakeResponse({"service": "local-ai-server", "modes": ["auto"]})
         return FakeResponse({"method": "GET"})
 
     def post(self, url: str, **kwargs) -> FakeResponse:
@@ -70,6 +72,20 @@ class FakeClient:
             )
         if url.endswith("/project/shell-dry-run"):
             return FakeResponse({"status": "allowed_preview", "would_execute": False})
+        if url.endswith("/assistant/sessions"):
+            return FakeResponse({"session_id": "session-1"})
+        if url.endswith("/assistant/message"):
+            return FakeResponse(
+                {
+                    "session_id": "session-1",
+                    "type": "answer",
+                    "answer": "통합 assistant 답변",
+                    "request_id": "55",
+                    "sources": [],
+                }
+            )
+        if url.endswith("/assistant/project-root/validate"):
+            return FakeResponse({"safe_for_read_only_agent": True})
         return FakeResponse({"method": "POST"})
 
 
@@ -109,9 +125,9 @@ def test_cli_status_and_next_show_phase(monkeypatch) -> None:
 
     assert status_result.exit_code == 0
     assert next_result.exit_code == 0
-    assert "현재 차수: 5차" in status_result.output
+    assert "현재 차수: 6차" in status_result.output
     assert "Recommended Next Model" in status_result.output
-    assert "다음 차수: 5차" in next_result.output
+    assert "다음 차수: 6차" in next_result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
         {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
@@ -162,6 +178,71 @@ def test_cli_assist_uses_ask_with_docs_and_prints_answer(monkeypatch) -> None:
             "json": {"question": "JWT 설명해줘", "top_k": 3, "temperature": 0.2},
             "headers": {"X-API-Key": "secret"},
         }
+    ]
+
+
+def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    capabilities_result = CliRunner().invoke(cli_main.app, ["assistant-capabilities"])
+    session_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-session", "--title", "Demo", "--project-root", "/tmp/project"],
+    )
+    message_result = CliRunner().invoke(
+        cli_main.app,
+        [
+            "assistant-message",
+            "JWT 설명해줘",
+            "--session-id",
+            "session-1",
+            "--project-root",
+            "/tmp/project",
+            "--mode",
+            "auto",
+            "--top-k",
+            "3",
+        ],
+    )
+    root_result = CliRunner().invoke(cli_main.app, ["assistant-root", "/tmp/project"])
+
+    assert capabilities_result.exit_code == 0
+    assert session_result.exit_code == 0
+    assert message_result.exit_code == 0
+    assert root_result.exit_code == 0
+    assert "통합 assistant 답변" in message_result.output
+    assert calls == [
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:8000/assistant/capabilities",
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/sessions",
+            "json": {"title": "Demo", "project_root": "/tmp/project"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/message",
+            "json": {
+                "message": "JWT 설명해줘",
+                "session_id": "session-1",
+                "project_root": "/tmp/project",
+                "mode": "auto",
+                "top_k": 3,
+                "temperature": 0.2,
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/project-root/validate",
+            "json": {"project_root": "/tmp/project"},
+            "headers": {"X-API-Key": "secret"},
+        },
     ]
 
 
@@ -362,12 +443,12 @@ def test_cli_assistant_repl_routes_docs_and_questions(monkeypatch) -> None:
     )
 
     assert result.exit_code == 0
-    assert "문서 기준 답변" in result.output
+    assert "통합 assistant 답변" in result.output
     assert calls == [
         {
             "method": "POST",
-            "url": "http://127.0.0.1:8000/ask-with-docs",
-            "json": {"question": "JWT 설명해줘", "top_k": 4, "temperature": 0.2},
+            "url": "http://127.0.0.1:8000/assistant/message",
+            "json": {"message": "JWT 설명해줘", "mode": "auto", "top_k": 4, "temperature": 0.2},
             "headers": {"X-API-Key": "secret"},
         },
         {

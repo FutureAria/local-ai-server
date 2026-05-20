@@ -13,6 +13,7 @@
 - Agent dry-run은 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 정책 판단만 기록한다.
 - shell dry-run policy는 `local-ai shell-policy`, `local-ai shell-dry-run "pwd"` 또는 `local-ai assistant`의 `/shell-policy`, `/shell-dry-run pwd`로 확인한다. 이 기능은 실제 shell 명령을 실행하지 않는다.
 - assistant 세션 요약은 현재 REPL 메모리 안에서만 제공되며 파일 저장, fine-tuning, 자동 학습을 수행하지 않는다.
+- 브라우저 UI 연결은 `/assistant/message`를 우선 사용한다. 이 API는 메시지를 자동 분기하지만 shell/browser/file-write 실행을 활성화하지 않는다.
 - `AGENT_ALLOWED_ROOTS`는 agent 파일/폴더 action의 read-only 접근 root를 제한한다.
 - `AGENT_WEB_FETCH_ENABLED`는 명시 URL read-only fetch를 별도로 제어한다.
 - `AGENT_WEB_FETCH_MAX_BYTES`는 URL fetch 응답을 지정한 바이트 이후 truncate한다.
@@ -79,6 +80,8 @@ local-ai repair-preview
 local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
+local-ai assistant-capabilities
+local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/local-ai-server
 ```
 
 공개 전 로컬 데이터와 secret 후보를 점검한다.

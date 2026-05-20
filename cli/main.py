@@ -121,6 +121,8 @@ def _assistant_help() -> str:
             "/results <id>",
             "/shell-policy",
             "/shell-dry-run <command>",
+            "/capabilities",
+            "/root <project_root>",
             "/summary",
             "/status",
             "/next",
@@ -235,6 +237,50 @@ def shell_policy() -> None:
 @app.command("shell-dry-run")
 def shell_dry_run(command: str) -> None:
     _print_json(_request_json("post", "/project/shell-dry-run", json={"command": command}, headers=_headers()))
+
+
+@app.command("assistant-capabilities")
+def assistant_capabilities() -> None:
+    _print_json(_request_json("get", "/assistant/capabilities", headers=_headers()))
+
+
+@app.command("assistant-session")
+def assistant_session(title: str | None = None, project_root: str | None = None) -> None:
+    payload = {"title": title, "project_root": project_root}
+    _print_json(_request_json("post", "/assistant/sessions", json=payload, headers=_headers()))
+
+
+@app.command("assistant-message")
+def assistant_message(
+    message: str,
+    session_id: str | None = None,
+    project_root: str | None = None,
+    mode: str = "auto",
+    top_k: int = 5,
+    temperature: float = 0.2,
+) -> None:
+    payload = {
+        "message": message,
+        "session_id": session_id,
+        "project_root": project_root,
+        "mode": mode,
+        "top_k": top_k,
+        "temperature": temperature,
+    }
+    response = _request_json("post", "/assistant/message", json=payload, headers=_headers())
+    _print_assistant_answer(response)
+
+
+@app.command("assistant-root")
+def assistant_root(project_root: str) -> None:
+    _print_json(
+        _request_json(
+            "post",
+            "/assistant/project-root/validate",
+            json={"project_root": project_root},
+            headers=_headers(),
+        )
+    )
 
 
 @app.command()
@@ -530,6 +576,12 @@ def _assistant_dispatch(command: str, top_k: int, temperature: float) -> dict | 
         if not value:
             raise ValueError("/shell-dry-run 명령에는 command가 필요합니다.")
         return _request_json("post", "/project/shell-dry-run", json={"command": value}, headers=_headers())
+    if name == "/capabilities":
+        return _request_json("get", "/assistant/capabilities", headers=_headers())
+    if name == "/root":
+        if not value:
+            raise ValueError("/root 명령에는 project_root가 필요합니다.")
+        return _request_json("post", "/assistant/project-root/validate", json={"project_root": value}, headers=_headers())
     if name == "/runs":
         return _request_json("get", "/agent/runs", headers=_headers())
     if name == "/search":
@@ -578,8 +630,8 @@ def _assistant_dispatch(command: str, top_k: int, temperature: float) -> dict | 
 
     return _request_json(
         "post",
-        "/ask-with-docs",
-        json={"question": command, "top_k": top_k, "temperature": temperature},
+        "/assistant/message",
+        json={"message": command, "mode": "auto", "top_k": top_k, "temperature": temperature},
         headers=_headers(),
     )
 

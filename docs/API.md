@@ -38,6 +38,11 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /agent/runs/{run_id}/execute`
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
+- `GET /assistant/capabilities`
+- `POST /assistant/sessions`
+- `GET /assistant/sessions/{session_id}`
+- `POST /assistant/message`
+- `POST /assistant/project-root/validate`
 
 조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
@@ -128,6 +133,78 @@ curl -X POST http://127.0.0.1:8000/project/shell-dry-run \
 - `reason`
 
 ## Ask
+
+## Assistant
+
+### `GET /assistant/capabilities`
+
+브라우저 UI나 외부 로컬 클라이언트가 현재 서버 기능과 안전 기본값을 확인한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/capabilities
+```
+
+응답 핵심 필드:
+
+- `modes`
+- `protected`
+- `safe_defaults`
+- `endpoints`
+
+### `POST /assistant/sessions`
+
+assistant 대화 세션을 생성한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/sessions \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Demo","project_root":"/Users/juyoung/local-ai-server"}'
+```
+
+### `GET /assistant/sessions/{session_id}`
+
+assistant 세션과 메시지 기록을 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/sessions/<session_id>
+```
+
+### `POST /assistant/message`
+
+UI 입력창에서 들어온 문장을 자동 분기한다. `mode=auto`에서는 문서 RAG, 검색, folder index preview, agent plan, shell dry-run 중 안전한 경로로 분류한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/message \
+  -H "Content-Type: application/json" \
+  -d '{"message":"내 문서 기준으로 JWT 설명해줘","project_root":"/Users/juyoung/local-ai-server","mode":"auto"}'
+```
+
+응답 핵심 필드:
+
+- `session_id`
+- `type`
+- `answer`
+- `data`
+- `used_documents`
+- `sources`
+- `request_id`
+- `safety`
+
+안전 기준:
+
+- 폴더 색인은 assistant API에서 preview-only로 처리한다.
+- shell은 실제 실행하지 않고 dry-run 정책 판단만 반환한다.
+- 브라우저 클릭, 파일 수정/삭제, 외부 LLM API 호출은 수행하지 않는다.
+
+### `POST /assistant/project-root/validate`
+
+UI에서 입력한 project root가 존재하는 폴더인지, `AGENT_ALLOWED_ROOTS` 안에 있는지 확인한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/project-root/validate \
+  -H "Content-Type: application/json" \
+  -d '{"project_root":"/Users/juyoung/local-ai-server"}'
+```
 
 ### `POST /ask`
 
@@ -489,6 +566,10 @@ local-ai next
 local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
+local-ai assistant-capabilities
+local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-root /Users/juyoung/local-ai-server
 local-ai assist "질문"
 local-ai assistant
 local-ai ask "질문"

@@ -25,18 +25,24 @@ PROJECT_PHASES = [
     },
     {
         "phase": 5,
-        "title": "Manual local QA and operations polish",
+        "title": "UI Bridge Assistant API",
+        "status": "done",
+        "summary": "Assistant capabilities, sessions, message router, project-root validation, and CLI bridge commands.",
+    },
+    {
+        "phase": 6,
+        "title": "Manual local UI integration QA",
         "status": "next",
-        "summary": "Validate real local documents, Ollama-backed RAG quality, and operations docs without enabling dangerous automation.",
+        "summary": "Connect the browser UI to /assistant/message and validate local document RAG behavior end to end.",
     },
 ]
 
 SAFE_NEXT_TASKS = [
+    "Connect the UI API URL, Bearer token, and project root to the local server.",
+    "Send a UI message to POST /assistant/message and confirm a safe response shape.",
     "Run upload/search/ask-with-docs against a real local .md or .txt note.",
-    "Check local-ai assistant with /roots, /status, /next, /summary, and /shell-dry-run.",
     "Review SQLite/Chroma status with local-ai stats and local-ai integrity.",
     "Keep shell/file-write/browser-interaction/deploy/fine-tuning in blocked or review-required status.",
-    "Use docs/PROJECT_SUMMARY.md and docs/NEXT_CHAT_HANDOFF.md as the continuation checkpoint.",
 ]
 
 BLOCKED_UNTIL_REVIEW = [
