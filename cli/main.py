@@ -121,6 +121,7 @@ def _assistant_help() -> str:
             "/results <id>",
             "/shell-policy",
             "/shell-dry-run <command>",
+            "/api-inventory",
             "/capabilities",
             "/root <project_root>",
             "/summary",
@@ -222,6 +223,11 @@ def project_next() -> None:
     for task in payload.get("safe_next_tasks", []):
         typer.echo(f"- {task}")
     _print_recommended_next_model(payload["recommended_next_model"])
+
+
+@app.command("api-inventory")
+def api_inventory() -> None:
+    _print_json(_request_json("get", "/project/api-inventory"))
 
 
 @app.command("roots")
@@ -640,6 +646,8 @@ def _assistant_dispatch(command: str, top_k: int, temperature: float) -> dict | 
         return _request_json("get", "/project/status")
     if name == "/next":
         return _request_json("get", "/project/next")
+    if name == "/api-inventory":
+        return _request_json("get", "/project/api-inventory")
     if name == "/shell-policy":
         return _request_json("get", "/project/shell-policy", headers=_headers())
     if name == "/shell-dry-run":

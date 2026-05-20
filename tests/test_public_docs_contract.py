@@ -71,6 +71,7 @@ ASSISTANT_CLI_COMMANDS = [
 PROJECT_ENDPOINTS = [
     "GET /project/status",
     "GET /project/next",
+    "GET /project/api-inventory",
     "GET /project/shell-policy",
     "POST /project/shell-dry-run",
 ]
@@ -78,6 +79,7 @@ PROJECT_ENDPOINTS = [
 PROJECT_CLI_COMMANDS = [
     "local-ai status",
     "local-ai next",
+    "local-ai api-inventory",
     "local-ai shell-policy",
     "local-ai shell-dry-run",
 ]

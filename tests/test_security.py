@@ -93,6 +93,31 @@ def test_local_rate_limit_blocks_protected_endpoint_after_limit(monkeypatch) -> 
     assert int(response.headers["retry-after"]) > 0
 
 
+def test_api_inventory_stays_public_but_marks_protected_endpoints(monkeypatch) -> None:
+    get_settings.cache_clear()
+    reset_rate_limiter()
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+    client = TestClient(app)
+
+    response = client.get("/project/api-inventory")
+
+    get_settings.cache_clear()
+    reset_rate_limiter()
+    monkeypatch.delenv("LOCAL_API_KEY", raising=False)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["mode"] == "read-only"
+    assert any(
+        endpoint["path"] == "/project/shell-policy" and endpoint["requires_api_key"] is True
+        for endpoint in body["endpoints"]
+    )
+    assert any(
+        endpoint["path"] == "/project/api-inventory" and endpoint["requires_api_key"] is False
+        for endpoint in body["endpoints"]
+    )
+
+
 def test_local_api_key_accepts_authorization_bearer(monkeypatch) -> None:
     get_settings.cache_clear()
     reset_rate_limiter()

@@ -5,7 +5,7 @@
 - Recommended AI: Codex
 - Recommended model: Codex GPT-5.5
 - Reason: 로컬 전용 FastAPI/Ollama/SQLite/Chroma 백엔드 구현과 검증은 Codex가 안전하게 계속 처리 가능
-- Next task: 브라우저 조작 없이 `/assistant/startup`, `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages` API 계약과 문서 QA 기준 보강
+- Next task: 브라우저 조작 없이 `/assistant/startup`, `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages`, `/project/api-inventory` API 계약과 문서 QA 기준 보강
 - User action required: 없음. 단, 실제 브라우저 렌더링 확인, 메시지 전송, 시스템 의존성 설치, 파일 삭제, 운영 배포, 외부 LLM API 활성화는 사용자 승인 또는 수동 확인 전 진행 불가
 
 ## 프로젝트 루트
@@ -113,6 +113,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `/documents/index-folder-preview`와 `local-ai index-preview`로 실제 저장 없이 폴더 색인 대상, 예상 chunk 수, 예상 embedding batch 수 확인 가능.
 - `/documents/index-folder`는 `indexed_files`, `skipped_file_details`로 파일별 색인 결과 확인 가능.
 - `/documents/supported-types`와 `local-ai document-types`로 문서 타입별 optional dependency 준비 상태 확인 가능.
+- `/project/api-inventory`와 `local-ai api-inventory`로 endpoint 목록, tag, method, API key 보호 여부를 read-only로 확인 가능.
 - `/documents/{document_id}/chunks`와 `local-ai chunks`로 chunk 페이지 조회 가능.
 - `/documents?source_type=&file_type=&query=`와 `local-ai docs --source-type --file-type --query`로 문서 목록 필터 조회 가능.
 - `.pdf`, `.docx`는 optional dependency 설치 시 텍스트 추출 가능. dependency가 없으면 명확한 설치 안내 오류를 반환함.
@@ -199,7 +200,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `176 passed`
+  - `.venv/bin/pytest`: `178 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -215,6 +216,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - assistant REPL에 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run <command>`를 추가했다.
 - `local-ai roots`, `local-ai shell-policy`, `local-ai shell-dry-run "pwd"`를 추가했다.
 - `/project/shell-policy`, `/project/shell-dry-run`은 실제 shell을 실행하지 않고 정책 판단만 반환한다.
+- `/project/api-inventory`와 `local-ai api-inventory`를 추가해 endpoint 목록과 API key 보호 여부를 read-only로 확인할 수 있다.
 - `/project/status`는 4차 safer automation loop 완료 이력을 포함한다.
 - `/assistant/capabilities`, `/assistant/sessions`, `/assistant/sessions/{session_id}`, `/assistant/message`, `/assistant/project-root/validate`를 추가했다.
 - `local-ai assistant-capabilities`, `local-ai assistant-session`, `local-ai assistant-message`, `local-ai assistant-root`를 추가했다.
@@ -228,7 +230,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `/assistant/action-preview`와 `local-ai assistant-action-preview`를 추가했다.
 - `/assistant/ui-contract`와 `local-ai assistant-ui-contract`를 추가했다.
 - `/assistant/startup`와 `local-ai assistant-startup`을 추가했다.
-- `/project/status`는 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA를 다음 단계로 표시한다.
+- `/project/status`는 14차 Project API inventory 완료, 15차 Live browser UI QA를 다음 단계로 표시한다.
 - `tests/test_next_chat_handoff.py`를 추가해 이 handoff가 브라우저 조작 없이 가능한 Codex 작업과 사용자 수동 확인 작업을 분리하는지 검증한다.
 - `tests/test_public_docs_contract.py`를 확장해 assistant endpoint/CLI 전체와 project continuation endpoint/CLI가 README/API/PROJECT_SUMMARY에 모두 문서화되어 있는지 검증한다.
 - `tests/test_ui_bridge_examples.py`를 확장해 UI bridge 예시 JSON이 실제 assistant Pydantic schema와 맞는지 검증한다.

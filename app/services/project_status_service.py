@@ -79,6 +79,12 @@ PROJECT_PHASES = [
     },
     {
         "phase": 14,
+        "title": "Project API inventory",
+        "status": "done",
+        "summary": "Read-only API inventory endpoint and CLI command for backend/UI integration checks.",
+    },
+    {
+        "phase": 15,
         "title": "Live browser UI QA",
         "status": "next",
         "summary": "Exercise the connected browser UI against the local assistant API and refine rendering details.",
@@ -87,6 +93,7 @@ PROJECT_PHASES = [
 
 SAFE_NEXT_TASKS = [
     "Call GET /assistant/startup from the browser UI to hydrate ping/config/dashboard/ui-contract in one request.",
+    "Use GET /project/api-inventory to confirm endpoint groups and API-key boundaries before wiring a client.",
     "Use GET /assistant/ui-contract as the browser UI integration checklist.",
     "Use POST /assistant/action-preview before sending messages that may become agent or shell dry-run requests.",
     "Use GET /assistant/sessions/{session_id}/messages for paged chat history rendering.",
@@ -168,6 +175,48 @@ def get_shell_policy() -> dict:
         ],
         "blocked_tokens": sorted(SHELL_DRY_RUN_BLOCKED_TOKENS),
         "note": "이 정책은 실제 shell 실행이 아니라 실행 전 판단만 제공합니다.",
+    }
+
+
+def build_api_inventory(routes: list) -> dict:
+    endpoints = []
+    for route in routes:
+        path = getattr(route, "path", "")
+        methods = sorted(method for method in getattr(route, "methods", set()) if method not in {"HEAD", "OPTIONS"})
+        if not path.startswith("/") or not methods:
+            continue
+        if path in {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}:
+            continue
+
+        dependencies = getattr(getattr(route, "dependant", None), "dependencies", [])
+        requires_api_key = any(getattr(dependency.call, "__name__", "") == "require_api_key" for dependency in dependencies)
+        tags = list(getattr(route, "tags", []) or [])
+        endpoints.append(
+            {
+                "path": path,
+                "methods": methods,
+                "tags": tags,
+                "name": getattr(route, "name", ""),
+                "requires_api_key": requires_api_key,
+            }
+        )
+
+    endpoints.sort(key=lambda item: (item["path"], item["methods"]))
+    protected_count = sum(1 for endpoint in endpoints if endpoint["requires_api_key"])
+    return {
+        "service": "local-ai-server",
+        "mode": "read-only",
+        "local_only": True,
+        "endpoints_count": len(endpoints),
+        "protected_endpoints_count": protected_count,
+        "public_endpoints_count": len(endpoints) - protected_count,
+        "endpoints": endpoints,
+        "safety": {
+            "external_llm_api": "disabled",
+            "shell_execution": "dry-run-only",
+            "browser_interaction": "disabled",
+            "file_write_delete": "disabled",
+        },
     }
 
 

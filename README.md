@@ -447,17 +447,20 @@ curl -X POST http://127.0.0.1:8000/ask \
 ```bash
 curl http://127.0.0.1:8000/project/status
 curl http://127.0.0.1:8000/project/next
+curl http://127.0.0.1:8000/project/api-inventory
 curl -H "X-API-Key: change-me" http://127.0.0.1:8000/project/shell-policy
 local-ai status
 local-ai next
+local-ai api-inventory
 ```
 
-`local-ai status`는 완료 차수와 현재 차수를 함께 보여주고, `local-ai next`는 다음에 Codex가 계속 진행하기 좋은 안전 작업만 요약합니다. `project/status`와 `project/next`는 조회 전용 continuation endpoint이고, shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호됩니다. shell 실행, 파일 수정/삭제, 브라우저 interaction, 배포, fine-tuning 실행은 여전히 별도 승인 전 보류 항목으로 표시됩니다.
+`local-ai status`는 완료 차수와 현재 차수를 함께 보여주고, `local-ai next`는 다음에 Codex가 계속 진행하기 좋은 안전 작업만 요약합니다. `project/status`, `project/next`, `project/api-inventory`는 조회 전용 continuation endpoint이고, shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호됩니다. shell 실행, 파일 수정/삭제, 브라우저 interaction, 배포, fine-tuning 실행은 여전히 별도 승인 전 보류 항목으로 표시됩니다.
 
 지원 endpoint:
 
 - `GET /project/status`: 현재 완료 차수와 다음 안전 작업 조회
 - `GET /project/next`: 다음 작업 후보와 Recommended Next Model 조회
+- `GET /project/api-inventory`: endpoint 목록, tag, 보호 여부를 read-only로 조회
 - `GET /project/shell-policy`: shell dry-run 정책 조회
 - `POST /project/shell-dry-run`: 실제 실행 없이 shell 명령 후보의 정책 판단만 조회
 
@@ -465,6 +468,7 @@ CLI 대응:
 
 - `local-ai status`
 - `local-ai next`
+- `local-ai api-inventory`
 - `local-ai shell-policy`
 - `local-ai shell-dry-run "pwd"`
 
@@ -476,12 +480,14 @@ CLI 대응:
 - `/roots`: `AGENT_ALLOWED_ROOTS` 기준으로 Agent가 read-only 접근할 수 있는 root와 존재 여부를 보여줍니다.
 - `/shell-policy`: shell dry-run allowlist와 blocked token을 보여줍니다.
 - `/shell-dry-run <command>`: 실제 shell 실행 없이 명령이 허용 후보인지 정책 판단만 반환합니다.
+- `/api-inventory`: 현재 FastAPI endpoint 목록과 API key 보호 여부를 read-only로 보여줍니다.
 - `/status`, `/next`: 차수와 다음 안전 작업을 REPL 안에서 확인합니다.
 
 CLI에서도 같은 내용을 확인할 수 있습니다.
 
 ```bash
 local-ai roots
+local-ai api-inventory
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 ```

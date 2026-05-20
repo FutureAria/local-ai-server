@@ -250,6 +250,7 @@ def test_project_status_contract() -> None:
 
     status_response = client.get("/project/status")
     next_response = client.get("/project/next")
+    inventory_response = client.get("/project/api-inventory")
     shell_policy_response = client.get("/project/shell-policy")
     shell_dry_run_response = client.post("/project/shell-dry-run", json={"command": "pwd"})
     blocked_shell_response = client.post("/project/shell-dry-run", json={"command": "rm -rf data"})
@@ -257,10 +258,23 @@ def test_project_status_contract() -> None:
     assert status_response.status_code == 200
     status_body = status_response.json()
     assert status_body["project"] == "local-ai-server"
-    assert status_body["current_phase"]["phase"] == 14
+    assert status_body["current_phase"]["phase"] == 15
     assert status_body["recommended_next_model"]["recommended_ai"] == "Codex"
     assert next_response.status_code == 200
     assert next_response.json()["recommended_next_model"]["recommended_model"] == "Codex GPT-5.5"
+    assert inventory_response.status_code == 200
+    inventory_body = inventory_response.json()
+    assert inventory_body["mode"] == "read-only"
+    assert inventory_body["local_only"] is True
+    assert inventory_body["endpoints_count"] >= 1
+    assert any(
+        endpoint["path"] == "/project/api-inventory" and endpoint["requires_api_key"] is False
+        for endpoint in inventory_body["endpoints"]
+    )
+    assert any(
+        endpoint["path"] == "/assistant/message" and endpoint["requires_api_key"] is True
+        for endpoint in inventory_body["endpoints"]
+    )
     assert shell_policy_response.status_code == 200
     assert shell_policy_response.json()["mode"] == "dry-run-only"
     assert shell_dry_run_response.status_code == 200

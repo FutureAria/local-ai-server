@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from app.api.dependencies import require_api_key
 from app.schemas.project import ShellDryRunRequest
-from app.services.project_status_service import dry_run_shell_command, get_project_status, get_shell_policy
+from app.services.project_status_service import (
+    build_api_inventory,
+    dry_run_shell_command,
+    get_project_status,
+    get_shell_policy,
+)
 
 router = APIRouter(prefix="/project", tags=["project"])
 
@@ -21,6 +26,11 @@ def project_next() -> dict:
         "blocked_until_review": status["blocked_until_review"],
         "recommended_next_model": status["recommended_next_model"],
     }
+
+
+@router.get("/api-inventory")
+def api_inventory(request: Request) -> dict:
+    return build_api_inventory(request.app.routes)
 
 
 @router.get("/shell-policy", dependencies=[Depends(require_api_key)])

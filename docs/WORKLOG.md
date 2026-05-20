@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `176 passed` |
+| `.venv/bin/pytest` | `178 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -434,6 +434,14 @@
 - `tests/test_public_release_summary.py`를 추가해 공개 요약 문서가 local-only/Ollama-only 경계, private data 제외, 검증 명령, 미구현 위험 기능을 계속 명시하는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py` 결과는 `13 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `176 passed, 1 warning`이다.
+
+### Project API inventory
+
+- `GET /project/api-inventory`를 추가해 현재 FastAPI endpoint 목록, HTTP method, tag, API key 보호 여부를 read-only로 조회할 수 있게 했다.
+- `local-ai api-inventory`와 assistant REPL `/api-inventory`를 추가해 CLI와 세션 안에서도 같은 정보를 확인할 수 있게 했다.
+- `/project/status` 차수를 14차 Project API inventory 완료, 15차 Live browser UI QA 다음 단계로 갱신했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_cli.py tests/test_security.py tests/test_public_docs_contract.py` 결과는 `72 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `178 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

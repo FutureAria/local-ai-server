@@ -35,7 +35,7 @@ class FakeClient:
             return FakeResponse(
                 {
                     "current_phase": {
-                        "phase": 14,
+                        "phase": 15,
                         "title": "Live browser UI QA",
                         "status": "next",
                         "summary": "Exercise browser UI.",
@@ -52,6 +52,15 @@ class FakeClient:
                         "next_task": "Send a real browser UI message",
                         "user_action_required": "없음",
                     },
+                }
+            )
+        if url.endswith("/project/api-inventory"):
+            return FakeResponse(
+                {
+                    "service": "local-ai-server",
+                    "mode": "read-only",
+                    "endpoints_count": 1,
+                    "endpoints": [{"path": "/project/api-inventory", "methods": ["GET"]}],
                 }
             )
         if url.endswith("/project/shell-policy"):
@@ -113,7 +122,7 @@ class FakeClient:
                 {
                     "service": "local-ai-server",
                     "capabilities": {"endpoints": {"message": "POST /assistant/message"}},
-                    "status": {"current_phase": {"phase": 14}},
+                    "status": {"current_phase": {"phase": 15}},
                     "project_root": {"safe_for_read_only_agent": True},
                     "sessions": {"sessions": []},
                     "recommended_calls": [],
@@ -173,12 +182,24 @@ def test_cli_status_and_next_show_phase(monkeypatch) -> None:
 
     assert status_result.exit_code == 0
     assert next_result.exit_code == 0
-    assert "현재 차수: 14차" in status_result.output
+    assert "현재 차수: 15차" in status_result.output
     assert "Recommended Next Model" in status_result.output
-    assert "다음 차수: 14차" in next_result.output
+    assert "다음 차수: 15차" in next_result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/status"},
         {"method": "GET", "url": "http://127.0.0.1:8000/project/next"},
+    ]
+
+
+def test_cli_api_inventory_calls_project_inventory(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+
+    result = CliRunner().invoke(cli_main.app, ["api-inventory"])
+
+    assert result.exit_code == 0
+    assert "api-inventory" in result.output
+    assert calls == [
+        {"method": "GET", "url": "http://127.0.0.1:8000/project/api-inventory"},
     ]
 
 

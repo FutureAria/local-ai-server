@@ -5,6 +5,7 @@
 브라우저 UI 연동용 예시 payload는 [UI_BRIDGE_EXAMPLES.md](UI_BRIDGE_EXAMPLES.md)에 별도로 정리되어 있다.
 브라우저 UI 수동 QA 기준은 [UI_QA_CHECKLIST.md](UI_QA_CHECKLIST.md)에 별도로 정리되어 있다.
 GitHub 공개 전 체크리스트는 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)에 별도로 정리되어 있다.
+공개 상태 요약은 [PUBLIC_RELEASE_SUMMARY.md](PUBLIC_RELEASE_SUMMARY.md)에 별도로 정리되어 있다.
 
 기본 실행 주소:
 
@@ -58,7 +59,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
 
-조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
+조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`, `GET /project/api-inventory`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
 ## Rate Limit
 
@@ -129,6 +130,25 @@ curl http://127.0.0.1:8000/project/status
 ```bash
 curl http://127.0.0.1:8000/project/next
 ```
+
+### `GET /project/api-inventory`
+
+현재 FastAPI endpoint 목록, tag, HTTP method, API key 보호 여부를 read-only로 조회한다. 브라우저 UI나 CLI가 어떤 endpoint를 연결해야 하는지 확인할 때 사용한다.
+
+```bash
+curl http://127.0.0.1:8000/project/api-inventory
+```
+
+응답 핵심 필드:
+
+- `mode=read-only`
+- `endpoints_count`
+- `protected_endpoints_count`
+- `public_endpoints_count`
+- `endpoints[].path`
+- `endpoints[].methods`
+- `endpoints[].requires_api_key`
+- `safety`
 
 ### `GET /project/shell-policy`
 
@@ -772,6 +792,7 @@ local-ai health
 local-ai doctor
 local-ai status
 local-ai next
+local-ai api-inventory
 local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"

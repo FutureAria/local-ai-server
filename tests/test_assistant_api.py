@@ -99,7 +99,7 @@ class FakeAssistantService:
     def status(self, db):
         return {
             "service": "local-ai-server",
-            "current_phase": {"phase": 14, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "current_phase": {"phase": 15, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
             "documents": {
                 "documents_count": 1,
                 "chunks_count": 2,
@@ -383,7 +383,7 @@ def test_assistant_bootstrap_endpoint_with_mock() -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["capabilities"]["endpoints"]["message"] == "POST /assistant/message"
-    assert body["status"]["current_phase"]["phase"] == 14
+    assert body["status"]["current_phase"]["phase"] == 15
     assert body["project_root"]["safe_for_read_only_agent"] is True
     assert body["sessions"]["limit"] == 5
     assert body["ui"]["ready"] is True

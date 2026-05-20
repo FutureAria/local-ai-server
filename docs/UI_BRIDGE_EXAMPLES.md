@@ -178,7 +178,7 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
   },
   "dashboard": {
     "current_phase": {
-      "phase": 14,
+      "phase": 15,
       "title": "Live browser UI QA",
       "status": "next"
     },
@@ -525,10 +525,10 @@ shell 명령을 실행하지 않고 정책 판단만 반환한다. UI는 실제 
 ```json
 {
   "type": "status",
-  "answer": "현재 차수는 14차입니다.",
+  "answer": "현재 차수는 15차입니다.",
   "data": {
     "current_phase": {
-      "phase": 14,
+      "phase": 15,
       "title": "Live browser UI QA",
       "status": "next"
     },
@@ -539,7 +539,7 @@ shell 명령을 실행하지 않고 정책 판단만 반환한다. UI는 실제 
   "ui": {
     "response_type": "status",
     "severity": "info",
-    "primary_text": "14차",
+    "primary_text": "15차",
     "display": "panel"
   }
 }
