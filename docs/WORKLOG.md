@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `172 passed` |
+| `.venv/bin/pytest` | `174 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -417,7 +417,15 @@
 - README, SECURITY, RELEASE_CHECKLIST가 외부 LLM API, shell 실행, browser interaction, 파일 생성/수정/삭제, 운영 배포, cloud/Oracle stop condition을 공유하는지 검증한다.
 - RELEASE_CHECKLIST에 `LOCAL_API_KEY=` 형태의 secret-like 예시가 들어가지 않는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_security_docs_contract.py` 결과는 `3 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `172 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `174 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
+
+### Portfolio docs polish
+
+- README에 `포트폴리오 포인트` 섹션을 추가해 담당 범위, 학습 포인트, 안전 설계, 문서 품질 관리를 명시했다.
+- `docs/PROJECT_SUMMARY.md`에도 포트폴리오 관점의 담당 범위, 설계 포인트, 안정성 포인트, 검증 포인트, 한계 명시를 추가했다.
+- `tests/test_portfolio_docs_contract.py`를 추가해 포트폴리오 설명이 빠지거나 배포 완료처럼 과장되지 않도록 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py` 결과는 `2 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `174 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`, `.venv/bin/python scripts/public_release_check.py --root . --json`, `git diff --check`도 성공했다.
 
 ### 응답 형식 업데이트
 

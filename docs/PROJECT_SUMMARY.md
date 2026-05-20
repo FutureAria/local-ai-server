@@ -35,6 +35,14 @@ CLI / curl
 - CLI는 백엔드 API를 호출하고 로직을 중복 구현하지 않는다.
 - 외부 LLM API, LangChain, cloud vector DB는 사용하지 않는다.
 
+## 포트폴리오 포인트
+
+- 담당 범위: FastAPI API, service layer, SQLite metadata 저장, Chroma vector search, Ollama local client, Typer CLI, 테스트/문서/보안 기준 정리
+- 설계 포인트: route와 service 책임 분리, SQLite와 Chroma 역할 분리, CLI의 HTTP API 재사용, local-only LLM/embedding 정책
+- 안정성 포인트: folder index preview, shell dry-run, agent approval 상태, LOCAL_API_KEY 보호 endpoint, public release check
+- 검증 포인트: API contract, schema validation, CLI mock, security docs contract, UI bridge example validation, public docs contract를 pytest로 고정
+- 한계 명시: 실제 브라우저 클릭, shell 실행, 파일 수정/삭제, 운영 배포, 외부 LLM API는 구현 범위 밖으로 분리
+
 ## Endpoint 목록
 
 Health:
@@ -183,7 +191,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `172 passed`
+- `.venv/bin/pytest`: `174 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능

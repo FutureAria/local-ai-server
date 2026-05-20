@@ -60,6 +60,19 @@ GitHub 공개 전 체크리스트는 [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CH
 - RAG 답변은 문서 밖 코드, 링크, 보안 세부사항, 추측성 표현을 감지하면 보수적인 fallback 답변으로 대체될 수 있습니다.
 - `/agent/plan`은 웹 이동, 폴더 열기, shell 실행 같은 요청을 위험도와 승인 필요 action으로 분류하지만 실제 실행하지 않습니다.
 
+## 포트폴리오 포인트
+
+이 프로젝트에서 맡은 역할은 백엔드 API 설계, 로컬 RAG 파이프라인 구현, SQLite/Chroma 저장소 분리, Typer CLI, 테스트/문서/보안 기준 정리까지 포함한 end-to-end 구현입니다.
+
+강조할 수 있는 학습 포인트:
+
+- FastAPI route를 얇게 유지하고 service 계층에 비즈니스 로직을 모으는 구조
+- SQLite와 Chroma를 각각 metadata source of truth와 vector search 전용 저장소로 분리한 설계
+- 외부 LLM API 없이 Ollama local `/api/chat`, `/api/embed`만 사용하는 로컬 AI 흐름
+- 문서 업로드, chunking, embedding batch, RAG 답변, feedback, SFT export로 이어지는 데이터 흐름
+- 실제 실행 기능을 바로 열지 않고 preview, dry-run, approval, protected endpoint로 나눈 안전 설계
+- README/API/보안 문서 예시가 실제 Pydantic schema와 어긋나지 않도록 테스트로 고정한 문서 품질 관리
+
 ## Architecture
 
 ```text
