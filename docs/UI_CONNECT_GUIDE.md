@@ -87,7 +87,7 @@ curl -X POST http://127.0.0.1:8000/assistant/bootstrap \
 curl -X POST http://127.0.0.1:8000/assistant/message \
   -H "Authorization: Bearer <LOCAL_API_KEY>" \
   -H "Content-Type: application/json" \
-  -d '{"message":"내 문서 기준으로 현재 상태 요약해줘","project_root":"/Users/juyoung/local-ai-server","mode":"status"}'
+  -d '{"message":"내 문서 기준으로 현재 상태 요약해줘","project_root":"/Users/juyoung/local-ai-server","mode":"auto"}'
 ```
 
 ## Copy-ready fetch 예시

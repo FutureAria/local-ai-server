@@ -53,6 +53,9 @@ def test_ui_connect_guide_includes_copy_ready_fetch_example() -> None:
     ]:
         assert phrase in text
 
+    assert '"mode":"auto"' in text
+    assert '"mode":"status"' not in text
+
 
 def test_ui_connect_guide_keeps_safety_boundaries_visible() -> None:
     text = GUIDE.read_text(encoding="utf-8")

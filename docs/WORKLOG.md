@@ -524,6 +524,13 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_assistant_service.py` 결과는 `5 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `199 passed, 1 warning`이다.
 
+### UI connect guide mode contract
+
+- `docs/UI_CONNECT_GUIDE.md`의 `/assistant/message` curl 예시를 실제 `AssistantMode` schema에 맞춰 `mode=auto`로 수정했다.
+- 상태 질문은 `mode=auto`에서 status intent로 분기하므로 별도 `mode=status` 요청값을 사용하지 않는다.
+- `tests/test_ui_connect_guide.py`에 `mode=auto` 예시 유지와 `mode=status` 예시 금지 검증을 추가했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_readme_quick_start.py tests/test_public_docs_contract.py` 결과는 `17 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.
