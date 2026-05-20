@@ -47,7 +47,7 @@ def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str,
 
     response = getattr(client, method)(path, **kwargs)
     assert response.status_code == 401
-    assert response.json()["detail"] == "LOCAL_API_KEY가 설정되어 있어 X-API-Key 헤더가 필요합니다."
+    assert response.json()["detail"] == "LOCAL_API_KEY가 설정되어 있어 X-API-Key 또는 Authorization: Bearer 헤더가 필요합니다."
 
     get_settings.cache_clear()
     reset_rate_limiter()
@@ -76,3 +76,20 @@ def test_local_rate_limit_blocks_protected_endpoint_after_limit(monkeypatch) -> 
     assert response.status_code == 429
     assert response.json()["detail"] == "요청이 너무 많습니다. 잠시 후 다시 시도하세요."
     assert int(response.headers["retry-after"]) > 0
+
+
+def test_local_api_key_accepts_authorization_bearer(monkeypatch) -> None:
+    get_settings.cache_clear()
+    reset_rate_limiter()
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+    app.dependency_overrides[get_search_service] = lambda: FakeSearchService()
+    client = TestClient(app)
+
+    response = client.post("/search", json={"query": "hello"}, headers={"Authorization": "Bearer secret"})
+
+    app.dependency_overrides.clear()
+    get_settings.cache_clear()
+    reset_rate_limiter()
+    monkeypatch.delenv("LOCAL_API_KEY", raising=False)
+
+    assert response.status_code == 200

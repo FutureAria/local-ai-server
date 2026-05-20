@@ -336,7 +336,7 @@ curl http://127.0.0.1:8000/documents/supported-types
 
 ## LOCAL_API_KEY
 
-`LOCAL_API_KEY`를 설정하면 보호 endpoint는 `X-API-Key` 헤더를 요구합니다.
+`LOCAL_API_KEY`를 설정하면 보호 endpoint는 `X-API-Key` 헤더를 요구합니다. 외부 UI가 token 입력칸에서 `Authorization: Bearer <token>` 형태로만 보낼 경우도 같은 키로 허용합니다.
 
 보호 endpoint:
 
@@ -364,6 +364,15 @@ curl http://127.0.0.1:8000/documents/supported-types
 export LOCAL_API_KEY=change-me
 curl -X POST http://127.0.0.1:8000/ask \
   -H "X-API-Key: change-me" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"안녕"}'
+```
+
+Bearer token 입력만 지원하는 로컬 UI에는 `LOCAL_API_KEY` 값을 그대로 token 칸에 넣으면 됩니다. 서버는 아래 요청도 같은 키로 인정합니다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/ask \
+  -H "Authorization: Bearer change-me" \
   -H "Content-Type: application/json" \
   -d '{"question":"안녕"}'
 ```

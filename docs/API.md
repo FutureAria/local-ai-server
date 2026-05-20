@@ -10,10 +10,11 @@ http://127.0.0.1:8000
 
 ## 인증
 
-`LOCAL_API_KEY`가 설정되어 있으면 보호 endpoint는 `X-API-Key` 헤더를 요구한다.
+`LOCAL_API_KEY`가 설정되어 있으면 보호 endpoint는 `X-API-Key` 헤더를 요구한다. 외부 로컬 UI가 Bearer token 입력만 지원하는 경우를 위해 `Authorization: Bearer <LOCAL_API_KEY>`도 같은 키로 허용한다.
 
 ```bash
 X-API-Key: <LOCAL_API_KEY>
+Authorization: Bearer <LOCAL_API_KEY>
 ```
 
 보호 endpoint:

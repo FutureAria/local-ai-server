@@ -14,7 +14,7 @@
 
 ## 인증과 접근 제어
 
-`LOCAL_API_KEY`가 설정되어 있으면 보호 endpoint는 `X-API-Key` 헤더를 요구한다.
+`LOCAL_API_KEY`가 설정되어 있으면 보호 endpoint는 `X-API-Key` 헤더를 요구한다. 로컬 UI 호환을 위해 `Authorization: Bearer <LOCAL_API_KEY>`도 같은 키로 허용한다.
 
 보호 endpoint:
 

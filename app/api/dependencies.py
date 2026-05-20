@@ -25,14 +25,19 @@ _agent_service: AgentService | None = None
 def require_api_key(
     request: Request,
     x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+    authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> None:
     settings = get_settings()
-    if settings.local_api_key and x_api_key != settings.local_api_key:
+    presented_key = x_api_key or _bearer_token(authorization)
+    if settings.local_api_key and presented_key != settings.local_api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="LOCAL_API_KEY가 설정되어 있어 X-API-Key 헤더가 필요합니다.",
+            detail="LOCAL_API_KEY가 설정되어 있어 X-API-Key 또는 Authorization: Bearer 헤더가 필요합니다.",
         )
-    identity = rate_limit_identity(x_api_key if settings.local_api_key else None, request.client.host if request.client else None)
+    identity = rate_limit_identity(
+        presented_key if settings.local_api_key else None,
+        request.client.host if request.client else None,
+    )
     retry_after = _rate_limiter.check(identity, settings.local_rate_limit_per_minute)
     if retry_after is not None:
         raise HTTPException(
@@ -40,6 +45,15 @@ def require_api_key(
             detail="요청이 너무 많습니다. 잠시 후 다시 시도하세요.",
             headers={"Retry-After": str(retry_after)},
         )
+
+
+def _bearer_token(authorization: str | None) -> str | None:
+    if not authorization:
+        return None
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token.strip():
+        return None
+    return token.strip()
 
 
 def reset_rate_limiter() -> None:

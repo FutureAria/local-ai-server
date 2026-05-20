@@ -151,7 +151,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `120 passed`
+- `.venv/bin/pytest`: `121 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
@@ -184,7 +184,7 @@ optional dependency 설치 시 지원:
 ## 보안과 운영 기준
 
 - 기본 서버 bind는 `127.0.0.1` 권장
-- `LOCAL_API_KEY` 설정 시 보호 endpoint는 `X-API-Key` 필요
+- `LOCAL_API_KEY` 설정 시 보호 endpoint는 `X-API-Key` 또는 `Authorization: Bearer <LOCAL_API_KEY>` 필요
 - 보호 endpoint에는 `LOCAL_RATE_LIMIT_PER_MINUTE` 기준 process-local in-memory rate limit 적용
 - 실행형 Agent는 계획, dry-run, 승인, 실행 엔진 v1 단계이며 기본값에서는 실제 실행 비활성
 - 실행 엔진 v1은 허용 root 안의 폴더 목록 조회, 텍스트 파일 내용 preview, 명시 URL read-only fetch만 지원
