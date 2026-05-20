@@ -60,6 +60,12 @@ def test_readme_keeps_safe_boundaries_visible_near_top() -> None:
         "파일 생성/수정/삭제 자동화",
         "운영 배포",
         "클라우드/Oracle",
+        "## Capability Boundary Matrix",
+        "Agent execution v1",
+        "조건부 read-only",
+        "dry-run only",
+        "명시 URL 단건 read-only fetch",
+        "크롤링/브라우저 이동이 아닙니다",
     ]:
         assert phrase in text
 

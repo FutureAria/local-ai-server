@@ -50,6 +50,18 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 - 파일 생성/수정/삭제 자동화는 구현 범위 밖입니다.
 - 운영 배포, 클라우드/Oracle 리소스 생성/변경은 이 프로젝트의 현재 범위 밖입니다.
 
+## Capability Boundary Matrix
+
+| 구분 | 현재 상태 | 설명 |
+|---|---|---|
+| 문서 업로드/검색/RAG | 가능 | `.txt`, `.md`, `.html`, `.htm`, optional `.pdf`, `.docx`를 로컬에서 색인하고 Ollama로 답변합니다. |
+| 폴더 색인 preview | 가능 | 실제 저장 전 대상 파일, 예상 chunk, 예상 embedding batch를 read-only로 확인합니다. |
+| Agent plan/approval | 가능 | 요청을 action 후보와 위험도로 기록하고 승인/거절 상태를 저장합니다. |
+| Agent execution v1 | 조건부 read-only | `AGENT_EXECUTION_ENABLED=true`에서도 허용 root 안의 폴더 목록 조회, 텍스트 파일 preview, 명시 URL 단건 read-only fetch만 지원합니다. |
+| shell | dry-run only | `shell-policy`, `shell-dry-run`은 정책 판단만 반환하고 실제 명령을 실행하지 않습니다. |
+| 브라우저/파일/배포 | 금지 | 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 클라우드/Oracle 리소스 변경은 구현하지 않았습니다. |
+| 외부 API | 금지 | 외부 LLM API와 cloud vector DB는 사용하지 않습니다. 명시 URL read-only fetch는 LLM API 연동이나 크롤링/브라우저 이동이 아닙니다. |
+
 ## Key Docs
 
 - 전체 API 계약: [docs/API.md](docs/API.md)

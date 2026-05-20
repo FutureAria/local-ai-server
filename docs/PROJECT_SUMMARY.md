@@ -43,6 +43,19 @@ CLI / curl
 - 검증 포인트: API contract, schema validation, CLI mock, security docs contract, UI bridge example validation, public docs contract를 pytest로 고정
 - 한계 명시: 실제 브라우저 클릭, shell 실행, 파일 수정/삭제, 운영 배포, 외부 LLM API는 구현 범위 밖으로 분리
 
+## 실행 가능 기능과 금지 기능
+
+| 구분 | 상태 | 포트폴리오 설명 기준 |
+|---|---|---|
+| 문서 업로드, 검색, RAG | 가능 | 로컬 파일을 chunking, embedding, SQLite/Chroma 저장 후 Ollama로 답변한다. |
+| CLI와 HTTP API | 가능 | CLI는 백엔드 HTTP API를 호출하며 비즈니스 로직을 중복 구현하지 않는다. |
+| Assistant UI bridge | 가능 | startup, bootstrap, action-preview, message, sessions API를 제공하되 UI 자체는 만들지 않는다. |
+| Agent plan/approval | 가능 | 요청을 실행하지 않고 action 후보, 위험도, 승인 상태로 기록한다. |
+| Agent execution v1 | 조건부 read-only | 기본값은 차단이며, 활성화해도 허용 root 폴더 목록 조회, 텍스트 preview, 명시 URL 단건 read-only fetch만 지원한다. |
+| shell 명령 | dry-run only | `shell-policy`, `shell-dry-run`은 정책 판단만 수행하고 실제 shell 실행은 하지 않는다. |
+| 브라우저/파일/배포 | 금지 | 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 클라우드/Oracle 리소스 변경은 구현 범위 밖이다. |
+| 외부 LLM API/cloud vector DB | 금지 | 런타임 AI 호출은 Ollama local API만 사용한다. |
+
 ## Endpoint 목록
 
 Health:

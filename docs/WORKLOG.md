@@ -555,6 +555,15 @@
 - `tests/test_smoke_script.py`가 assistant bridge smoke 요약 출력의 `endpoints_count`, `protected_endpoints_count`, `sessions_count`, `total_messages`를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_ui_qa_checklist.py tests/test_next_chat_handoff.py` 결과는 `9 passed, 1 warning`이다.
 
+### Public capability boundary matrix
+
+- README 상단에 `Capability Boundary Matrix`를 추가해 가능한 기능, 조건부 read-only 기능, 금지 기능을 한눈에 구분했다.
+- `docs/PROJECT_SUMMARY.md`에 `실행 가능 기능과 금지 기능` 표를 추가해 포트폴리오 설명에서 Agent 기능을 과대해석하지 않도록 정리했다.
+- `Agent execution v1`은 기본 차단이며, 활성화해도 허용 root 폴더 목록 조회, 텍스트 preview, 명시 URL 단건 read-only fetch만 지원한다고 명시했다.
+- shell은 dry-run only, 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 외부 LLM API/cloud vector DB는 금지 또는 범위 밖으로 명시했다.
+- `tests/test_readme_quick_start.py`, `tests/test_portfolio_docs_contract.py`를 보강해 공개 문서의 safe boundary matrix가 유지되도록 했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_public_release_summary.py` 결과는 `17 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.
