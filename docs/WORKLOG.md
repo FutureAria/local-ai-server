@@ -475,6 +475,13 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `18 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `189 passed, 1 warning`이다.
 
+### UI bridge API inventory docs
+
+- `docs/UI_BRIDGE_EXAMPLES.md`에 read-only `GET /project/api-inventory` 예시를 추가해 UI 개발자가 현재 route 목록, method, tag, API key 보호 여부를 확인할 수 있게 했다.
+- `docs/UI_QA_CHECKLIST.md`에 API inventory 확인 항목과 수동 curl 예시를 추가했다.
+- `tests/test_ui_bridge_examples.py`, `tests/test_ui_qa_checklist.py`를 보강해 UI bridge 문서가 `/project/api-inventory`를 계속 포함하도록 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_ui_qa_checklist.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `17 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

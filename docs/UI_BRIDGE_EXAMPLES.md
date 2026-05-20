@@ -17,7 +17,7 @@
 4. `POST /assistant/message`
 5. `GET /assistant/sessions/{session_id}/messages`
 
-개별 refresh가 필요할 때만 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`, `GET /assistant/sessions`를 호출한다.
+개별 refresh가 필요할 때만 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`, `GET /assistant/sessions`를 호출한다. 개발/디버그 화면에서 현재 백엔드 API 목록과 보호 여부를 보여줘야 하면 read-only `GET /project/api-inventory`를 호출한다.
 
 ## `GET /assistant/ui-contract`
 
@@ -82,6 +82,11 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
       "method": "GET",
       "path": "/assistant/sessions",
       "purpose": "session sidebar refresh"
+    },
+    {
+      "method": "GET",
+      "path": "/project/api-inventory",
+      "purpose": "read-only endpoint inventory for developer/debug UI"
     }
   ],
   "message_flow": [
@@ -130,6 +135,48 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
     "UI contract is read-only.",
     "Do not enable shell/browser/file-write actions from this response."
   ]
+}
+```
+
+## `GET /project/api-inventory`
+
+UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 여부를 read-only로 확인할 때 사용한다. 이 endpoint는 API 목록만 반환하며 shell 실행, 파일 수정, 브라우저 조작을 수행하지 않는다.
+
+```json
+{
+  "service": "local-ai-server",
+  "total_routes": 42,
+  "protected_routes": 31,
+  "routes": [
+    {
+      "path": "/assistant/startup",
+      "methods": [
+        "GET"
+      ],
+      "name": "get_assistant_startup",
+      "tags": [
+        "assistant"
+      ],
+      "protected": true
+    },
+    {
+      "path": "/project/api-inventory",
+      "methods": [
+        "GET"
+      ],
+      "name": "get_project_api_inventory",
+      "tags": [
+        "project"
+      ],
+      "protected": false
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "shell_execution": "disabled",
+    "browser_interaction": "blocked",
+    "file_write_delete": "blocked"
+  }
 }
 ```
 

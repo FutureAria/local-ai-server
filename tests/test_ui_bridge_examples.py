@@ -29,11 +29,14 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
 
     assert "GET /assistant/startup" in text
     assert "GET /assistant/ui-contract" in text
+    assert "GET /project/api-inventory" in text
     assert "POST /assistant/message" in text
     assert '"path": "/assistant/startup"' in text
+    assert '"path": "/project/api-inventory"' in text
     assert '"refresh_endpoints"' in text
     assert '"display": "startup_snapshot"' in text
     assert '"external_llm_api": "not-used"' in text
+    assert '"read_only": true' in text
 
 
 def test_ui_bridge_examples_document_message_response_types() -> None:

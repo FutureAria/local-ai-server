@@ -223,6 +223,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `local-ai roots`, `local-ai shell-policy`, `local-ai shell-dry-run "pwd"`를 추가했다.
 - `/project/shell-policy`, `/project/shell-dry-run`은 실제 shell을 실행하지 않고 정책 판단만 반환한다.
 - `/project/api-inventory`와 `local-ai api-inventory`를 추가해 endpoint 목록과 API key 보호 여부를 read-only로 확인할 수 있다.
+- `docs/UI_BRIDGE_EXAMPLES.md`와 `docs/UI_QA_CHECKLIST.md`에 read-only `GET /project/api-inventory` UI 연동/QA 기준을 추가했다.
 - `/project/status`는 4차 safer automation loop 완료 이력을 포함한다.
 - `/assistant/capabilities`, `/assistant/sessions`, `/assistant/sessions/{session_id}`, `/assistant/message`, `/assistant/project-root/validate`를 추가했다.
 - `local-ai assistant-capabilities`, `local-ai assistant-session`, `local-ai assistant-message`, `local-ai assistant-root`를 추가했다.

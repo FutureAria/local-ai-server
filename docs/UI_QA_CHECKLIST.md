@@ -30,6 +30,13 @@
 - [ ] `ui.display`가 `startup_snapshot`이다.
 - [ ] API key 원문은 응답, 화면, 로그 어디에도 표시되지 않는다.
 
+## API Inventory
+
+- [ ] `GET /project/api-inventory` 호출이 `200`을 반환한다.
+- [ ] `routes` 목록에 `/assistant/startup`, `/assistant/message`, `/project/api-inventory`가 표시된다.
+- [ ] 각 route의 `methods`, `tags`, `protected` 값이 디버그/개발 화면에서 확인 가능하다.
+- [ ] 이 화면은 read-only API 목록만 보여주며 shell 실행, 파일 수정, 브라우저 조작 버튼을 제공하지 않는다.
+
 ## Bootstrap
 
 - [ ] `POST /assistant/bootstrap` 호출이 `200`을 반환한다.
@@ -74,6 +81,9 @@
 
 ```bash
 curl http://127.0.0.1:8000/assistant/startup \
+  -H "Authorization: Bearer <LOCAL_API_KEY>"
+
+curl http://127.0.0.1:8000/project/api-inventory \
   -H "Authorization: Bearer <LOCAL_API_KEY>"
 
 curl -X POST http://127.0.0.1:8000/assistant/action-preview \

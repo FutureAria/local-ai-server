@@ -5,10 +5,13 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     text = Path("docs/UI_QA_CHECKLIST.md").read_text(encoding="utf-8")
 
     assert "GET /assistant/startup" in text
+    assert "GET /project/api-inventory" in text
     assert "POST /assistant/bootstrap" in text
     assert "POST /assistant/action-preview" in text
     assert "POST /assistant/message" in text
     assert "GET /assistant/sessions/{session_id}/messages" in text
+    assert "routes" in text
+    assert "protected" in text
     assert "type=agent_plan" in text
     assert "type=shell_dry_run" in text
 
