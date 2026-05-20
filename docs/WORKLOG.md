@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `193 passed` |
+| `.venv/bin/pytest` | `196 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -490,6 +490,14 @@
 - `tests/test_ui_connect_guide.py`를 추가해 연결값, startup flow, 안전 경계가 문서에 유지되는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `15 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `193 passed, 1 warning`이다.
+
+### UI contract cheatsheet
+
+- `docs/UI_CONTRACT_CHEATSHEET.md`를 추가해 UI가 endpoint별로 읽어야 할 핵심 응답 필드, message response type 매핑, safety/error 표시 규칙을 얇게 정리했다.
+- README `Key Docs`, handoff, PROJECT_SUMMARY에서 UI field cheatsheet를 참조하도록 연결했다.
+- `tests/test_ui_contract_cheatsheet.py`를 추가해 endpoint, response type, safety/error 계약이 문서에 유지되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_contract_cheatsheet.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_readme_quick_start.py` 결과는 `19 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `196 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

@@ -58,6 +58,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 - GitHub 공개 전 체크리스트: [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - 공개 상태 요약: [docs/PUBLIC_RELEASE_SUMMARY.md](docs/PUBLIC_RELEASE_SUMMARY.md)
 - UI 연결 가이드: [docs/UI_CONNECT_GUIDE.md](docs/UI_CONNECT_GUIDE.md)
+- UI 필드 치트시트: [docs/UI_CONTRACT_CHEATSHEET.md](docs/UI_CONTRACT_CHEATSHEET.md)
 - 브라우저 UI 연동 예시 payload: [docs/UI_BRIDGE_EXAMPLES.md](docs/UI_BRIDGE_EXAMPLES.md)
 - 브라우저 UI 수동 QA 기준: [docs/UI_QA_CHECKLIST.md](docs/UI_QA_CHECKLIST.md)
 - 문서 정합성 리뷰 handoff: [docs/CLAUDE_REVIEW_HANDOFF.md](docs/CLAUDE_REVIEW_HANDOFF.md)
