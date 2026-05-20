@@ -14,7 +14,7 @@
 - 로컬 서버를 호출하는 Typer CLI
 - assistant 세션 요약, allowed root 온보딩, shell dry-run 정책 확인
 - feedback 저장과 SFT JSONL export
-- 문서/운영/보안/API/인계 문서
+- 문서/운영/보안/API/UI 연결/인계 문서
 
 ## 핵심 설계
 
@@ -193,7 +193,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `189 passed`
+- `.venv/bin/pytest`: `192 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능

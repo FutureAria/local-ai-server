@@ -15,7 +15,7 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
 
     assert ".venv/bin/pytest" in text
-    assert "189 passed" in text
+    assert "192 passed" in text
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert "git diff --check" in text
@@ -26,6 +26,7 @@ def test_next_chat_handoff_links_release_and_ui_docs() -> None:
 
     for doc in [
         "docs/UI_BRIDGE_EXAMPLES.md",
+        "docs/UI_CONNECT_GUIDE.md",
         "docs/UI_QA_CHECKLIST.md",
         "docs/RELEASE_CHECKLIST.md",
         "docs/PUBLIC_RELEASE_SUMMARY.md",
