@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from app.schemas.assistant import AssistantMessageListResponse, AssistantSessionListResponse
+
 
 CHEATSHEET = Path("docs/UI_CONTRACT_CHEATSHEET.md")
 
@@ -20,9 +22,25 @@ def test_ui_contract_cheatsheet_lists_core_endpoints_and_fields() -> None:
         "dashboard.cards.connection.status",
         "ui.response_type",
         "routes[].protected",
+        "sessions[].messages_count",
+        "sessions[].last_message_preview",
+        "total_messages",
     ]
     for item in required_items:
         assert item in text
+
+
+def test_ui_contract_cheatsheet_matches_session_schema_field_names() -> None:
+    text = CHEATSHEET.read_text(encoding="utf-8")
+    session_fields = set(AssistantSessionListResponse.model_fields)
+    message_fields = set(AssistantMessageListResponse.model_fields)
+
+    assert {"sessions", "limit", "offset"} <= session_fields
+    assert {"messages", "limit", "offset", "total_messages"} <= message_fields
+    assert "`GET /assistant/sessions` | 세션 목록 | `sessions`, `limit`, `offset`" in text
+    assert "`GET /assistant/sessions/{session_id}/messages` | 메시지 기록 | `messages`, `limit`, `offset`, `total_messages`" in text
+    assert "`GET /assistant/sessions` | 세션 목록 | `sessions`, `total`" not in text
+    assert "`GET /assistant/sessions/{session_id}/messages` | 메시지 기록 | `messages`, `limit`, `offset`, `total`" not in text
 
 
 def test_ui_contract_cheatsheet_lists_response_type_mapping() -> None:

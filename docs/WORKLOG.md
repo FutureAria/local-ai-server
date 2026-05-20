@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `199 passed` |
+| `.venv/bin/pytest` | `200 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -530,6 +530,14 @@
 - 상태 질문은 `mode=auto`에서 status intent로 분기하므로 별도 `mode=status` 요청값을 사용하지 않는다.
 - `tests/test_ui_connect_guide.py`에 `mode=auto` 예시 유지와 `mode=status` 예시 금지 검증을 추가했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_readme_quick_start.py tests/test_public_docs_contract.py` 결과는 `17 passed, 1 warning`이다.
+
+### UI contract cheatsheet session fields
+
+- `docs/UI_CONTRACT_CHEATSHEET.md`의 `GET /assistant/sessions` 표시 필드를 실제 `AssistantSessionListResponse`에 맞춰 `sessions`, `limit`, `offset`, `sessions[].messages_count`, `sessions[].last_message_preview`로 수정했다.
+- `GET /assistant/sessions/{session_id}/messages` 표시 필드를 실제 `AssistantMessageListResponse`에 맞춰 `total_messages`로 수정했다.
+- `tests/test_ui_contract_cheatsheet.py`가 실제 assistant session/message list schema 필드명과 cheatsheet 문구를 함께 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_contract_cheatsheet.py tests/test_ui_bridge_examples.py tests/test_public_docs_contract.py` 결과는 `16 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `200 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

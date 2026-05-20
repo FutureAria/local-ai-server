@@ -23,8 +23,8 @@
 | `POST /assistant/bootstrap` | project root와 세션 초기화 | `project_root.safe_for_read_only_agent`, `sessions.sessions`, `ui.blocked_actions` |
 | `POST /assistant/action-preview` | 전송 전 위험도 미리보기 | `intent`, `risk_level`, `requires_approval`, `missing_inputs`, `ui` |
 | `POST /assistant/message` | 실제 메시지 API | `type`, `answer`, `data`, `sources`, `request_id`, `ui.response_type`, `ui.display` |
-| `GET /assistant/sessions` | 세션 목록 | `sessions`, `total` |
-| `GET /assistant/sessions/{session_id}/messages` | 메시지 기록 | `messages`, `limit`, `offset`, `total` |
+| `GET /assistant/sessions` | 세션 목록 | `sessions`, `limit`, `offset`, `sessions[].messages_count`, `sessions[].last_message_preview` |
+| `GET /assistant/sessions/{session_id}/messages` | 메시지 기록 | `messages`, `limit`, `offset`, `total_messages` |
 | `GET /project/api-inventory` | 개발/디버그 API 목록 | `routes[].path`, `routes[].methods`, `routes[].tags`, `routes[].protected` |
 
 ## Message response type 매핑
