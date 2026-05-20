@@ -38,6 +38,7 @@
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `GET /assistant/status`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`

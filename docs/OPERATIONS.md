@@ -82,6 +82,7 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-status
 local-ai assistant-sessions
 local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/local-ai-server
 ```

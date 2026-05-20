@@ -24,6 +24,26 @@ class FakeAssistantService:
             "endpoints": {"message": "POST /assistant/message"},
         }
 
+    def status(self, db):
+        return {
+            "service": "local-ai-server",
+            "current_phase": {"phase": 7, "title": "Live browser UI QA", "status": "next", "summary": "qa"},
+            "documents": {
+                "documents_count": 1,
+                "chunks_count": 2,
+                "chroma_vectors_count": 2,
+                "missing_stored_files_count": 0,
+            },
+            "integrity": {
+                "status": "ok",
+                "chunks_missing_vectors_count": 0,
+                "orphan_vectors_count": 0,
+                "repair_available": False,
+            },
+            "sessions": {"sessions_count": 1, "messages_count": 2},
+            "safety": {"shell_execution": "disabled"},
+        }
+
     def create_session(self, db, title=None, project_root=None):
         return SimpleNamespace(
             id="session-1",
@@ -110,6 +130,19 @@ def test_assistant_capabilities_endpoint_with_mock() -> None:
     assert response.status_code == 200
     assert response.json()["llm_provider"] == "ollama-local"
     assert response.json()["safe_defaults"]["shell_execution"] == "disabled"
+
+
+def test_assistant_status_endpoint_with_mock() -> None:
+    app.dependency_overrides[get_assistant_service] = lambda: FakeAssistantService()
+    client = TestClient(app)
+
+    response = client.get("/assistant/status")
+
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["documents"]["documents_count"] == 1
+    assert body["sessions"]["messages_count"] == 2
 
 
 def test_assistant_session_endpoints_with_mock() -> None:

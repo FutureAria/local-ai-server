@@ -60,6 +60,34 @@ class AssistantService:
             },
         }
 
+    def status(self, db: Session) -> dict:
+        project_status = get_project_status()
+        document_stats = self.document_service.get_stats(db)
+        integrity = self.document_service.get_integrity_report(db)
+        sessions_count = db.scalar(select(func.count(AssistantSession.id))) or 0
+        messages_count = db.scalar(select(func.count(AssistantMessage.id))) or 0
+        return {
+            "service": self.settings.service_name,
+            "current_phase": project_status["current_phase"],
+            "documents": {
+                "documents_count": document_stats["documents_count"],
+                "chunks_count": document_stats["chunks_count"],
+                "chroma_vectors_count": document_stats["chroma_vectors_count"],
+                "missing_stored_files_count": document_stats["missing_stored_files_count"],
+            },
+            "integrity": {
+                "status": integrity["status"],
+                "chunks_missing_vectors_count": integrity["chunks_missing_vectors_count"],
+                "orphan_vectors_count": integrity["orphan_vectors_count"],
+                "repair_available": integrity["repair_available"],
+            },
+            "sessions": {
+                "sessions_count": sessions_count,
+                "messages_count": messages_count,
+            },
+            "safety": _safety(),
+        }
+
     def create_session(self, db: Session, title: str | None = None, project_root: str | None = None) -> AssistantSession:
         session = AssistantSession(
             id=uuid4().hex,

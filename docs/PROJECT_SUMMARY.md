@@ -51,6 +51,7 @@ Ask/Search:
 Assistant:
 
 - `GET /assistant/capabilities`
+- `GET /assistant/status`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
@@ -108,6 +109,7 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-status
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
 local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server
@@ -165,7 +167,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `133 passed`
+- `.venv/bin/pytest`: `135 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 E2E smoke test 가능
 - `python scripts/public_release_check.py --root .`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
@@ -174,6 +176,7 @@ python -m compileall app cli scripts
 - `local-ai agent-execute 1`: 승인된 run 실행 시도 가능. 기본 설정에서는 고위험 실행을 차단함
 - `local-ai assistant` 내부 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run pwd`: 로컬 비서 세션과 안전 정책 확인 가능
 - `local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server`: UI bridge와 같은 `/assistant/message` 호출 가능
+- `local-ai assistant-status`: UI 첫 화면용 문서/세션/integrity/안전 상태 요약 확인 가능
 
 ## 구현된 문서 타입
 

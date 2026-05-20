@@ -244,6 +244,11 @@ def assistant_capabilities() -> None:
     _print_json(_request_json("get", "/assistant/capabilities", headers=_headers()))
 
 
+@app.command("assistant-status")
+def assistant_status() -> None:
+    _print_json(_request_json("get", "/assistant/status", headers=_headers()))
+
+
 @app.command("assistant-session")
 def assistant_session(title: str | None = None, project_root: str | None = None) -> None:
     payload = {"title": title, "project_root": project_root}

@@ -39,6 +39,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `GET /assistant/status`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
@@ -167,6 +168,22 @@ curl http://127.0.0.1:8000/assistant/capabilities
 - `protected`
 - `safe_defaults`
 - `endpoints`
+
+### `GET /assistant/status`
+
+UI 첫 화면에서 필요한 현재 차수, 문서 저장소 요약, integrity 요약, assistant 세션 요약, 안전 상태를 한 번에 조회한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/status
+```
+
+응답 핵심 필드:
+
+- `current_phase`
+- `documents`
+- `integrity`
+- `sessions`
+- `safety`
 
 ### `POST /assistant/sessions`
 
@@ -601,6 +618,7 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-status
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
 local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server

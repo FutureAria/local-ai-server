@@ -49,6 +49,15 @@ class AssistantSessionListResponse(BaseModel):
     offset: int
 
 
+class AssistantStatusResponse(BaseModel):
+    service: str
+    current_phase: dict
+    documents: dict
+    integrity: dict
+    sessions: dict
+    safety: dict
+
+
 class AssistantMessageItem(BaseModel):
     id: int
     role: str

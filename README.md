@@ -275,6 +275,7 @@ local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
+local-ai assistant-status
 local-ai assistant-session --title "Demo" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-sessions
 local-ai assistant-message "내 문서 기준으로 JWT 설명해줘" --project-root /Users/juyoung/local-ai-server
@@ -365,6 +366,7 @@ curl http://127.0.0.1:8000/documents/supported-types
 - `GET /project/shell-policy`
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
+- `GET /assistant/status`
 - `POST /assistant/sessions`
 - `GET /assistant/sessions`
 - `GET /assistant/sessions/{session_id}`
@@ -440,6 +442,7 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 지원 endpoint:
 
 - `GET /assistant/capabilities`: UI가 사용할 수 있는 기능과 안전 기본값 확인
+- `GET /assistant/status`: UI 첫 화면용 문서/세션/integrity/안전 상태 요약
 - `POST /assistant/sessions`: 대화 세션 생성
 - `GET /assistant/sessions`: 최근 대화 세션 목록 조회
 - `GET /assistant/sessions/{session_id}`: 세션 기록 조회

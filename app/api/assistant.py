@@ -10,6 +10,7 @@ from app.schemas.assistant import (
     AssistantSessionCreateRequest,
     AssistantSessionListResponse,
     AssistantSessionResponse,
+    AssistantStatusResponse,
     ProjectRootValidateRequest,
     ProjectRootValidateResponse,
 )
@@ -25,6 +26,14 @@ def assistant_capabilities(
     assistant_service: AssistantService = Depends(get_assistant_service),
 ) -> dict:
     return assistant_service.capabilities()
+
+
+@router.get("/status", response_model=AssistantStatusResponse)
+def assistant_status(
+    db: Session = Depends(get_db),
+    assistant_service: AssistantService = Depends(get_assistant_service),
+) -> dict:
+    return assistant_service.status(db)
 
 
 @router.post("/sessions", response_model=AssistantSessionResponse)

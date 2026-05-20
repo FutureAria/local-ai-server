@@ -37,6 +37,12 @@ PROJECT_PHASES = [
     },
     {
         "phase": 7,
+        "title": "UI dashboard status API",
+        "status": "done",
+        "summary": "Assistant status endpoint for document, integrity, session, and safety dashboard data.",
+    },
+    {
+        "phase": 8,
         "title": "Live browser UI QA",
         "status": "next",
         "summary": "Exercise the connected browser UI against the local assistant API and refine response contracts.",
@@ -45,6 +51,7 @@ PROJECT_PHASES = [
 
 SAFE_NEXT_TASKS = [
     "Send a real browser UI message to POST /assistant/message and confirm CORS/auth/response rendering.",
+    "Load GET /assistant/status in the UI and confirm dashboard rendering.",
     "Check GET /assistant/sessions in the UI after a few messages.",
     "Run upload/search/ask-with-docs against a real local .md or .txt note.",
     "Review SQLite/Chroma status with local-ai stats and local-ai integrity.",
