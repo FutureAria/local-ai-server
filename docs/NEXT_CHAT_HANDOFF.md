@@ -134,6 +134,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `docs/RELEASE_CHECKLIST.md`에 GitHub 공개 전 release checklist와 stop condition이 정리되어 있음.
 - `docs/PUBLIC_RELEASE_SUMMARY.md`에 GitHub 공개 가능 범위, 비공개 로컬 데이터, 검증 명령, 현재 한계가 정리되어 있음.
 - `scripts/smoke_test_api.py --assistant-bridge-only`로 브라우저 조작 없이 assistant startup/api-inventory/bootstrap/action-preview/message/session history API 흐름을 확인 가능.
+- `scripts/local_ci_check.py`로 pytest, compileall, public release check, git diff check를 한 번에 실행 가능.
 - `docs/OPERATIONS.md`에 로컬 운영 로그, 저장공간 점검, 백업, 수동 rotation 예시가 정리되어 있음.
 - `SECURITY.md`에 로컬 운영 보안 원칙, 공개 전 체크리스트, 고위험 작업 기준이 정리되어 있음.
 - README 앞부분에 개발 배경, 기술 선택 이유, 핵심 구현 포인트가 포트폴리오용으로 정리되어 있음.
@@ -201,10 +202,11 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `179 passed`
+  - `.venv/bin/pytest`: `182 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
+  - `python scripts/local_ci_check.py --root .`: 성공
 
 ## 최근 테스트 보강
 
@@ -212,6 +214,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_security.py`를 확장해 보호 endpoint 전체의 `LOCAL_API_KEY` 요구 동작을 검증한다.
 - `tests/test_rate_limiter.py`를 추가해 process-local in-memory rate limiter를 검증한다.
 - `tests/test_smoke_script.py`를 추가해 `scripts/smoke_test_api.py`의 문서/RAG smoke와 assistant bridge smoke API 호출 순서를 mock으로 검증한다.
+- `tests/test_local_ci_check.py`를 추가해 `scripts/local_ci_check.py`가 고정된 안전 검증 명령을 순서대로 실행하고 실패 시 중단하는지 mock으로 검증한다.
 - `tests/test_public_release_check.py`를 추가해 공개 전 read-only 보안 점검 스크립트를 검증한다.
 - `tests/test_agent_service.py`, `tests/test_agent_api.py`를 추가해 Agent preview plan 생성과 조회 API를 검증한다.
 - assistant REPL에 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run <command>`를 추가했다.

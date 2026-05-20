@@ -855,3 +855,21 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 ```
 
 Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 순서로 호출한다. `/assistant/message`는 `mode=status`로 호출하므로 Ollama 답변 생성은 사용하지 않지만 SQLite에 assistant session/message 기록은 추가된다.
+
+## Local CI Check
+
+로컬에서 공개 전 최소 검증을 한 번에 실행한다.
+
+```bash
+python scripts/local_ci_check.py --root .
+python scripts/local_ci_check.py --root . --json
+```
+
+실행 순서:
+
+1. `pytest`
+2. `python -m compileall app cli scripts`
+3. `python scripts/public_release_check.py --root . --json`
+4. `git diff --check`
+
+실패가 발생하면 그 단계에서 멈춘다. 시스템 패키지 설치, 운영 배포, 외부 API 활성화는 수행하지 않는다.

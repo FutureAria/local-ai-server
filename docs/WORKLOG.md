@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `179 passed` |
+| `.venv/bin/pytest` | `182 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -450,6 +450,14 @@
 - `tests/test_smoke_script.py`를 확장해 문서/RAG smoke와 assistant bridge smoke의 API 호출 순서를 mock으로 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py` 결과는 `15 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `179 passed, 1 warning`이다.
+
+### Local CI check script
+
+- `scripts/local_ci_check.py`를 추가해 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행하는 로컬 검증 진입점을 제공했다.
+- 실패가 발생하면 해당 단계에서 중단하고, 시스템 의존성 설치, 운영 배포, 외부 API 활성화는 수행하지 않는다.
+- `tests/test_local_ci_check.py`를 추가해 고정 검증 명령 순서와 실패 시 중단 동작을 mock으로 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_local_ci_check.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py` 결과는 `16 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `182 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

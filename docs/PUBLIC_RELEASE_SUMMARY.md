@@ -48,14 +48,16 @@
 .venv/bin/python -m compileall app cli scripts
 .venv/bin/python scripts/public_release_check.py --root . --json
 git diff --check
+python scripts/local_ci_check.py --root .
 ```
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `179 passed`
+- `.venv/bin/pytest`: `182 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
+- `python scripts/local_ci_check.py --root .`: 성공
 
 ## 명확한 한계
 

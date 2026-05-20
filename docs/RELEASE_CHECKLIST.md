@@ -25,6 +25,7 @@
 .venv/bin/python -m compileall app cli scripts
 .venv/bin/python scripts/public_release_check.py --root . --json
 git diff --check
+python scripts/local_ci_check.py --root .
 ```
 
 통과 기준:
@@ -33,6 +34,7 @@ git diff --check
 - [ ] compileall이 성공한다.
 - [ ] public release check가 `ok=true`를 반환한다.
 - [ ] `git diff --check`가 whitespace 오류를 출력하지 않는다.
+- [ ] `python scripts/local_ci_check.py --root .`가 통과한다.
 
 ## 3. 문서 정합성
 

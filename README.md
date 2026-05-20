@@ -716,6 +716,15 @@ curl "http://127.0.0.1:8000/documents/1/chunks?limit=20&offset=0"
 pytest
 ```
 
+전체 로컬 검증을 한 번에 실행하려면 아래 명령을 사용합니다.
+
+```bash
+python scripts/local_ci_check.py --root .
+python scripts/local_ci_check.py --root . --json
+```
+
+이 스크립트는 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행합니다. 실패가 발생하면 그 단계에서 멈추며, 시스템 의존성 설치나 배포는 수행하지 않습니다.
+
 ## E2E Smoke Test
 
 서버와 Ollama 모델이 실행 중일 때 임시 Markdown 문서로 `health → upload → search → ask-with-docs → feedback → stats` 흐름을 확인할 수 있습니다.
