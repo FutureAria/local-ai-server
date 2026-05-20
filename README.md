@@ -446,6 +446,16 @@ local-ai shell-dry-run "pwd"
 
 브라우저 기반 로컬 비서 UI는 `/assistant/ping`으로 연결/token 상태를 빠르게 확인하고, `/assistant/config`로 secret 없이 안전 설정을 읽고, `/assistant/dashboard`로 첫 화면 카드를 구성할 수 있습니다. 시작 시에는 `/assistant/startup`으로 `ping`, `config`, `dashboard`, `ui_contract`를 한 번에 읽을 수 있고, project root가 준비되면 `/assistant/bootstrap`으로 기능, 상태, project root 검증, 최근 세션 목록, UI 힌트를 받을 수 있습니다. 실제 메시지는 기능별 endpoint를 직접 조합하지 않고 `/assistant/message` 하나로 보낼 수 있습니다.
 
+브라우저 UI를 붙이는 기본 순서는 아래처럼 잡으면 됩니다.
+
+1. `GET /assistant/startup`: token, CORS, 모델, dashboard, UI contract snapshot을 한 번에 읽습니다.
+2. `POST /assistant/bootstrap`: 사용자가 입력한 project root와 최근 session 상태를 확인합니다.
+3. `POST /assistant/action-preview`: 메시지를 보내기 전에 intent, 위험도, 필요한 입력값을 preview합니다.
+4. `POST /assistant/message`: 사용자가 확인한 메시지를 보내고 `ui.response_type` 기준으로 렌더링합니다.
+5. `GET /assistant/sessions/{session_id}/messages`: 긴 대화 기록은 paging으로 가져옵니다.
+
+수동 QA 기준은 [docs/UI_QA_CHECKLIST.md](docs/UI_QA_CHECKLIST.md), 응답 예시는 [docs/UI_BRIDGE_EXAMPLES.md](docs/UI_BRIDGE_EXAMPLES.md)를 기준으로 확인합니다.
+
 ```bash
 curl http://127.0.0.1:8000/assistant/ping \
   -H "Authorization: Bearer change-me"

@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `155 passed` |
+| `.venv/bin/pytest` | `156 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -372,11 +372,12 @@
 - `docs/UI_BRIDGE_EXAMPLES.md`를 추가해 startup, ui-contract, assistant message 예시 payload를 안전한 placeholder로 문서화했다.
 - `docs/UI_BRIDGE_EXAMPLES.md`에 `/assistant/message` 응답 타입별 예시를 추가했다.
 - `docs/UI_QA_CHECKLIST.md`를 추가해 실제 브라우저 조작 없이 확인할 수 있는 수동 QA 기준과 stop condition을 문서화했다.
+- README에 브라우저 UI를 붙이는 기본 순서 `startup -> bootstrap -> action-preview -> message -> messages paging`를 추가했다.
 - 이 endpoint는 상태/계약 조회만 수행하며 shell 실행, 파일 수정/삭제, 브라우저 조작을 활성화하지 않는다.
 - `local-ai assistant-startup` CLI 명령을 추가했다.
 - `/project/status` 차수를 13차 Assistant startup snapshot 완료, 14차 Live browser UI QA 다음 단계로 갱신했다.
-- targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_ui_qa_checklist.py` 결과는 `5 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/pytest` 결과는 `155 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_ui_bridge.py tests/test_ui_bridge_examples.py tests/test_ui_qa_checklist.py` 결과는 `6 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `156 passed, 1 warning`이고, `.venv/bin/python -m compileall app cli scripts`와 `scripts/public_release_check.py --root . --json`도 성공했다.
 
 ### 응답 형식 업데이트
 
