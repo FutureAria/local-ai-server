@@ -108,6 +108,87 @@ python scripts/public_release_check.py --root .
 - `data/local_ai.sqlite3`: chat log, chunk, feedback 누적에 따라 증가한다.
 - `data/logs/`: shell redirection 또는 운영 환경 설정에 따라 증가한다.
 
+## 로컬 운영 Runbook
+
+아래 순서는 로컬 서버를 실제로 켠 뒤 API와 CLI가 서로 맞는지 확인하는 안전한 점검 흐름이다. 브라우저 클릭/입력/전송 자동화, shell 실제 실행, 파일 생성/수정/삭제 자동화, 운영 배포는 포함하지 않는다.
+
+### 1. 빠른 정적 검증
+
+코드와 문서가 공개 가능한 상태인지 먼저 확인한다.
+
+```bash
+python scripts/local_ci_check.py --root .
+```
+
+이 명령은 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행한다. 실패하면 그 단계에서 멈춘다.
+
+### 2. 서버 시작
+
+서버는 로컬에서만 접근하도록 `127.0.0.1`에 bind한다.
+
+```bash
+ollama serve
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+다른 터미널에서 기본 상태를 확인한다.
+
+```bash
+curl http://127.0.0.1:8000/health
+local-ai doctor
+```
+
+### 3. Assistant UI bridge smoke
+
+브라우저를 조작하지 않고 UI가 연결할 API 계약만 확인한다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
+```
+
+확인 흐름:
+
+1. `GET /assistant/startup`
+2. `GET /project/api-inventory`
+3. `POST /assistant/bootstrap`
+4. `POST /assistant/action-preview`
+5. `POST /assistant/message` with `mode=status`
+6. `GET /assistant/sessions`
+7. `GET /assistant/sessions/{session_id}/messages`
+
+이 smoke는 업로드, RAG, Ollama 답변 생성을 피한다. 다만 `/assistant/message`를 호출하므로 SQLite에 assistant session/message 기록은 추가된다.
+
+### 4. 문서/RAG smoke
+
+Ollama와 Chroma까지 포함한 문서 기반 흐름은 별도로 확인한다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
+```
+
+확인 흐름:
+
+1. `GET /health`
+2. `POST /documents/upload`
+3. `POST /search`
+4. `POST /ask-with-docs`
+5. `POST /feedback`
+6. `GET /documents/stats`
+
+이 smoke는 임시 Markdown 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가된다. 자동 삭제는 수행하지 않는다.
+
+### 5. 점검 결과 정리
+
+점검 후 아래 상태를 확인한다.
+
+```bash
+local-ai stats
+local-ai integrity
+local-ai repair-preview
+```
+
+문제가 있으면 실제 repair/delete/rebuild를 실행하지 말고 `repair-preview` 결과와 로그만 확인한다.
+
 ## 백업 기준
 
 백업 대상:

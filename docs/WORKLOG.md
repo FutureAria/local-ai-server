@@ -52,7 +52,7 @@
 
 | 명령 | 결과 |
 |---|---|
-| `.venv/bin/pytest` | `182 passed` |
+| `.venv/bin/pytest` | `184 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -458,6 +458,14 @@
 - `tests/test_local_ci_check.py`를 추가해 고정 검증 명령 순서와 실패 시 중단 동작을 mock으로 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_local_ci_check.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py` 결과는 `16 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `182 passed, 1 warning`이다.
+
+### Operations runbook
+
+- `docs/OPERATIONS.md`에 로컬 운영 Runbook을 추가해 정적 검증, 서버 시작, assistant bridge smoke, 문서/RAG smoke, 점검 결과 정리 순서를 명확히 했다.
+- Runbook은 브라우저 클릭/입력/전송 자동화, shell 실제 실행, 파일 생성/수정/삭제 자동화, 운영 배포를 포함하지 않는다.
+- `tests/test_operations_runbook.py`를 추가해 runbook 명령 순서와 위험 작업 제외 문구가 유지되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_operations_runbook.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `13 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `184 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
