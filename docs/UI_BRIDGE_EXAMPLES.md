@@ -145,9 +145,12 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
 ```json
 {
   "service": "local-ai-server",
-  "total_routes": 42,
-  "protected_routes": 31,
-  "routes": [
+  "mode": "read-only",
+  "local_only": true,
+  "endpoints_count": 42,
+  "protected_endpoints_count": 31,
+  "public_endpoints_count": 11,
+  "endpoints": [
     {
       "path": "/assistant/startup",
       "methods": [
@@ -157,7 +160,7 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
       "tags": [
         "assistant"
       ],
-      "protected": true
+      "requires_api_key": true
     },
     {
       "path": "/project/api-inventory",
@@ -168,14 +171,14 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
       "tags": [
         "project"
       ],
-      "protected": false
+      "requires_api_key": false
     }
   ],
   "safety": {
-    "read_only": true,
-    "shell_execution": "disabled",
-    "browser_interaction": "blocked",
-    "file_write_delete": "blocked"
+    "external_llm_api": "disabled",
+    "shell_execution": "dry-run-only",
+    "browser_interaction": "disabled",
+    "file_write_delete": "disabled"
   }
 }
 ```

@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `200 passed` |
+| `.venv/bin/pytest` | `201 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -538,6 +538,14 @@
 - `tests/test_ui_contract_cheatsheet.py`가 실제 assistant session/message list schema 필드명과 cheatsheet 문구를 함께 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_contract_cheatsheet.py tests/test_ui_bridge_examples.py tests/test_public_docs_contract.py` 결과는 `16 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `200 passed, 1 warning`이다.
+
+### UI bridge API inventory fields
+
+- `docs/UI_BRIDGE_EXAMPLES.md`의 `GET /project/api-inventory` 예시를 실제 런타임 응답 필드인 `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count`, `endpoints[].requires_api_key` 기준으로 수정했다.
+- `docs/UI_CONTRACT_CHEATSHEET.md`도 `routes[].protected` 대신 `endpoints[].requires_api_key`를 보도록 수정했다.
+- `tests/test_ui_bridge_examples.py`에 `build_api_inventory(app.routes)`와 예시 JSON의 핵심 필드명이 일치하는지 검증하는 테스트를 추가했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_ui_qa_checklist.py tests/test_public_docs_contract.py` 결과는 `19 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `201 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

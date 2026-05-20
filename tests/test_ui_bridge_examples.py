@@ -2,12 +2,14 @@ import json
 import re
 from pathlib import Path
 
+from app.main import app
 from app.schemas.assistant import (
     AssistantMessageRequest,
     AssistantMessageResponse,
     AssistantStartupResponse,
     AssistantUiContractResponse,
 )
+from app.services.project_status_service import build_api_inventory
 
 
 def _json_block_after_heading(text: str, heading: str) -> dict:
@@ -36,7 +38,7 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert '"refresh_endpoints"' in text
     assert '"display": "startup_snapshot"' in text
     assert '"external_llm_api": "not-used"' in text
-    assert '"read_only": true' in text
+    assert '"mode": "read-only"' in text
 
 
 def test_ui_bridge_examples_document_message_response_types() -> None:
@@ -75,3 +77,28 @@ def test_ui_bridge_full_examples_match_assistant_schemas() -> None:
     AssistantStartupResponse.model_validate(_json_block_after_heading(text, "GET /assistant/startup"))
     AssistantMessageRequest.model_validate(_json_block_after_label(text, "요청"))
     AssistantMessageResponse.model_validate(_json_block_after_label(text, "응답"))
+
+
+def test_ui_bridge_api_inventory_example_matches_runtime_field_names() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+    example = _json_block_after_heading(text, "GET /project/api-inventory")
+    runtime = build_api_inventory(app.routes)
+
+    for field in [
+        "mode",
+        "local_only",
+        "endpoints_count",
+        "protected_endpoints_count",
+        "public_endpoints_count",
+        "endpoints",
+        "safety",
+    ]:
+        assert field in example
+        assert field in runtime
+
+    endpoint = example["endpoints"][0]
+    assert {"path", "methods", "name", "tags", "requires_api_key"} <= set(endpoint)
+    assert "routes" not in example
+    assert "total_routes" not in example
+    assert "protected_routes" not in example
+    assert "protected" not in endpoint

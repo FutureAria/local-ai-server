@@ -21,7 +21,7 @@ def test_ui_contract_cheatsheet_lists_core_endpoints_and_fields() -> None:
         "config.protected",
         "dashboard.cards.connection.status",
         "ui.response_type",
-        "routes[].protected",
+        "endpoints[].requires_api_key",
         "sessions[].messages_count",
         "sessions[].last_message_preview",
         "total_messages",

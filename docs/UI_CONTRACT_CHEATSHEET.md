@@ -25,7 +25,7 @@
 | `POST /assistant/message` | 실제 메시지 API | `type`, `answer`, `data`, `sources`, `request_id`, `ui.response_type`, `ui.display` |
 | `GET /assistant/sessions` | 세션 목록 | `sessions`, `limit`, `offset`, `sessions[].messages_count`, `sessions[].last_message_preview` |
 | `GET /assistant/sessions/{session_id}/messages` | 메시지 기록 | `messages`, `limit`, `offset`, `total_messages` |
-| `GET /project/api-inventory` | 개발/디버그 API 목록 | `routes[].path`, `routes[].methods`, `routes[].tags`, `routes[].protected` |
+| `GET /project/api-inventory` | 개발/디버그 API 목록 | `endpoints[].path`, `endpoints[].methods`, `endpoints[].tags`, `endpoints[].requires_api_key` |
 
 ## Message response type 매핑
 
