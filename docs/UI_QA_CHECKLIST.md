@@ -19,6 +19,14 @@
 - [ ] `LOCAL_API_KEY`가 설정된 경우 UI가 `Authorization: Bearer <LOCAL_API_KEY>` 또는 `X-API-Key`를 보낸다.
 - [ ] project root 입력값은 실제 존재하는 로컬 폴더다.
 
+## Backend Identity Preflight
+
+- [ ] `GET /health` 호출이 `200`을 반환한다.
+- [ ] `GET /assistant/startup` 호출이 `200`을 반환한다.
+- [ ] `GET /project/api-inventory` 호출이 `200`을 반환한다.
+- [ ] `/health`는 성공하지만 `/assistant/startup`이 `404`이면 `127.0.0.1:8000`을 다른 서버가 사용 중일 수 있으므로 smoke test를 중단한다.
+- [ ] `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server`로 브라우저 조작 없이 assistant bridge API 흐름만 확인할 수 있다.
+
 ## Startup
 
 - [ ] `GET /assistant/startup` 호출이 `200`을 반환한다.
@@ -80,6 +88,8 @@
 서버가 실행 중일 때 아래 명령으로 UI가 호출할 API를 확인할 수 있다.
 
 ```bash
+curl http://127.0.0.1:8000/health
+
 curl http://127.0.0.1:8000/assistant/startup \
   -H "Authorization: Bearer <LOCAL_API_KEY>"
 
@@ -95,6 +105,8 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
   -H "Authorization: Bearer <LOCAL_API_KEY>" \
   -H "Content-Type: application/json" \
   -d '{"message":"내 문서 기준으로 JWT 설명해줘","project_root":"/Users/example/project","mode":"auto"}'
+
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 ```
 
 ## Stop Conditions

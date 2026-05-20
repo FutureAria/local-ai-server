@@ -151,6 +151,7 @@ export async function sendAssistantMessage(localApiKey, message) {
 | `401 Unauthorized` | `LOCAL_API_KEY` 설정 여부와 header 값 |
 | CORS 오류 | UI origin이 `LOCAL_CORS_ORIGINS`에 포함되어 있는지 |
 | `404 Not Found` | endpoint path 오타 또는 서버 버전 |
+| `/health`는 성공하지만 `/assistant/startup`은 `404` | `127.0.0.1:8000`을 다른 서버가 사용 중일 수 있음 |
 | Ollama 오류 | `ollama serve`, `ollama pull llama3.2`, `ollama pull nomic-embed-text` |
 | project root warning | 입력한 경로가 실제 존재하는 폴더인지 |
 

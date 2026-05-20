@@ -499,6 +499,13 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_contract_cheatsheet.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py tests/test_readme_quick_start.py` 결과는 `19 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `196 passed, 1 warning`이다.
 
+### UI smoke preflight docs
+
+- 현재 세션에서 `127.0.0.1:8000`은 응답 중이었지만 `/assistant/startup`이 `404`를 반환해 assistant bridge smoke test는 실행하지 않았다.
+- `docs/UI_QA_CHECKLIST.md`에 backend identity preflight를 추가해 `/health` 성공만으로 같은 서버라고 판단하지 않고 `/assistant/startup`, `/project/api-inventory`까지 확인하도록 했다.
+- `docs/UI_CONNECT_GUIDE.md` troubleshooting에 `/health`는 성공하지만 `/assistant/startup`이 `404`인 경우 다른 서버가 `127.0.0.1:8000`을 사용 중일 수 있다고 명시했다.
+- `tests/test_ui_qa_checklist.py`, `tests/test_ui_connect_guide.py`를 보강해 assistant bridge smoke command와 포트 점유 경고가 유지되는지 검증한다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

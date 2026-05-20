@@ -65,6 +65,7 @@ def test_ui_connect_guide_keeps_safety_boundaries_visible() -> None:
         "파일 생성/수정/삭제 자동화",
         "외부 LLM API 호출",
         "운영 배포 또는 클라우드/Oracle 리소스 변경",
+        "다른 서버가 사용 중",
     ]:
         assert phrase in text
 
