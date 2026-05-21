@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `235 passed` |
+| `.venv/bin/pytest` | `237 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -748,6 +748,16 @@
 - `tests/test_api_contracts.py`, `tests/test_security.py`, `tests/test_api_docs_payloads.py`를 보강해 endpoint response contract, API key 보호, request/response field 문서 계약을 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_api_docs_payloads.py tests/test_public_docs_contract.py tests/test_security.py tests/test_security_docs_contract.py` 결과는 `69 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `235 passed, 1 warning`이다.
+
+### Vector rebuild preview self-check
+
+- `GET /documents/vector-rebuild-preview`를 추가해 Chroma vector가 누락된 SQLite chunk만 대상으로 재생성 후보를 read-only로 확인할 수 있게 했다.
+- `local-ai vector-rebuild-preview` CLI 명령을 추가했다.
+- 이 기능은 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정을 수행하지 않는다.
+- README, `docs/API.md`, `docs/PROJECT_SUMMARY.md`, `docs/OPERATIONS.md`, `docs/RELEASE_CHECKLIST.md`에 endpoint와 CLI 명령을 문서화했다.
+- `tests/test_repair_preview.py`, `tests/test_document_stats.py`, `tests/test_cli.py`, `tests/test_public_docs_contract.py`를 보강해 service preview, endpoint contract, CLI route, public docs 계약을 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_repair_preview.py tests/test_document_stats.py tests/test_cli.py tests/test_api_docs_payloads.py tests/test_public_docs_contract.py tests/test_operations_runbook.py` 결과는 `44 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `237 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

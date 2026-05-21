@@ -22,6 +22,7 @@ CORE_ENDPOINTS = [
     "GET /assistant/sessions/{session_id}/messages",
     "POST /ask-with-docs",
     "POST /documents/index-folder-preview",
+    "GET /documents/vector-rebuild-preview",
     "GET /documents/integrity",
     "POST /agent/plan",
     "POST /project/shell-dry-run",
@@ -36,6 +37,7 @@ CORE_CLI_COMMANDS = [
     "local-ai ask-docs",
     "local-ai index-preview",
     "local-ai integrity",
+    "local-ai vector-rebuild-preview",
     "local-ai agent-plan",
     "local-ai shell-dry-run",
 ]

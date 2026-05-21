@@ -418,6 +418,36 @@ class DocumentService:
             "note": "미리보기 전용입니다. 실제 파일 삭제, DB 수정, Chroma 수정은 수행하지 않습니다.",
         }
 
+    def get_vector_rebuild_preview(self, db: Session) -> dict:
+        integrity = self.get_integrity_report(db)
+        missing_vectors = integrity["chunks_missing_vectors"]
+        actions = [
+            {
+                "action": "rebuild_vector",
+                "target_type": "chunk",
+                "target_id": missing_vector["chunk_id"],
+                "reason": "SQLite chunk는 있지만 Chroma vector가 없습니다.",
+                "requires_user_approval": True,
+            }
+            for missing_vector in missing_vectors
+        ]
+
+        return {
+            "status": "needs_rebuild" if actions else "ok",
+            "dry_run": True,
+            "chunks_missing_vectors_count": len(missing_vectors),
+            "embedding_batch_size": self.settings.embedding_batch_size,
+            "embedding_batches_estimated": ceil(len(missing_vectors) / self.settings.embedding_batch_size)
+            if missing_vectors
+            else 0,
+            "actions_count": len(actions),
+            "actions": actions,
+            "note": (
+                "미리보기 전용입니다. 실제 Ollama embedding 생성, Chroma vector 재생성, "
+                "DB 수정은 수행하지 않습니다."
+            ),
+        }
+
     def _missing_stored_files(self, documents: list[Document]) -> list[dict]:
         return [
             {

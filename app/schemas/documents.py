@@ -172,3 +172,14 @@ class DocumentRepairPreviewResponse(BaseModel):
     actions_count: int
     actions: list[RepairPreviewAction]
     note: str
+
+
+class DocumentVectorRebuildPreviewResponse(BaseModel):
+    status: str
+    dry_run: bool
+    chunks_missing_vectors_count: int
+    embedding_batch_size: int
+    embedding_batches_estimated: int
+    actions_count: int
+    actions: list[RepairPreviewAction]
+    note: str

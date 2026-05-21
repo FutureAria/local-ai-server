@@ -78,6 +78,7 @@ du -sh data/uploads data/chroma data/logs 2>/dev/null
 local-ai stats
 local-ai integrity
 local-ai repair-preview
+local-ai vector-rebuild-preview
 local-ai roots
 local-ai shell-policy
 local-ai shell-dry-run "pwd"
@@ -200,9 +201,11 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 local-ai stats
 local-ai integrity
 local-ai repair-preview
+local-ai vector-rebuild-preview
 ```
 
 문제가 있으면 실제 repair/delete/rebuild를 실행하지 말고 `repair-preview` 결과와 로그만 확인한다.
+Chroma vector 누락만 따로 보고 싶으면 `vector-rebuild-preview`를 사용하되, 이 명령도 실제 embedding 생성이나 Chroma 수정을 수행하지 않는다.
 
 ## 백업 기준
 
@@ -245,6 +248,7 @@ local-ai doctor
 local-ai stats
 local-ai integrity
 local-ai repair-preview
+local-ai vector-rebuild-preview
 ```
 
 4. 최근 chat log 확인

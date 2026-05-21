@@ -80,6 +80,7 @@ local-ai assistant-startup
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
 local-ai integrity
+local-ai vector-rebuild-preview
 ```
 
 통과 기준:
@@ -106,7 +107,7 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 - [ ] endpoint/response field 계약 테스트 보강
 - [ ] upload/search/ask-with-docs end-to-end 재검증
 - [ ] 대용량 색인 job/status API progress response schema 기준 실제 queue 도입 조건 문서화
-- [ ] Chroma 누락 vector 재생성 명령의 preview-only 설계
+- [ ] Chroma 누락 vector 재생성 preview-only 기준 실제 rebuild 활성화 조건 문서화
 - [ ] assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:

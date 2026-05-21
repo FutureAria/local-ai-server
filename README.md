@@ -280,6 +280,7 @@ Documents:
 - `GET /documents/stats`
 - `GET /documents/integrity`
 - `GET /documents/repair-preview`
+- `GET /documents/vector-rebuild-preview`
 - `GET /documents/{document_id}`
 - `GET /documents/{document_id}/chunks`
 - `DELETE /documents/{document_id}`
@@ -534,6 +535,7 @@ curl "http://127.0.0.1:8000/documents?source_type=upload&file_type=md&query=back
 - `GET /documents/stats`
 - `GET /documents/integrity`
 - `GET /documents/repair-preview`
+- `GET /documents/vector-rebuild-preview`
 
 ```bash
 curl http://127.0.0.1:8000/documents/stats
@@ -542,6 +544,7 @@ curl http://127.0.0.1:8000/documents/repair-preview
 local-ai stats
 local-ai integrity
 local-ai repair-preview
+local-ai vector-rebuild-preview
 ```
 
 현재 환경에서 사용할 수 있는 문서 타입과 optional dependency 준비 상태는 다음 명령으로 확인합니다.
@@ -852,6 +855,8 @@ local-ai repair-preview
 
 `local-ai repair-preview`는 integrity 결과를 기반으로 필요한 복구 후보를 미리 보여줍니다. 이 명령도 read-only이며 실제 파일 삭제, DB 수정, Chroma 수정은 수행하지 않습니다.
 
+`local-ai vector-rebuild-preview`는 Chroma vector가 누락된 SQLite chunk만 대상으로 재생성 후보를 미리 보여줍니다. 이 명령도 read-only이며 실제 Ollama embedding 생성, Chroma 수정, DB 수정은 수행하지 않습니다.
+
 ## 운영 로그와 저장공간
 
 운영 로그, 저장공간 점검, 백업 기준은 [docs/OPERATIONS.md](docs/OPERATIONS.md)에 정리되어 있습니다.
@@ -941,6 +946,7 @@ python scripts/public_release_check.py --root . --json
 - `local-ai stats`: SQLite/Chroma 저장 상태 확인 성공
 - `local-ai integrity`: SQLite/Chroma 정합성 점검 성공
 - `local-ai repair-preview`: repair action 미리보기 성공
+- `local-ai vector-rebuild-preview`: 누락 vector 재생성 후보 미리보기 성공
 - `local-ai document-types`: 문서 타입별 사용 가능 여부 확인 성공
 - `local-ai chunks 1 --limit 5 --offset 0`: chunk 페이지 조회 성공
 - `local-ai logs --limit 2 --offset 0`: chat log 목록 조회 성공
@@ -1028,7 +1034,7 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 계속 보강
 2. 실제 사용자 `.md`/`.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증
 3. 대용량 색인 job/status API progress response schema 기준 실제 queue 도입 조건 문서화
-4. Chroma 누락 vector 재생성 명령의 preview-only 설계
+4. Chroma 누락 vector 재생성 preview-only 기준 실제 rebuild 활성화 조건 문서화
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:

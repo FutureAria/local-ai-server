@@ -98,6 +98,7 @@ Documents:
 - `GET /documents/stats`
 - `GET /documents/integrity`
 - `GET /documents/repair-preview`
+- `GET /documents/vector-rebuild-preview`
 - `GET /documents/{document_id}`
 - `GET /documents/{document_id}/chunks`
 - `DELETE /documents/{document_id}`
@@ -168,6 +169,7 @@ local-ai chunks 1
 local-ai stats
 local-ai integrity
 local-ai repair-preview
+local-ai vector-rebuild-preview
 local-ai logs
 local-ai log 1
 local-ai feedbacks
@@ -207,7 +209,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `235 passed`
+- `.venv/bin/pytest`: `237 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능
@@ -296,7 +298,7 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 계속 보강
 2. 실제 사용자 `.md`/`.txt` 문서로 upload/search/ask-with-docs end-to-end 재검증
 3. 대용량 색인 job/status API progress response schema 기준 실제 queue 도입 조건 문서화
-4. Chroma 누락 vector 재생성 명령의 preview-only 설계
+4. Chroma 누락 vector 재생성 preview-only 기준 실제 rebuild 활성화 조건 문서화
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:

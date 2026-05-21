@@ -60,7 +60,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
 
-조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`, `GET /project/api-inventory`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
+조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /documents/vector-rebuild-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`, `GET /project/api-inventory`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
 ## Rate Limit
 
@@ -636,6 +636,25 @@ curl http://127.0.0.1:8000/documents/integrity
 curl http://127.0.0.1:8000/documents/repair-preview
 ```
 
+### `GET /documents/vector-rebuild-preview`
+
+Chroma vector가 누락된 SQLite chunk만 대상으로 재생성 후보를 반환한다. 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정은 수행하지 않는다.
+
+```bash
+curl http://127.0.0.1:8000/documents/vector-rebuild-preview
+```
+
+응답 핵심 필드:
+
+- `status`
+- `dry_run`
+- `chunks_missing_vectors_count`
+- `embedding_batch_size`
+- `embedding_batches_estimated`
+- `actions_count`
+- `actions`
+- `note`
+
 ## Search
 
 ### `POST /search`
@@ -849,6 +868,7 @@ local-ai chunks 1
 local-ai stats
 local-ai integrity
 local-ai repair-preview
+local-ai vector-rebuild-preview
 local-ai logs
 local-ai log 1
 local-ai feedbacks

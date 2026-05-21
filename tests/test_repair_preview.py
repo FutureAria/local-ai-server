@@ -1,9 +1,11 @@
+from types import SimpleNamespace
+
 from app.services.document_service import DocumentService
 
 
 class FakeRepairPreviewService(DocumentService):
     def __init__(self):
-        pass
+        self.settings = SimpleNamespace(embedding_batch_size=8)
 
     def get_integrity_report(self, db):
         return {
@@ -26,3 +28,16 @@ def test_repair_preview_is_dry_run_and_lists_actions() -> None:
         "rebuild_vector",
         "review_orphan_vector",
     }
+
+
+def test_vector_rebuild_preview_is_dry_run_and_lists_only_rebuild_actions() -> None:
+    service = FakeRepairPreviewService()
+    preview = service.get_vector_rebuild_preview(db=None)
+    assert preview["dry_run"] is True
+    assert preview["status"] == "needs_rebuild"
+    assert preview["chunks_missing_vectors_count"] == 1
+    assert preview["embedding_batch_size"] == 8
+    assert preview["embedding_batches_estimated"] == 1
+    assert preview["actions_count"] == 1
+    assert preview["actions"][0]["action"] == "rebuild_vector"
+    assert preview["actions"][0]["target_id"] == 2

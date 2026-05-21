@@ -196,7 +196,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 9. `/search` 실제 embedding + Chroma 검색 재확인
 10. `/ask-with-docs` 실제 RAG 답변 품질 확인
 11. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
-12. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 재생성 명령 설계
+12. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 실제 rebuild 활성화 조건 문서화
 13. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
 14. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
 
@@ -206,7 +206,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `235 passed`
+  - `.venv/bin/pytest`: `237 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공

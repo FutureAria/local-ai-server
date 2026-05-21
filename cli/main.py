@@ -744,6 +744,12 @@ def repair_preview() -> None:
         _print_response(client.get(f"{_base_url()}/documents/repair-preview"))
 
 
+@app.command("vector-rebuild-preview")
+def vector_rebuild_preview() -> None:
+    with httpx.Client(timeout=30.0) as client:
+        _print_response(client.get(f"{_base_url()}/documents/vector-rebuild-preview"))
+
+
 @app.command("export-sft")
 def export_sft(output: Path = Path("data/sft_dataset.jsonl")) -> None:
     from scripts.export_sft_data import export_sft_data

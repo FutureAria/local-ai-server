@@ -11,6 +11,7 @@ from app.schemas.documents import (
     DocumentStatsResponse,
     DocumentSummary,
     DocumentUploadResponse,
+    DocumentVectorRebuildPreviewResponse,
     IndexFolderJobPreviewResponse,
     IndexFolderPreviewResponse,
     IndexFolderRequest,
@@ -85,6 +86,14 @@ def document_repair_preview(
     document_service: DocumentService = Depends(get_document_service),
 ) -> dict:
     return document_service.get_repair_preview(db)
+
+
+@router.get("/vector-rebuild-preview", response_model=DocumentVectorRebuildPreviewResponse)
+def document_vector_rebuild_preview(
+    db: Session = Depends(get_db),
+    document_service: DocumentService = Depends(get_document_service),
+) -> dict:
+    return document_service.get_vector_rebuild_preview(db)
 
 
 @router.get("/{document_id}", response_model=DocumentDetail)
