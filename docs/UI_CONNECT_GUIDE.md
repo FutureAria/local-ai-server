@@ -69,6 +69,30 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8010 --assistant-br
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8010 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 ```
 
+## Assistant bridge smoke 기대 출력
+
+`--assistant-bridge-preflight`는 read-only로 서버 identity만 확인한다. 성공 기준은 JSON 결과의 `ok=true`와 아래 step 상태다.
+
+| step | 기대 값 | 의미 |
+|---|---|---|
+| `health.status` | `200` | FastAPI 서버가 응답함 |
+| `assistant-startup.status` | `200` | 이 서버가 assistant bridge API를 제공함 |
+| `api-inventory.status` | `200` | read-only API inventory를 조회할 수 있음 |
+
+`--assistant-bridge-only`는 브라우저 조작 없이 UI bridge API 흐름을 확인한다. 성공 기준은 `ok=true`와 아래 summary field다.
+
+| step | 확인할 summary field | 기대 값 |
+|---|---|---|
+| `assistant-startup` | `ui_ready`, `protected` | `ui_ready=true`, token 필요 여부 표시 |
+| `api-inventory` | `endpoints_count`, `protected_endpoints_count` | endpoint 수와 보호 endpoint 수가 표시됨 |
+| `assistant-bootstrap` | `ui_ready`, `has_project_root` | `ui_ready=true`, project root 검증 결과 포함 |
+| `assistant-action-preview` | `intent`, `would_execute` | `intent=status`, `would_execute=false` |
+| `assistant-message` | `session_id`, `response_type` | `session_id` 존재, `response_type=status` |
+| `assistant-sessions` | `sessions_count` | 최근 세션 수 표시 |
+| `assistant-messages` | `total_messages` | paging 가능한 메시지 수 표시 |
+
+이 smoke는 업로드, RAG, Ollama 답변 생성을 피한다. 다만 `/assistant/message`를 호출하므로 SQLite에 assistant session/message 기록은 추가될 수 있다.
+
 ## 최소 요청 예시
 
 ```bash

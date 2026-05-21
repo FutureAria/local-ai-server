@@ -199,3 +199,32 @@ def test_smoke_flow_docs_match_script_contract() -> None:
         assert document_flow in text, f"{path} missing document smoke flow"
         for token in assistant_endpoint_tokens:
             assert token in text, f"{path} missing {token}"
+
+
+def test_ui_connect_guide_documents_assistant_smoke_expected_output() -> None:
+    text = Path("docs/UI_CONNECT_GUIDE.md").read_text(encoding="utf-8")
+
+    for step in smoke.ASSISTANT_BRIDGE_PREFLIGHT_FLOW + smoke.ASSISTANT_BRIDGE_SMOKE_FLOW:
+        assert f"`{step}" in text or f"`{step}.status`" in text
+
+    for field in [
+        "ok=true",
+        "health.status",
+        "assistant-startup.status",
+        "api-inventory.status",
+        "ui_ready",
+        "protected",
+        "endpoints_count",
+        "protected_endpoints_count",
+        "has_project_root",
+        "intent=status",
+        "would_execute=false",
+        "session_id",
+        "response_type=status",
+        "sessions_count",
+        "total_messages",
+    ]:
+        assert field in text
+
+    assert "업로드, RAG, Ollama 답변 생성" in text
+    assert "SQLite에 assistant session/message 기록" in text
