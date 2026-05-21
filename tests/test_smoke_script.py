@@ -144,6 +144,50 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
     assert summary["steps"][6]["total_messages"] == 2
 
 
+def test_sanitized_smoke_summary_omits_sensitive_or_noisy_fields(monkeypatch) -> None:
+    calls: list[dict] = []
+
+    def client_factory(timeout: float) -> FakeClient:
+        return FakeClient(calls)
+
+    monkeypatch.setattr(smoke.httpx, "Client", client_factory)
+    monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+    summary = smoke.run_smoke_test("http://server.test/")
+    safe = smoke.build_sanitized_smoke_summary(summary)
+    encoded = str(safe)
+
+    assert safe["safe_to_paste"] is True
+    assert safe["mode"] == "document-rag"
+    assert safe["steps"][1]["documents"] == [
+        {"filename": "smoke-backend-notes.md", "chunks_created": 1},
+        {"filename": "smoke-architecture-notes.txt", "chunks_created": 1},
+    ]
+    assert "request_id" in safe["excluded_fields"]
+    assert "request_id" not in str(safe["steps"])
+    assert "document_id" not in encoded
+    assert "Authorization header access token" not in encoded
+    assert "secret" not in encoded
+
+
+def test_sanitized_assistant_summary_omits_project_root(monkeypatch) -> None:
+    calls: list[dict] = []
+
+    def client_factory(timeout: float) -> FakeClient:
+        return FakeClient(calls)
+
+    monkeypatch.setattr(smoke.httpx, "Client", client_factory)
+
+    summary = smoke.run_assistant_bridge_smoke_test("http://server.test/", project_root="/Users/juyoung/local-ai-server")
+    safe = smoke.build_sanitized_smoke_summary(summary)
+    encoded = str(safe)
+
+    assert safe["mode"] == "assistant-bridge"
+    assert safe["steps"][2]["has_project_root"] is True
+    assert "/Users/juyoung/local-ai-server" not in encoded
+    assert "project_root" in safe["excluded_fields"]
+
+
 def test_assistant_bridge_preflight_detects_wrong_server(monkeypatch) -> None:
     calls: list[dict] = []
 
@@ -208,14 +252,28 @@ def test_smoke_flow_docs_match_script_contract() -> None:
     assert "임시 Markdown/Text 문서" in readme
     assert "smoke-backend-notes.md" in readme
     assert "smoke-architecture-notes.txt" in readme
+    assert "--sanitized-summary" in readme
+    assert "safe_to_paste=true" in readme
 
     for path in SMOKE_DOCS:
         text = Path(path).read_text(encoding="utf-8")
         assert document_flow in text, f"{path} missing document smoke flow"
         assert "smoke-backend-notes.md" in text, f"{path} missing Markdown smoke sample"
         assert "smoke-architecture-notes.txt" in text, f"{path} missing text smoke sample"
+        assert "--sanitized-summary" in text, f"{path} missing sanitized smoke summary command"
+        assert "excluded_fields" in text, f"{path} missing sanitized excluded fields"
         for token in assistant_endpoint_tokens:
             assert token in text, f"{path} missing {token}"
+
+
+def test_api_and_release_docs_include_sanitized_smoke_summary_contract() -> None:
+    for path in ["docs/API.md", "docs/RELEASE_CHECKLIST.md"]:
+        text = Path(path).read_text(encoding="utf-8")
+        assert "--sanitized-summary" in text
+        assert "safe_to_paste=true" in text
+        assert "질문/답변 원문" in text
+        assert "request id" in text
+        assert "stored path" in text
 
 
 def test_ui_connect_guide_documents_assistant_smoke_expected_output() -> None:

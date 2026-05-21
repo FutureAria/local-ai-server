@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `237 passed` |
+| `.venv/bin/pytest` | `240 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -776,6 +776,15 @@
 - 위험 작업 경계는 실제 repair/delete/rebuild, 브라우저 click/fill/submit 자동화, 실제 shell 실행, 파일 생성/수정/삭제 자동화, OCR/JavaScript 렌더링/외부 URL 크롤링, 운영 배포/HTTPS termination/다중 사용자 권한/분산 rate limit로 유지했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `33 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `237 passed, 1 warning`이다.
+
+### Sanitized smoke summary self-check
+
+- `scripts/smoke_test_api.py`에 `--sanitized-summary` 옵션과 `build_sanitized_smoke_summary()`를 추가했다.
+- sanitized smoke summary는 `safe_to_paste=true`, `mode`, step별 status/count, sample document 이름, `excluded_fields`를 남기고 질문/답변 원문, request id, header, 로컬 project root, stored path를 제외한다.
+- README, `docs/API.md`, `docs/OPERATIONS.md`, `docs/RELEASE_CHECKLIST.md`에 작업 기록용 paste-safe smoke 결과 생성 방법을 추가했다.
+- `tests/test_smoke_script.py`를 보강해 document/RAG smoke와 assistant bridge smoke의 sanitized summary가 secret, request id, document id, local project root를 출력하지 않는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_operations_runbook.py tests/test_readme_quick_start.py tests/test_api_docs_payloads.py tests/test_public_release_summary.py` 결과는 `29 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `240 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

@@ -895,6 +895,14 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 
 기본 smoke sample은 `smoke-backend-notes.md`와 `smoke-architecture-notes.txt`다. 이 흐름은 `.md`와 `.txt` 업로드를 모두 수행한 뒤 `search`, `ask-with-docs`, `feedback`, `stats`를 확인한다.
 
+공개 문서나 작업 기록에는 paste-safe 결과만 남긴다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
+```
+
+sanitized smoke summary는 `safe_to_paste=true`, `mode=document-rag`, `steps[].status`, `documents_count`, `results_count`, `sources_count`, `chunks_count`, `excluded_fields`를 포함하고, 질문/답변 원문, request id, header, 로컬 project root, stored path는 제외한다.
+
 브라우저 조작 없는 Assistant UI bridge smoke test:
 
 ```bash

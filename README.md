@@ -46,6 +46,14 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 ```
 
+작업 기록에 붙일 때는 민감하거나 불필요한 세부값을 뺀 summary만 출력합니다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
+```
+
+`--sanitized-summary`는 질문/답변 원문, request id, header, 로컬 project root, stored path를 제외하고 `safe_to_paste=true`, `mode`, `excluded_fields`, step별 status/count만 남깁니다.
+
 검증 명령의 저장 영향:
 
 | 명령 | 서버 필요 | Ollama 필요 | 저장 영향 |
@@ -53,6 +61,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 | `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary` | 예 | 예 | 문서/RAG smoke와 저장 영향은 같지만 출력에서 질문/답변 원문, request id, header, local path를 제외 |
 
 ## Local Assistant Quick Flow
 

@@ -51,6 +51,17 @@ ASSISTANT_BRIDGE_SMOKE_FLOW = [
     "assistant-messages",
 ]
 
+SANITIZED_SUMMARY_EXCLUDED_FIELDS = [
+    "answer",
+    "content",
+    "headers",
+    "note",
+    "project_root",
+    "question",
+    "request_id",
+    "stored_path",
+]
+
 
 def _headers() -> dict[str, str]:
     api_key = os.getenv("LOCAL_API_KEY")
@@ -318,6 +329,63 @@ def run_assistant_bridge_smoke_test(base_url: str, project_root: str | None = No
     return summary
 
 
+def build_sanitized_smoke_summary(summary: dict) -> dict:
+    steps = summary.get("steps", [])
+    mode = summary.get("mode") or (
+        "assistant-bridge" if any(step.get("step") == "assistant-message" for step in steps) else "document-rag"
+    )
+    sanitized: dict = {
+        "ok": summary.get("ok", False),
+        "mode": mode,
+        "base_url": summary.get("base_url"),
+        "steps": [],
+        "safe_to_paste": True,
+        "excluded_fields": SANITIZED_SUMMARY_EXCLUDED_FIELDS,
+    }
+
+    if "sample_documents" in summary:
+        sanitized["sample_documents"] = summary["sample_documents"]
+    if "assistant_bridge" in summary:
+        sanitized["assistant_bridge"] = build_sanitized_smoke_summary(summary["assistant_bridge"])
+
+    for step in steps:
+        step_name = step.get("step")
+        safe_step = {
+            "step": step_name,
+            "status": step.get("status"),
+        }
+        for key in [
+            "documents_count",
+            "chunks_count",
+            "results_count",
+            "sources_count",
+            "feedback_id",
+            "ui_ready",
+            "protected",
+            "endpoints_count",
+            "protected_endpoints_count",
+            "has_project_root",
+            "intent",
+            "would_execute",
+            "response_type",
+            "sessions_count",
+            "total_messages",
+        ]:
+            if key in step:
+                safe_step[key] = step[key]
+        if step_name == "upload":
+            safe_step["documents"] = [
+                {
+                    "filename": item.get("filename"),
+                    "chunks_created": item.get("chunks_created"),
+                }
+                for item in step.get("documents", [])
+            ]
+        sanitized["steps"].append(safe_step)
+
+    return sanitized
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run local-ai-server API smoke test against a running server.")
     parser.add_argument("--base-url", default=os.getenv("LOCAL_AI_SERVER_URL", "http://127.0.0.1:8000"))
@@ -337,6 +405,11 @@ def main() -> None:
         action="store_true",
         help="Run the document RAG smoke flow and then the assistant/project API bridge smoke flow.",
     )
+    parser.add_argument(
+        "--sanitized-summary",
+        action="store_true",
+        help="Print a paste-safe summary without prompt text, answer text, request ids, headers, or local project paths.",
+    )
     args = parser.parse_args()
     if args.assistant_bridge_preflight:
         result = run_assistant_bridge_preflight(args.base_url)
@@ -346,6 +419,8 @@ def main() -> None:
         result = run_smoke_test(args.base_url)
         if args.include_assistant_bridge:
             result["assistant_bridge"] = run_assistant_bridge_smoke_test(args.base_url, project_root=args.project_root)
+    if args.sanitized_summary:
+        result = build_sanitized_smoke_summary(result)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

@@ -182,6 +182,26 @@ Ollama와 Chroma까지 포함한 문서 기반 흐름은 별도로 확인한다.
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 ```
 
+공유하거나 `docs/WORKLOG.md`에 붙일 결과는 원문 JSON 대신 sanitized smoke summary로 만든다.
+이 출력은 질문/답변 원문, request id, header, 로컬 project root, stored path를 제외하고 step별 status와 count만 남긴다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
+```
+
+sanitized smoke summary에서 확인할 필드:
+
+- `safe_to_paste=true`
+- `mode=document-rag`
+- `sample_documents`
+- `steps[].step`
+- `steps[].status`
+- `documents_count`
+- `results_count`
+- `sources_count`
+- `chunks_count`
+- `excluded_fields`
+
 확인 흐름:
 
 1. `GET /health`
