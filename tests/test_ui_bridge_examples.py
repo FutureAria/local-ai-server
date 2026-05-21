@@ -9,6 +9,7 @@ from app.schemas.assistant import (
     AssistantStartupResponse,
     AssistantUiContractResponse,
 )
+from app.services.assistant_service import AssistantService
 from app.services.project_status_service import build_api_inventory
 
 
@@ -102,3 +103,17 @@ def test_ui_bridge_api_inventory_example_matches_runtime_field_names() -> None:
     assert "total_routes" not in example
     assert "protected_routes" not in example
     assert "protected" not in endpoint
+
+
+def test_ui_bridge_ui_contract_example_matches_runtime_contract_keys() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+    example = _json_block_after_heading(text, "GET /assistant/ui-contract")
+    runtime = AssistantService().ui_contract()
+
+    example_refresh_paths = {endpoint["path"] for endpoint in example["refresh_endpoints"]}
+    runtime_refresh_paths = {endpoint["path"] for endpoint in runtime["refresh_endpoints"]}
+
+    assert set(example["response_types"]) == set(runtime["response_types"])
+    assert example_refresh_paths == runtime_refresh_paths
+    assert "/project/api-inventory" in runtime_refresh_paths
+    assert example["blocked_actions"] == runtime["blocked_actions"]

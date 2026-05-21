@@ -90,6 +90,11 @@ class AssistantService:
                 {"method": "GET", "path": "/assistant/config", "purpose": "safe local settings"},
                 {"method": "GET", "path": "/assistant/dashboard", "purpose": "dashboard cards"},
                 {"method": "GET", "path": "/assistant/sessions", "purpose": "session sidebar refresh"},
+                {
+                    "method": "GET",
+                    "path": "/project/api-inventory",
+                    "purpose": "read-only endpoint inventory for developer/debug UI",
+                },
             ],
             "message_flow": [
                 {"step": 1, "method": "POST", "path": "/assistant/action-preview", "purpose": "intent/risk preview"},

@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `227 passed` |
+| `.venv/bin/pytest` | `228 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -686,6 +686,13 @@
 - 같은 테스트가 Typer runtime CLI command 전체가 README와 `docs/API.md`에 빠짐없이 노출되는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_api_docs_payloads.py tests/test_readme_quick_start.py` 결과는 `25 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `227 passed, 1 warning`이다.
+
+### UI contract refresh endpoint self-check
+
+- `/assistant/ui-contract` 실제 service 응답의 refresh endpoint에 read-only `GET /project/api-inventory`를 포함해 UI bridge 예시와 맞췄다.
+- `tests/test_ui_bridge_examples.py`가 UI contract 예시의 response type, refresh endpoint, blocked action 목록이 실제 `AssistantService().ui_contract()`와 같은지 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_assistant_api.py tests/test_ui_contract_cheatsheet.py tests/test_smoke_script.py` 결과는 `27 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `228 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
