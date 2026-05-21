@@ -2,6 +2,14 @@
 
 `local-ai-server`는 내 컴퓨터 또는 내 서버에서만 동작하는 백엔드 전용 로컬 AI 지식 서버입니다. 런타임에서 OpenAI, Claude, Gemini 같은 외부 LLM API를 사용하지 않고, Ollama local API만 호출합니다.
 
+## Highlights
+
+- 로컬 Ollama 기반 direct ask와 문서 기반 RAG 답변 API를 제공합니다.
+- SQLite를 문서 metadata, chunk, chat log, feedback의 source of truth로 사용합니다.
+- Chroma는 vector search 전용으로 사용하고, cloud vector DB는 사용하지 않습니다.
+- Typer CLI는 FastAPI 백엔드를 HTTP로 호출해 API 계약을 재사용합니다.
+- Agent/assistant 기능은 preview, dry-run, approval, read-only 경계를 기본값으로 둡니다.
+
 ## Quick Start
 
 Ollama는 보통 별도 터미널에서 먼저 실행합니다.

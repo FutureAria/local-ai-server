@@ -10,6 +10,7 @@ def test_readme_has_top_level_onboarding_sections() -> None:
     text = README.read_text(encoding="utf-8")
 
     for heading in [
+        "## Highlights",
         "## Quick Start",
         "## Verification",
         "## Local Assistant Quick Flow",
@@ -17,6 +18,24 @@ def test_readme_has_top_level_onboarding_sections() -> None:
         "## Key Docs",
     ]:
         assert heading in text
+
+
+def test_readme_highlights_explain_project_at_a_glance() -> None:
+    text = README.read_text(encoding="utf-8")
+    highlights = text.split("## Highlights", 1)[1].split("## Quick Start", 1)[0]
+
+    for phrase in [
+        "로컬 Ollama",
+        "문서 기반 RAG",
+        "SQLite",
+        "source of truth",
+        "Chroma",
+        "cloud vector DB",
+        "Typer CLI",
+        "FastAPI",
+        "preview, dry-run, approval, read-only",
+    ]:
+        assert phrase in highlights
 
 
 def test_readme_quick_start_documents_core_commands() -> None:
