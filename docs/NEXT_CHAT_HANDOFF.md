@@ -230,6 +230,8 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_ui_connect_guide.py`를 보강해 UI 연결 가이드의 `/assistant/startup`과 `/assistant/bootstrap` 응답 필드 설명이 실제 Pydantic response schema와 어긋나지 않도록 검증한다.
 - `tests/test_smoke_script.py`를 보강해 UI 연결 가이드의 assistant bridge smoke expected output이 실제 smoke summary field와 어긋나지 않도록 검증한다.
 - `tests/test_portfolio_docs_contract.py`를 보강해 README와 PROJECT_SUMMARY의 다음 추천 개선이 최신 API 상태와 안전 경계를 같이 반영하는지 검증한다.
+- `scripts/smoke_test_api.py`의 문서/RAG smoke가 `smoke-backend-notes.md`와 `smoke-architecture-notes.txt`를 함께 업로드하도록 확장했다.
+- `tests/test_smoke_script.py`가 Markdown/Text sample 업로드, content type, README/OPERATIONS 안내 문구를 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 README 상단 Local Assistant Quick Flow와 preview/dry-run 안전 문구를 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 CLI assistant REPL 도움말과 README 명령 목록 정합성을 검증한다.
 - `tests/test_ui_connect_guide.py`를 추가해 UI 연결값, startup flow, 안전 경계 문서 계약을 검증한다.

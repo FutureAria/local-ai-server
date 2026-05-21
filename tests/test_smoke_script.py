@@ -45,7 +45,9 @@ class FakeClient:
     def post(self, url: str, **kwargs) -> FakeResponse:
         self.calls.append({"method": "POST", "url": url, **kwargs})
         if url.endswith("/documents/upload"):
-            return FakeResponse(200, {"document_id": 1, "filename": "smoke.md", "chunks_created": 1})
+            filename = kwargs["files"]["file"][0]
+            document_id = 1 if filename.endswith(".md") else 2
+            return FakeResponse(200, {"document_id": document_id, "filename": filename, "chunks_created": 1})
         if url.endswith("/search"):
             return FakeResponse(200, {"query": "JWT", "results": [{"chunk_id": 1}]})
         if url.endswith("/ask-with-docs"):
@@ -74,8 +76,18 @@ def test_smoke_script_calls_expected_api_flow(monkeypatch) -> None:
 
     assert summary["ok"] is True
     assert [step["step"] for step in summary["steps"]] == smoke.DOCUMENT_RAG_SMOKE_FLOW
+    assert summary["sample_documents"] == ["smoke-backend-notes.md", "smoke-architecture-notes.txt"]
+    assert summary["steps"][1]["documents_count"] == 2
+    assert [item["filename"] for item in summary["steps"][1]["documents"]] == [
+        "smoke-backend-notes.md",
+        "smoke-architecture-notes.txt",
+    ]
     assert calls[1]["headers"] == {"X-API-Key": "secret"}
-    assert calls[3]["json"]["question"] == "내 문서 기준으로 access token은 어디로 전달해?"
+    assert calls[1]["files"]["file"][0] == "smoke-backend-notes.md"
+    assert calls[1]["files"]["file"][2] == "text/markdown"
+    assert calls[2]["files"]["file"][0] == "smoke-architecture-notes.txt"
+    assert calls[2]["files"]["file"][2] == "text/plain"
+    assert calls[4]["json"]["question"] == "내 문서 기준으로 access token은 어디로 전달해?"
 
 
 def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
@@ -193,10 +205,15 @@ def test_smoke_flow_docs_match_script_contract() -> None:
     readme = Path("README.md").read_text(encoding="utf-8")
     assert document_flow in readme
     assert assistant_readme_flow in readme
+    assert "임시 Markdown/Text 문서" in readme
+    assert "smoke-backend-notes.md" in readme
+    assert "smoke-architecture-notes.txt" in readme
 
     for path in SMOKE_DOCS:
         text = Path(path).read_text(encoding="utf-8")
         assert document_flow in text, f"{path} missing document smoke flow"
+        assert "smoke-backend-notes.md" in text, f"{path} missing Markdown smoke sample"
+        assert "smoke-architecture-notes.txt" in text, f"{path} missing text smoke sample"
         for token in assistant_endpoint_tokens:
             assert token in text, f"{path} missing {token}"
 

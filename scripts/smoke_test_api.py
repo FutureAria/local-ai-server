@@ -7,12 +7,24 @@ from pathlib import Path
 import httpx
 
 
-SAMPLE_TEXT = """# Local AI smoke test
+SAMPLE_MARKDOWN_TEXT = """# Local AI smoke test
 
 JWT 인증 흐름은 access token을 Authorization header로 전달하고,
 refresh token은 재발급에 사용한다.
 이 문서는 local-ai-server E2E smoke test용 임시 문서다.
 """
+
+SAMPLE_TEXT_TEXT = """Local AI smoke test text note
+
+Controller는 HTTP 요청과 응답 경계를 담당하고,
+Service는 비즈니스 규칙과 트랜잭션 흐름을 담당한다.
+이 텍스트 파일은 local-ai-server E2E smoke test용 임시 문서다.
+"""
+
+SAMPLE_DOCUMENTS = [
+    ("smoke-backend-notes.md", SAMPLE_MARKDOWN_TEXT, "text/markdown"),
+    ("smoke-architecture-notes.txt", SAMPLE_TEXT_TEXT, "text/plain"),
+]
 
 DOCUMENT_RAG_SMOKE_FLOW = [
     "health",
@@ -52,6 +64,15 @@ def _raise_for_status(step: str, response: httpx.Response) -> None:
         raise RuntimeError(f"{step} failed: HTTP {response.status_code} {response.text}") from exc
 
 
+def _write_sample_documents(temp_dir: str) -> list[tuple[Path, str]]:
+    sample_files = []
+    for filename, content, media_type in SAMPLE_DOCUMENTS:
+        sample_file = Path(temp_dir) / filename
+        sample_file.write_text(content, encoding="utf-8")
+        sample_files.append((sample_file, media_type))
+    return sample_files
+
+
 def run_assistant_bridge_preflight(base_url: str, timeout: float = 30.0) -> dict:
     base_url = base_url.rstrip("/")
     headers = _headers()
@@ -89,31 +110,39 @@ def run_assistant_bridge_preflight(base_url: str, timeout: float = 30.0) -> dict
 def run_smoke_test(base_url: str, timeout: float = 120.0) -> dict:
     base_url = base_url.rstrip("/")
     headers = _headers()
-    summary: dict = {"base_url": base_url, "steps": []}
+    summary: dict = {"base_url": base_url, "sample_documents": [item[0] for item in SAMPLE_DOCUMENTS], "steps": []}
 
     with tempfile.TemporaryDirectory(prefix="local-ai-smoke-") as temp_dir:
-        sample_file = Path(temp_dir) / "smoke-backend-notes.md"
-        sample_file.write_text(SAMPLE_TEXT, encoding="utf-8")
+        sample_files = _write_sample_documents(temp_dir)
 
         with httpx.Client(timeout=timeout) as client:
             health = client.get(f"{base_url}/health")
             _raise_for_status("health", health)
             summary["steps"].append({"step": "health", "status": health.status_code})
 
-            with sample_file.open("rb") as file:
-                upload = client.post(
-                    f"{base_url}/documents/upload",
-                    files={"file": (sample_file.name, file, "text/markdown")},
-                    headers=headers,
+            uploaded_documents = []
+            for sample_file, media_type in sample_files:
+                with sample_file.open("rb") as file:
+                    upload = client.post(
+                        f"{base_url}/documents/upload",
+                        files={"file": (sample_file.name, file, media_type)},
+                        headers=headers,
+                    )
+                _raise_for_status(f"upload {sample_file.name}", upload)
+                upload_body = upload.json()
+                uploaded_documents.append(
+                    {
+                        "filename": upload_body.get("filename", sample_file.name),
+                        "document_id": upload_body["document_id"],
+                        "chunks_created": upload_body["chunks_created"],
+                    }
                 )
-            _raise_for_status("upload", upload)
-            upload_body = upload.json()
             summary["steps"].append(
                 {
                     "step": "upload",
-                    "status": upload.status_code,
-                    "document_id": upload_body["document_id"],
-                    "chunks_created": upload_body["chunks_created"],
+                    "status": 200,
+                    "documents_count": len(uploaded_documents),
+                    "documents": uploaded_documents,
                 }
             )
 

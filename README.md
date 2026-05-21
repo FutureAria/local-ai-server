@@ -52,7 +52,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 |---|---:|---:|---|
 | `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
-| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
 
 ## Local Assistant Quick Flow
 
@@ -904,13 +904,13 @@ python scripts/local_ci_check.py --root . --json
 
 ## E2E Smoke Test
 
-서버와 Ollama 모델이 실행 중일 때 임시 Markdown 문서로 `health → upload → search → ask-with-docs → feedback → stats` 흐름을 확인할 수 있습니다.
+서버와 Ollama 모델이 실행 중일 때 임시 Markdown/Text 문서로 `health → upload → search → ask-with-docs → feedback → stats` 흐름을 확인할 수 있습니다. 기본 샘플은 `smoke-backend-notes.md`와 `smoke-architecture-notes.txt`이며, `.md`와 `.txt` 업로드가 같은 RAG 흐름에서 함께 동작하는지 확인합니다.
 
 ```bash
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 ```
 
-`LOCAL_API_KEY`가 설정되어 있으면 smoke test도 자동으로 `X-API-Key` 헤더를 보냅니다. 이 스크립트는 테스트용 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가됩니다. 자동 삭제는 수행하지 않습니다.
+`LOCAL_API_KEY`가 설정되어 있으면 smoke test도 자동으로 `X-API-Key` 헤더를 보냅니다. 이 스크립트는 테스트용 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가됩니다. 자동 삭제는 수행하지 않습니다.
 
 브라우저 조작 없이 Assistant UI bridge 계약만 확인하려면 아래처럼 실행합니다. 이 흐름은 업로드/RAG/Ollama 호출을 피하고 `assistant-startup → api-inventory → assistant-bootstrap → action-preview → assistant-message(auto/status intent) → sessions → messages`만 확인합니다.
 
@@ -960,7 +960,7 @@ python scripts/public_release_check.py --root . --json
 - `local-ai upload /tmp/local-ai-smoke/backend-notes.md`: 업로드 및 chunk 저장 성공
 - `local-ai search "JWT 인증 흐름"`: Chroma 검색 성공
 - `local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름..."`: sources 포함 RAG 답변 성공
-- `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 임시 Markdown 문서 기반 API smoke test 가능
+- `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 임시 Markdown/Text 문서 기반 API smoke test 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server`: 브라우저 조작 없는 Assistant UI bridge smoke test 가능
 - `local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"`: 실행형 Agent 계획 생성 가능
 

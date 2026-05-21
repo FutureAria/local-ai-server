@@ -731,6 +731,15 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_security_docs_contract.py` 결과는 `25 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `233 passed, 1 warning`이다.
 
+### Markdown/Text document RAG smoke self-check
+
+- `scripts/smoke_test_api.py`의 문서/RAG smoke가 `smoke-backend-notes.md`와 `smoke-architecture-notes.txt`를 모두 업로드하도록 확장했다.
+- smoke summary에 `sample_documents`, 업로드된 문서 목록, 문서 수를 포함해 실제 서버에서 어떤 샘플이 들어갔는지 확인할 수 있게 했다.
+- README, `docs/OPERATIONS.md`, `docs/API.md`에 문서/RAG smoke가 `.md`와 `.txt`를 함께 검증한다는 점을 명시했다.
+- `tests/test_smoke_script.py`가 Markdown/Text sample 업로드, content type, 문서 안내 문구를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_operations_runbook.py tests/test_readme_quick_start.py tests/test_api_docs_payloads.py` 결과는 `22 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `233 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

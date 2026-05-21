@@ -848,6 +848,8 @@ local-ai export-sft --output data/sft_dataset.jsonl
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 ```
 
+기본 smoke sample은 `smoke-backend-notes.md`와 `smoke-architecture-notes.txt`다. 이 흐름은 `.md`와 `.txt` 업로드를 모두 수행한 뒤 `search`, `ask-with-docs`, `feedback`, `stats`를 확인한다.
+
 브라우저 조작 없는 Assistant UI bridge smoke test:
 
 ```bash

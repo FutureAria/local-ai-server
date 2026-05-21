@@ -118,7 +118,7 @@ python scripts/public_release_check.py --root .
 |---|---:|---:|---|
 | `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
-| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
 
 ### 1. 빠른 정적 검증
 
@@ -175,7 +175,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 
 ### 4. 문서/RAG smoke
 
-Ollama와 Chroma까지 포함한 문서 기반 흐름은 별도로 확인한다. 실행 흐름은 `health → upload → search → ask-with-docs → feedback → stats` 순서다.
+Ollama와 Chroma까지 포함한 문서 기반 흐름은 별도로 확인한다. 실행 흐름은 `health → upload → search → ask-with-docs → feedback → stats` 순서다. 기본 샘플은 `smoke-backend-notes.md`와 `smoke-architecture-notes.txt`이며, `.md`와 `.txt` 업로드가 같은 RAG 흐름에서 함께 동작하는지 확인한다.
 
 ```bash
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
@@ -190,7 +190,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 5. `POST /feedback`
 6. `GET /documents/stats`
 
-이 smoke는 임시 Markdown 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가된다. 자동 삭제는 수행하지 않는다.
+이 smoke는 임시 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가된다. 자동 삭제는 수행하지 않는다.
 
 ### 5. 점검 결과 정리
 
