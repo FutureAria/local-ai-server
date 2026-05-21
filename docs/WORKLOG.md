@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `207 passed` |
+| `.venv/bin/pytest` | `208 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -601,7 +601,15 @@
 - `cards.documents`, `actions[].tool`, `status=planned` 같은 문서 표현은 최상위 response field로 정규화해 검증한다.
 - response model이 없는 read-only project metadata endpoint는 schema field 대조에서 제외한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py` 결과는 `2 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `207 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 당시 내부 `pytest` 결과는 `207 passed, 1 warning`이다.
+
+### CLI HTTP route matrix self-check
+
+- `tests/test_cli.py`에 직접 HTTP backend를 호출하는 CLI 명령의 method/path matrix를 추가했다.
+- `local-ai health`, `doctor`, `ask`, `ask-docs`, `search`, documents, assistant bridge, project, agent 명령이 기대한 FastAPI endpoint를 호출하는지 한 번에 검증한다.
+- REPL 명령과 로컬 파일 export처럼 backend HTTP 호출이 아닌 명령은 기존 별도 테스트와 기능 범위에 맡긴다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_cli.py` 결과는 `18 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `208 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

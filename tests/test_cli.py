@@ -5,6 +5,53 @@ from typer.testing import CliRunner
 import cli.main as cli_main
 
 
+DIRECT_HTTP_CLI_ROUTE_CASES = [
+    (["health"], "GET", "/health"),
+    (["doctor"], "GET", "/health/ollama"),
+    (["status"], "GET", "/project/status"),
+    (["next"], "GET", "/project/next"),
+    (["api-inventory"], "GET", "/project/api-inventory"),
+    (["shell-policy"], "GET", "/project/shell-policy"),
+    (["shell-dry-run", "pwd"], "POST", "/project/shell-dry-run"),
+    (["assistant-capabilities"], "GET", "/assistant/capabilities"),
+    (["assistant-ping"], "GET", "/assistant/ping"),
+    (["assistant-config"], "GET", "/assistant/config"),
+    (["assistant-status"], "GET", "/assistant/status"),
+    (["assistant-dashboard"], "GET", "/assistant/dashboard"),
+    (["assistant-action-preview", "브라우저 열어줘"], "POST", "/assistant/action-preview"),
+    (["assistant-ui-contract"], "GET", "/assistant/ui-contract"),
+    (["assistant-startup"], "GET", "/assistant/startup"),
+    (["assistant-bootstrap"], "POST", "/assistant/bootstrap"),
+    (["assistant-session"], "POST", "/assistant/sessions"),
+    (["assistant-sessions"], "GET", "/assistant/sessions"),
+    (["assistant-messages", "session-1"], "GET", "/assistant/sessions/session-1/messages"),
+    (["assistant-message", "질문"], "POST", "/assistant/message"),
+    (["assistant-root", "/tmp/project"], "POST", "/assistant/project-root/validate"),
+    (["ask", "질문"], "POST", "/ask"),
+    (["ask-docs", "질문"], "POST", "/ask-with-docs"),
+    (["assist", "질문"], "POST", "/ask-with-docs"),
+    (["search", "JWT"], "POST", "/search"),
+    (["index", "/tmp/notes"], "POST", "/documents/index-folder"),
+    (["index-preview", "/tmp/notes"], "POST", "/documents/index-folder-preview"),
+    (["docs"], "GET", "/documents"),
+    (["document-types"], "GET", "/documents/supported-types"),
+    (["chunks", "1"], "GET", "/documents/1/chunks"),
+    (["stats"], "GET", "/documents/stats"),
+    (["logs"], "GET", "/chat-logs"),
+    (["log", "1"], "GET", "/chat-logs/1"),
+    (["feedbacks"], "GET", "/feedback"),
+    (["agent-plan", "README 읽어줘"], "POST", "/agent/plan"),
+    (["agent-runs"], "GET", "/agent/runs"),
+    (["agent-run", "1"], "GET", "/agent/runs/1"),
+    (["agent-results", "1"], "GET", "/agent/runs/1/results"),
+    (["agent-actions", "1"], "GET", "/agent/runs/1/actions"),
+    (["agent-dry-run", "1"], "POST", "/agent/runs/1/dry-run"),
+    (["agent-approve", "1"], "POST", "/agent/runs/1/approve"),
+    (["agent-reject", "1"], "POST", "/agent/runs/1/reject"),
+    (["agent-execute", "1"], "POST", "/agent/runs/1/execute"),
+]
+
+
 class FakeResponse:
     status_code = 200
     text = '{"ok": true}'
@@ -154,6 +201,23 @@ def _install_fake_client(monkeypatch) -> list[dict]:
 
     monkeypatch.setattr(cli_main.httpx, "Client", client_factory)
     return calls
+
+
+def _path_from_url(url: str) -> str:
+    return "/" + url.split("://", 1)[1].split("/", 1)[1]
+
+
+def test_direct_http_cli_commands_call_expected_routes(monkeypatch) -> None:
+    for args, expected_method, expected_path in DIRECT_HTTP_CLI_ROUTE_CASES:
+        calls = _install_fake_client(monkeypatch)
+        monkeypatch.setenv("LOCAL_API_KEY", "secret")
+
+        result = CliRunner().invoke(cli_main.app, args)
+
+        assert result.exit_code == 0, f"local-ai {' '.join(args)} failed: {result.output}"
+        assert calls, f"local-ai {' '.join(args)} did not call the backend"
+        assert calls[0]["method"] == expected_method, f"local-ai {' '.join(args)} used wrong method"
+        assert _path_from_url(calls[0]["url"]) == expected_path, f"local-ai {' '.join(args)} used wrong path"
 
 
 def test_cli_ask_sends_server_url_payload_and_api_key(monkeypatch) -> None:
