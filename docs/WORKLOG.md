@@ -794,6 +794,14 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_api_docs_payloads.py tests/test_readme_quick_start.py` 결과는 `26 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `240 passed, 1 warning`이다.
 
+### Release checklist final-pass contract self-check
+
+- `docs/RELEASE_CHECKLIST.md`에 sanitized smoke summary 계약, runtime endpoint count drift check, public/security docs contract를 최종 공개 전 회귀 기준으로 추가했다.
+- 최종 공개 판단 섹션을 추가해 공개 범위가 로컬 백엔드 API, CLI, 문서, 테스트 코드로 한정되고 실제 `.env`, SQLite DB, Chroma index, 업로드 문서, 로그, SFT JSONL은 공개하지 않는다는 점을 명시했다.
+- release checklist final pass 후에도 실제 배포, repair/delete/rebuild, browser interaction, shell/file 자동 실행을 진행하지 않는다고 명시했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_security_docs_contract.py tests/test_smoke_script.py tests/test_ui_bridge_examples.py` 결과는 `36 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `240 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

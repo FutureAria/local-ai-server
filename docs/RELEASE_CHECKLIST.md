@@ -35,6 +35,9 @@ python scripts/local_ci_check.py --root .
 - [ ] public release check가 `ok=true`를 반환한다.
 - [ ] `git diff --check`가 whitespace 오류를 출력하지 않는다.
 - [ ] `python scripts/local_ci_check.py --root .`가 통과한다.
+- [ ] `tests/test_smoke_script.py`가 sanitized smoke summary 계약을 검증한다.
+- [ ] `tests/test_ui_bridge_examples.py`가 runtime endpoint count drift check를 검증한다.
+- [ ] `tests/test_public_docs_contract.py`와 `tests/test_security_docs_contract.py`가 공개 문서 endpoint/보안 경계를 검증한다.
 
 ## 3. 문서 정합성
 
@@ -119,6 +122,13 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 - [ ] 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
 - [ ] OCR loader, JavaScript 렌더링, 외부 URL 크롤링
 - [ ] 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
+
+## 9. 최종 공개 판단
+
+- [ ] 현재 공개 범위는 로컬 백엔드 API, CLI, 문서, 테스트 코드로 한정된다.
+- [ ] 실제 `.env`, SQLite DB, Chroma index, 업로드 문서, 로그, SFT JSONL은 공개하지 않는다.
+- [ ] 구현된 기능과 preview-only 기능이 README/API/PROJECT_SUMMARY/PUBLIC_RELEASE_SUMMARY에서 구분된다.
+- [ ] release checklist final pass 후에도 실제 배포, repair/delete/rebuild, browser interaction, shell/file 자동 실행은 진행하지 않는다.
 
 ## Stop Conditions
 

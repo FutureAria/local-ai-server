@@ -281,9 +281,19 @@ def test_release_checklist_covers_publication_gates() -> None:
         "운영 배포",
         "클라우드 또는 Oracle 리소스",
     ]
+    regression_gates = [
+        "tests/test_smoke_script.py",
+        "sanitized smoke summary 계약",
+        "tests/test_ui_bridge_examples.py",
+        "runtime endpoint count drift check",
+        "tests/test_public_docs_contract.py",
+        "tests/test_security_docs_contract.py",
+        "최종 공개 판단",
+        "preview-only 기능",
+    ]
 
     assert checklist.exists()
-    for item in required_commands + sensitive_paths + stop_conditions:
+    for item in required_commands + sensitive_paths + stop_conditions + regression_gates:
         assert item in text
     assert "LOCAL_API_KEY=" not in text
 
