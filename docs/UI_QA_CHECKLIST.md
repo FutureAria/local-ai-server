@@ -39,6 +39,16 @@
 - [ ] `ui.display`가 `startup_snapshot`이다.
 - [ ] API key 원문은 응답, 화면, 로그 어디에도 표시되지 않는다.
 
+## UI Contract
+
+- [ ] `GET /assistant/ui-contract` 호출이 `200`을 반환한다.
+- [ ] `startup_sequence`가 `/assistant/startup`, `/assistant/bootstrap`, `/assistant/action-preview`, `/assistant/message` 순서를 표시한다.
+- [ ] `refresh_endpoints`에 `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/sessions`, `/project/api-inventory`가 포함된다.
+- [ ] `message_flow`가 action preview, confirmed message, paged history 순서를 표시한다.
+- [ ] `response_types`에 `answer`, `search_results`, `index_preview`, `needs_project_root`, `shell_dry_run`, `agent_plan`, `status`, `action_preview`가 모두 표시된다.
+- [ ] `blocked_actions`에 `shell_execution`, `browser_interaction`, `file_write_delete`, `external_llm_api`가 표시된다.
+- [ ] `auth.secret_returned=false`가 표시되고 API key 원문은 표시되지 않는다.
+
 ## API Inventory
 
 - [ ] `GET /project/api-inventory` 호출이 `200`을 반환한다.

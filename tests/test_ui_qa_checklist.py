@@ -19,6 +19,14 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "sessions_count" in text
     assert "total_messages" in text
     assert "response_type=status" in text
+    assert "GET /assistant/ui-contract" in text
+    assert "startup_sequence" in text
+    assert "refresh_endpoints" in text
+    assert "message_flow" in text
+    assert "response_types" in text
+    assert "blocked_actions" in text
+    assert "action_preview" in text
+    assert "auth.secret_returned=false" in text
     assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server" in text
     assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight" in text
     assert "다른 서버가 사용 중" in text
@@ -26,6 +34,43 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "type=shell_dry_run" in text
     assert "routes` 목록" not in text
     assert "`protected` 값" not in text
+
+
+def test_ui_qa_checklist_covers_ui_contract_runtime_shape() -> None:
+    text = Path("docs/UI_QA_CHECKLIST.md").read_text(encoding="utf-8")
+
+    for endpoint in [
+        "/assistant/startup",
+        "/assistant/bootstrap",
+        "/assistant/action-preview",
+        "/assistant/message",
+        "/assistant/ping",
+        "/assistant/config",
+        "/assistant/dashboard",
+        "/assistant/sessions",
+        "/project/api-inventory",
+    ]:
+        assert endpoint in text
+
+    for response_type in [
+        "answer",
+        "search_results",
+        "index_preview",
+        "needs_project_root",
+        "shell_dry_run",
+        "agent_plan",
+        "status",
+        "action_preview",
+    ]:
+        assert response_type in text
+
+    for blocked_action in [
+        "shell_execution",
+        "browser_interaction",
+        "file_write_delete",
+        "external_llm_api",
+    ]:
+        assert blocked_action in text
 
 
 def test_ui_qa_checklist_documents_safety_stop_conditions() -> None:

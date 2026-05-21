@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `228 passed` |
+| `.venv/bin/pytest` | `229 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -693,6 +693,13 @@
 - `tests/test_ui_bridge_examples.py`가 UI contract 예시의 response type, refresh endpoint, blocked action 목록이 실제 `AssistantService().ui_contract()`와 같은지 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_assistant_api.py tests/test_ui_contract_cheatsheet.py tests/test_smoke_script.py` 결과는 `27 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `228 passed, 1 warning`이다.
+
+### UI QA checklist contract self-check
+
+- `docs/UI_QA_CHECKLIST.md`에 `GET /assistant/ui-contract` 수동 QA 섹션을 추가해 startup sequence, refresh endpoint, message flow, response type, blocked action, secret 반환 금지 확인을 명시했다.
+- `tests/test_ui_qa_checklist.py`가 UI contract runtime shape에 필요한 endpoint, response type, blocked action 문구를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_qa_checklist.py tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_ui_connect_guide.py` 결과는 `17 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `229 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
