@@ -769,6 +769,14 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_qa_checklist.py tests/test_ui_connect_guide.py tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_smoke_script.py` 결과는 `24 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `237 passed, 1 warning`이다.
 
+### Next improvement roadmap refresh self-check
+
+- README, `docs/PROJECT_SUMMARY.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`, `docs/RELEASE_CHECKLIST.md`의 다음 개선 목록을 최신 preview endpoint 완료 상태에 맞게 갱신했다.
+- 다음 개선은 새 기능 구현처럼 표현하지 않고, endpoint/response field 계약 테스트 확장, runtime endpoint count drift check, 실제 사용자 문서 기반 upload/search/ask-with-docs end-to-end 재검증, sanitized smoke summary 기록, preview-only 계약 기준 queue/rebuild 활성화 조건 문서 유지로 정리했다.
+- 위험 작업 경계는 실제 repair/delete/rebuild, 브라우저 click/fill/submit 자동화, 실제 shell 실행, 파일 생성/수정/삭제 자동화, OCR/JavaScript 렌더링/외부 URL 크롤링, 운영 배포/HTTPS termination/다중 사용자 권한/분산 rate limit로 유지했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `33 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `237 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.
