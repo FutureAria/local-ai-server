@@ -95,6 +95,7 @@ PROJECT_CLI_COMMANDS = [
 
 PUBLIC_DOC_LINKS = [
     "docs/API.md",
+    "docs/OPERATIONS.md",
     "docs/UI_CONNECT_GUIDE.md",
     "docs/UI_CONTRACT_CHEATSHEET.md",
     "docs/UI_BRIDGE_EXAMPLES.md",

@@ -810,6 +810,13 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_public_release_summary.py` 결과는 `31 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `241 passed, 1 warning`이다.
 
+### Public docs link-set self-check
+
+- `tests/test_public_docs_contract.py`의 `PUBLIC_DOC_LINKS`에 `docs/OPERATIONS.md`를 추가해 README/PROJECT_SUMMARY가 참조하는 공개 문서 링크 세트와 테스트 기준을 맞췄다.
+- 기존 markdown link resolver가 README, SECURITY, API, PROJECT_SUMMARY, OPERATIONS, RELEASE_CHECKLIST, PUBLIC_RELEASE_SUMMARY, UI 문서, handoff/worklog 내부 링크가 실제 파일로 resolve되는지 계속 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_operations_runbook.py` 결과는 `27 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `241 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.
