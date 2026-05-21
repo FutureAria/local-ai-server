@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `240 passed` |
+| `.venv/bin/pytest` | `241 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -801,6 +801,14 @@
 - release checklist final pass 후에도 실제 배포, repair/delete/rebuild, browser interaction, shell/file 자동 실행을 진행하지 않는다고 명시했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_security_docs_contract.py tests/test_smoke_script.py tests/test_ui_bridge_examples.py` 결과는 `36 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `240 passed, 1 warning`이다.
+
+### README public status snapshot self-check
+
+- README 상단에 `Current Status Snapshot`을 추가해 구현됨, preview-only, 하지 않음 상태를 첫 화면에서 구분했다.
+- 로컬 API 서버, 문서 기반 RAG, CLI 로컬 비서는 구현됨으로 표시하고 Agent 실행 엔진은 preview-only, 운영 배포/브라우저 조작/파일 자동 수정/삭제/외부 LLM API 연결은 하지 않음으로 표시했다.
+- `tests/test_readme_quick_start.py`가 README 첫 화면의 상태 구분 문구를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_public_release_summary.py` 결과는 `31 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `241 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

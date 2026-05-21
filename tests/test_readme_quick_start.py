@@ -11,6 +11,7 @@ def test_readme_has_top_level_onboarding_sections() -> None:
 
     for heading in [
         "## Highlights",
+        "## Current Status Snapshot",
         "## Quick Start",
         "## Verification",
         "## Local Assistant Quick Flow",
@@ -36,6 +37,26 @@ def test_readme_highlights_explain_project_at_a_glance() -> None:
         "preview, dry-run, approval, read-only",
     ]:
         assert phrase in highlights
+
+
+def test_readme_current_status_snapshot_separates_done_preview_and_out_of_scope() -> None:
+    text = README.read_text(encoding="utf-8")
+    snapshot = text.split("## Current Status Snapshot", 1)[1].split("## Quick Start", 1)[0]
+
+    for phrase in [
+        "로컬 API 서버",
+        "구현됨",
+        "문서 기반 RAG",
+        "CLI 로컬 비서",
+        "Agent 실행 엔진",
+        "preview-only",
+        "배포/외부 자동화",
+        "하지 않음",
+        "실제 shell/file/browser 실행은 하지 않습니다",
+        "운영 배포",
+        "외부 LLM API",
+    ]:
+        assert phrase in snapshot
 
 
 def test_readme_quick_start_documents_core_commands() -> None:
