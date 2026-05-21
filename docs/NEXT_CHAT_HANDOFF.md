@@ -206,7 +206,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `221 passed`
+  - `.venv/bin/pytest`: `222 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -255,6 +255,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_api_docs_payloads.py`를 보강해 `docs/API.md` top-level 섹션 순서와 Ask endpoint 배치를 검증한다.
 - `tests/test_security_docs_contract.py`를 추가해 README/SECURITY/RELEASE_CHECKLIST 보안 문구와 보호 endpoint 목록 정합성을 검증한다.
 - `tests/test_portfolio_docs_contract.py`를 추가해 README/PROJECT_SUMMARY 포트폴리오 설명과 한계 명시가 유지되는지 검증한다.
+- `tests/test_portfolio_docs_contract.py`를 보강해 README/PROJECT_SUMMARY/SECURITY의 현재 한계와 금지 기능 표현을 교차 검증한다.
 - 확인 항목:
   - `local-ai ask`가 `LOCAL_AI_SERVER_URL`, payload, `X-API-Key`를 올바르게 사용함
   - `local-ai docs`가 필터 query parameter를 올바르게 전달함

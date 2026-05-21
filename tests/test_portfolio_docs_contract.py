@@ -1,8 +1,13 @@
 from pathlib import Path
 
 
+README = Path("README.md")
+PROJECT_SUMMARY = Path("docs/PROJECT_SUMMARY.md")
+SECURITY = Path("SECURITY.md")
+
+
 def test_readme_includes_portfolio_story_without_overclaiming() -> None:
-    text = Path("README.md").read_text(encoding="utf-8")
+    text = README.read_text(encoding="utf-8")
 
     assert "## 포트폴리오 포인트" in text
     for phrase in [
@@ -21,7 +26,7 @@ def test_readme_includes_portfolio_story_without_overclaiming() -> None:
 
 
 def test_project_summary_includes_portfolio_points_and_limits() -> None:
-    text = Path("docs/PROJECT_SUMMARY.md").read_text(encoding="utf-8")
+    text = PROJECT_SUMMARY.read_text(encoding="utf-8")
 
     assert "## 포트폴리오 포인트" in text
     assert "## 실행 가능 기능과 금지 기능" in text
@@ -43,3 +48,31 @@ def test_project_summary_includes_portfolio_points_and_limits() -> None:
         "파일 생성/수정/삭제",
     ]:
         assert phrase in text
+
+
+def test_public_docs_share_current_limit_boundaries() -> None:
+    docs = {
+        "README.md": README.read_text(encoding="utf-8"),
+        "docs/PROJECT_SUMMARY.md": PROJECT_SUMMARY.read_text(encoding="utf-8"),
+        "SECURITY.md": SECURITY.read_text(encoding="utf-8"),
+    }
+    required_boundary_terms = [
+        "외부 LLM API",
+        "cloud vector DB",
+        "브라우저 클릭",
+        "파일 수정",
+        "shell 실행",
+        "운영 배포",
+        "Oracle",
+        "OCR",
+        "HTTPS",
+        "rate limit",
+        "다중 사용자",
+    ]
+
+    for path, text in docs.items():
+        for term in required_boundary_terms:
+            assert term in text, f"{path} missing shared limit boundary: {term}"
+
+    assert "배포 완료" not in README.read_text(encoding="utf-8")
+    assert "배포 완료" not in PROJECT_SUMMARY.read_text(encoding="utf-8")

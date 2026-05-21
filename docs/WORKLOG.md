@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `221 passed` |
+| `.venv/bin/pytest` | `222 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -656,6 +656,14 @@
 - `tests/test_api_docs_payloads.py`가 top-level API 섹션 순서와 `Ask` 섹션의 endpoint 배치를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_public_docs_contract.py tests/test_api_contracts.py` 결과는 `24 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `221 passed, 1 warning`이다.
+
+### Public limitation boundary self-check
+
+- `tests/test_portfolio_docs_contract.py`가 README, `docs/PROJECT_SUMMARY.md`, `SECURITY.md`의 현재 한계/금지 기능 핵심 표현을 함께 검증하도록 보강했다.
+- 교차 검증 항목은 외부 LLM API, cloud vector DB, 브라우저 클릭, 파일 수정, shell 실행, 운영 배포, Oracle, OCR, HTTPS, rate limit, 다중 사용자 한계다.
+- README와 `docs/PROJECT_SUMMARY.md`에는 `배포 완료` 같은 과장 표현이 없는지도 함께 검증한다. `SECURITY.md`의 공개 전 체크리스트 문구는 예외로 둔다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_security_docs_contract.py` 결과는 `18 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `222 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
