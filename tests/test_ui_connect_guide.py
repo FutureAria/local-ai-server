@@ -33,6 +33,8 @@ def test_ui_connect_guide_documents_startup_flow() -> None:
         "POST /assistant/message",
         "GET /assistant/sessions/{session_id}/messages",
         "GET /project/api-inventory",
+        "/documents/index-folder-job-preview",
+        "/documents/vector-rebuild-preview",
         "--assistant-bridge-preflight",
         "http://127.0.0.1:8010",
     ]:
@@ -102,6 +104,9 @@ def test_ui_connect_guide_keeps_safety_boundaries_visible() -> None:
         "브라우저 클릭/입력/전송 자동화",
         "실제 shell 실행",
         "파일 생성/수정/삭제 자동화",
+        "Chroma write",
+        "DB 수정",
+        "repair/delete/rebuild",
         "외부 LLM API 호출",
         "운영 배포 또는 클라우드/Oracle 리소스 변경",
         "다른 서버가 사용 중",

@@ -7,6 +7,8 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "GET /assistant/startup" in text
     assert "GET /health" in text
     assert "GET /project/api-inventory" in text
+    assert "/documents/index-folder-job-preview" in text
+    assert "/documents/vector-rebuild-preview" in text
     assert "POST /assistant/bootstrap" in text
     assert "POST /assistant/action-preview" in text
     assert "POST /assistant/message" in text
@@ -31,6 +33,10 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight" in text
     assert "다른 서버가 사용 중" in text
     assert "type=agent_plan" in text
+    assert "dry_run=true" in text
+    assert "would_enqueue=false" in text
+    assert "progress.percent=0" in text
+    assert "embedding_batches_estimated" in text
     assert "type=shell_dry_run" in text
     assert "routes` 목록" not in text
     assert "`protected` 값" not in text
@@ -49,6 +55,8 @@ def test_ui_qa_checklist_covers_ui_contract_runtime_shape() -> None:
         "/assistant/dashboard",
         "/assistant/sessions",
         "/project/api-inventory",
+        "/documents/index-folder-job-preview",
+        "/documents/vector-rebuild-preview",
     ]:
         assert endpoint in text
 
@@ -82,3 +90,4 @@ def test_ui_qa_checklist_documents_safety_stop_conditions() -> None:
     assert "외부 LLM API 연결" in text
     assert "운영 배포 또는 클라우드 리소스 변경" in text
     assert "실제 repair/delete/rebuild 실행" in text
+    assert "Chroma write 버튼" in text

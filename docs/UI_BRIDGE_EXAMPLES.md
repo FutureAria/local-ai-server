@@ -147,9 +147,9 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
   "service": "local-ai-server",
   "mode": "read-only",
   "local_only": true,
-  "endpoints_count": 42,
-  "protected_endpoints_count": 31,
-  "public_endpoints_count": 11,
+  "endpoints_count": 51,
+  "protected_endpoints_count": 35,
+  "public_endpoints_count": 16,
   "endpoints": [
     {
       "path": "/assistant/startup",
@@ -170,6 +170,28 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
       "name": "get_project_api_inventory",
       "tags": [
         "project"
+      ],
+      "requires_api_key": false
+    },
+    {
+      "path": "/documents/index-folder-job-preview",
+      "methods": [
+        "POST"
+      ],
+      "name": "index_folder_job_preview",
+      "tags": [
+        "documents"
+      ],
+      "requires_api_key": true
+    },
+    {
+      "path": "/documents/vector-rebuild-preview",
+      "methods": [
+        "GET"
+      ],
+      "name": "document_vector_rebuild_preview",
+      "tags": [
+        "documents"
       ],
       "requires_api_key": false
     }

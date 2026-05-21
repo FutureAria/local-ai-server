@@ -33,6 +33,8 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert "GET /assistant/startup" in text
     assert "GET /assistant/ui-contract" in text
     assert "GET /project/api-inventory" in text
+    assert "/documents/index-folder-job-preview" in text
+    assert "/documents/vector-rebuild-preview" in text
     assert "POST /assistant/message" in text
     assert '"path": "/assistant/startup"' in text
     assert '"path": "/project/api-inventory"' in text
@@ -99,6 +101,9 @@ def test_ui_bridge_api_inventory_example_matches_runtime_field_names() -> None:
 
     endpoint = example["endpoints"][0]
     assert {"path", "methods", "name", "tags", "requires_api_key"} <= set(endpoint)
+    example_paths = {endpoint["path"] for endpoint in example["endpoints"]}
+    assert "/documents/index-folder-job-preview" in example_paths
+    assert "/documents/vector-rebuild-preview" in example_paths
     assert "routes" not in example
     assert "total_routes" not in example
     assert "protected_routes" not in example

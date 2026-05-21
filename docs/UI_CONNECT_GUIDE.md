@@ -93,6 +93,15 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8010 --assistant-br
 
 이 smoke는 업로드, RAG, Ollama 답변 생성을 피한다. 다만 `/assistant/message`를 호출하므로 SQLite에 assistant session/message 기록은 추가될 수 있다.
 
+API inventory 화면에서는 최신 문서/복구 preview endpoint도 함께 표시되어야 한다.
+
+| endpoint | UI 표시 기준 |
+|---|---|
+| `/documents/index-folder-job-preview` | 대용량 색인 job/status progress schema 미리보기. `dry_run=true`, `would_enqueue=false`를 강조 |
+| `/documents/vector-rebuild-preview` | Chroma 누락 vector 재생성 후보 미리보기. `dry_run=true`, `embedding_batches_estimated`, `actions` 표시 |
+
+두 endpoint 모두 실제 queue 생성, Ollama embedding 생성, Chroma write, DB 수정, repair/delete/rebuild 실행 버튼으로 연결하지 않는다.
+
 ## 최소 요청 예시
 
 ```bash

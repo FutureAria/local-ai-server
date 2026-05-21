@@ -240,8 +240,15 @@ def test_ui_connect_guide_documents_assistant_smoke_expected_output() -> None:
         "response_type=status",
         "sessions_count",
         "total_messages",
+        "/documents/index-folder-job-preview",
+        "/documents/vector-rebuild-preview",
+        "dry_run=true",
+        "would_enqueue=false",
+        "embedding_batches_estimated",
+        "actions",
     ]:
         assert field in text
 
     assert "업로드, RAG, Ollama 답변 생성" in text
     assert "SQLite에 assistant session/message 기록" in text
+    assert "Chroma write" in text

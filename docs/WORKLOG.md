@@ -759,6 +759,16 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_repair_preview.py tests/test_document_stats.py tests/test_cli.py tests/test_api_docs_payloads.py tests/test_public_docs_contract.py tests/test_operations_runbook.py` 결과는 `44 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `237 passed, 1 warning`이다.
 
+### Assistant bridge latest preview endpoint UI docs self-check
+
+- `docs/UI_QA_CHECKLIST.md`에 `/documents/index-folder-job-preview`와 `/documents/vector-rebuild-preview` 표시 기준을 추가했다.
+- `docs/UI_CONNECT_GUIDE.md`의 assistant bridge smoke 기대 출력 아래에 최신 preview endpoint의 UI 표시 기준과 금지 동작을 추가했다.
+- `docs/UI_BRIDGE_EXAMPLES.md`의 `GET /project/api-inventory` 예시를 현재 runtime count인 `endpoints_count=51`, `protected_endpoints_count=35`, `public_endpoints_count=16` 기준으로 갱신하고 최신 preview endpoint 예시를 포함했다.
+- `docs/UI_CONTRACT_CHEATSHEET.md`에 두 preview endpoint의 UI 목적과 표시 필드를 추가했다.
+- `tests/test_ui_qa_checklist.py`, `tests/test_ui_connect_guide.py`, `tests/test_ui_bridge_examples.py`, `tests/test_ui_contract_cheatsheet.py`, `tests/test_smoke_script.py`를 보강해 최신 preview endpoint 문서 계약을 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_qa_checklist.py tests/test_ui_connect_guide.py tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_smoke_script.py` 결과는 `24 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `237 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

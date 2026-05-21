@@ -52,7 +52,7 @@
 ## API Inventory
 
 - [ ] `GET /project/api-inventory` 호출이 `200`을 반환한다.
-- [ ] `endpoints` 목록에 `/assistant/startup`, `/assistant/message`, `/project/api-inventory`가 표시된다.
+- [ ] `endpoints` 목록에 `/assistant/startup`, `/assistant/message`, `/project/api-inventory`, `/documents/index-folder-job-preview`, `/documents/vector-rebuild-preview`가 표시된다.
 - [ ] 각 endpoint의 `methods`, `tags`, `requires_api_key` 값이 디버그/개발 화면에서 확인 가능하다.
 - [ ] summary 필드인 `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count`가 표시된다.
 - [ ] 이 화면은 read-only API 목록만 보여주며 shell 실행, 파일 수정, 브라우저 조작 버튼을 제공하지 않는다.
@@ -77,6 +77,8 @@
 - [ ] `type=needs_project_root`는 project root 입력 요청 warning으로 렌더링된다.
 - [ ] `type=shell_dry_run`은 실제 실행이 아니라 정책 판단 panel로 렌더링된다.
 - [ ] `type=agent_plan`은 실행 대신 계획/승인 필요 panel로 렌더링된다.
+- [ ] `/documents/index-folder-job-preview` 결과는 실제 queue 생성 없이 `dry_run=true`, `would_enqueue=false`, `progress.percent=0`인 계획/진행률 미리보기 panel로만 렌더링한다.
+- [ ] `/documents/vector-rebuild-preview` 결과는 실제 embedding/Chroma 수정 없이 `dry_run=true`, `embedding_batches_estimated`, `actions`를 보여주는 복구 미리보기 panel로만 렌더링한다.
 
 ## Session History
 
@@ -95,6 +97,7 @@
 - [ ] `safety.browser_interaction`이 `blocked`이면 브라우저 조작 버튼을 활성화하지 않는다.
 - [ ] `safety.file_write_delete`가 `blocked`이면 파일 수정/삭제 버튼을 활성화하지 않는다.
 - [ ] `external_llm_api`는 `not-used`로 표시된다.
+- [ ] `vector-rebuild-preview`와 `index-folder-job-preview` 화면에서도 실제 repair/delete/rebuild, embedding 생성, Chroma write 버튼은 제공하지 않는다.
 
 ## Manual Smoke Commands
 
