@@ -3,6 +3,7 @@ from pathlib import Path
 
 README = Path("README.md")
 PROJECT_SUMMARY = Path("docs/PROJECT_SUMMARY.md")
+FINAL_REPORT = Path("docs/FINAL_REPORT.md")
 SECURITY = Path("SECURITY.md")
 
 
@@ -48,6 +49,45 @@ def test_project_summary_includes_portfolio_points_and_limits() -> None:
         "파일 생성/수정/삭제",
     ]:
         assert phrase in text
+
+
+def test_final_report_matches_required_completion_report_shape() -> None:
+    text = FINAL_REPORT.read_text(encoding="utf-8")
+
+    for heading in [
+        "## 1. 무엇을 만들었는지",
+        "## 2. 생성된 endpoint 목록",
+        "## 3. CLI 명령어 목록",
+        "## 4. 서버 실행 방법",
+        "## 5. 테스트 실행 방법",
+        "## 6. 현재 한계",
+        "## 7. 다음 추천 개선 사항",
+    ]:
+        assert heading in text
+
+    for phrase in [
+        "외부 GPT API, Claude API, Gemini API 없이",
+        "Ollama local API",
+        "FastAPI 기반 로컬 HTTP API",
+        "SQLite 기반",
+        "Chroma 기반 vector search",
+        "Typer 기반 `local-ai` CLI",
+        "POST /ask-with-docs",
+        "GET /project/api-inventory",
+        "local-ai assistant",
+        "uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+        ".venv/bin/pytest",
+        "243 passed",
+        "프론트엔드는 포함하지 않는다",
+        "실제 shell 실행은 지원하지 않는다",
+        "운영 배포",
+        "Codex가 바로 이어서 할 수 있는 안전한 개선",
+        "별도 승인 또는 보안 리뷰가 필요한 개선",
+    ]:
+        assert phrase in text
+
+    assert "배포 완료" not in text
+    assert "LOCAL_API_KEY=" not in text
 
 
 def test_public_docs_share_current_limit_boundaries() -> None:

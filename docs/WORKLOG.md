@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `242 passed` |
+| `.venv/bin/pytest` | `243 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -828,8 +828,9 @@
 
 - `docs/FINAL_REPORT.md`를 추가해 무엇을 만들었는지, endpoint 목록, CLI 명령어 목록, 서버 실행 방법, 테스트 실행 방법, 현재 한계, 다음 추천 개선 사항을 한 문서에 정리했다.
 - README `Key Docs`와 public docs link contract에 `docs/FINAL_REPORT.md`를 추가했다.
-- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py` 결과는 `32 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `242 passed, 1 warning`, public release check는 `scanned_files=111`, finding 없음이다.
+- `tests/test_portfolio_docs_contract.py`가 `docs/FINAL_REPORT.md`의 최종 보고 섹션, 주요 endpoint/CLI/검증 명령, 현재 한계, 다음 개선, 과장 금지 문구를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `33 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `243 passed, 1 warning`, public release check는 `scanned_files=111`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
