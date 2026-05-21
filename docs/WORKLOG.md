@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `229 passed` |
+| `.venv/bin/pytest` | `230 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -700,6 +700,13 @@
 - `tests/test_ui_qa_checklist.py`가 UI contract runtime shape에 필요한 endpoint, response type, blocked action 문구를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_qa_checklist.py tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_ui_connect_guide.py` 결과는 `17 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `229 passed, 1 warning`이다.
+
+### UI connect response field self-check
+
+- `docs/UI_CONNECT_GUIDE.md`에 `GET /assistant/startup`과 `POST /assistant/bootstrap` 응답에서 UI가 읽어야 할 핵심 필드 표를 추가했다.
+- `tests/test_ui_connect_guide.py`가 `AssistantStartupResponse`, `AssistantBootstrapResponse`의 top-level 필드와 주요 nested field 문서화를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_ui_qa_checklist.py tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py` 결과는 `18 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `230 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

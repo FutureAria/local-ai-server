@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from app.schemas.assistant import AssistantBootstrapResponse, AssistantStartupResponse
+
 
 GUIDE = Path("docs/UI_CONNECT_GUIDE.md")
 
@@ -55,6 +57,38 @@ def test_ui_connect_guide_includes_copy_ready_fetch_example() -> None:
 
     assert '"mode":"auto"' in text
     assert '"mode":"status"' not in text
+
+
+def test_ui_connect_guide_documents_startup_and_bootstrap_response_fields() -> None:
+    text = GUIDE.read_text(encoding="utf-8")
+
+    for field in AssistantStartupResponse.model_fields:
+        assert f"`{field}`" in text or f"`{field}." in text
+
+    for field in AssistantBootstrapResponse.model_fields:
+        assert f"`{field}`" in text or f"`{field}." in text
+
+    for nested_field in [
+        "ping.status",
+        "config.cors_origins",
+        "config.allowed_roots",
+        "config.models",
+        "dashboard.cards",
+        "ui_contract.startup_sequence",
+        "ui_contract.refresh_endpoints",
+        "ui_contract.message_flow",
+        "ui_contract.response_types",
+        "ui.display",
+        "capabilities.modes",
+        "capabilities.safe_defaults",
+        "status.current_phase",
+        "status.safety",
+        "project_root.safe_for_read_only_agent",
+        "sessions.sessions",
+        "ui.ready",
+        "ui.blocked_actions",
+    ]:
+        assert nested_field in text
 
 
 def test_ui_connect_guide_keeps_safety_boundaries_visible() -> None:

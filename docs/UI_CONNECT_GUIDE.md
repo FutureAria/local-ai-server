@@ -90,6 +90,43 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
   -d '{"message":"내 문서 기준으로 현재 상태 요약해줘","project_root":"/Users/juyoung/local-ai-server","mode":"auto"}'
 ```
 
+## UI가 읽어야 할 응답 필드
+
+`GET /assistant/startup`은 첫 화면을 그리기 위한 read-only snapshot이다. UI는 아래 필드를 기준으로 초기 화면을 구성한다.
+
+| 필드 | 용도 |
+|---|---|
+| `service` | 백엔드 서비스 식별 |
+| `protected` | token 필요 여부 표시 |
+| `local_only` | 로컬 전용 연결 표시 |
+| `ping.status` | 서버 연결 상태 표시 |
+| `config.cors_origins` | 허용된 로컬 UI origin 확인 |
+| `config.allowed_roots` | read-only agent root 후보 표시 |
+| `config.models` | Ollama 모델명 표시 |
+| `dashboard.cards` | 첫 화면 문서, integrity, 세션, 연결 카드 구성 |
+| `ui_contract.startup_sequence` | UI 시작 순서 표시 |
+| `ui_contract.refresh_endpoints` | 개별 새로고침 endpoint 목록 표시 |
+| `ui_contract.message_flow` | 메시지 전송 전후 순서 표시 |
+| `ui_contract.response_types` | 응답 렌더링 타입 매핑 |
+| `recommended_calls` | 다음에 호출할 endpoint 힌트 |
+| `safety` | 실행 금지 상태 표시 |
+| `ui.display` | `startup_snapshot` 렌더링 |
+
+`POST /assistant/bootstrap`은 project root와 세션 목록이 준비된 뒤 UI를 활성화하는 응답이다.
+
+| 필드 | 용도 |
+|---|---|
+| `service` | 백엔드 서비스 식별 |
+| `capabilities.modes` | UI가 제공할 수 있는 안전 모드 표시 |
+| `capabilities.safe_defaults` | 기본 차단 정책 표시 |
+| `status.current_phase` | 현재 프로젝트 차수 표시 |
+| `status.safety` | shell/browser/file/external LLM 상태 표시 |
+| `project_root.safe_for_read_only_agent` | 입력한 project root 사용 가능 여부 표시 |
+| `sessions.sessions` | 최근 대화 목록 표시 |
+| `recommended_calls` | 다음 호출 후보 표시 |
+| `ui.ready` | UI 활성화 가능 여부 표시 |
+| `ui.blocked_actions` | 실행 금지 항목 표시 |
+
 ## Copy-ready fetch 예시
 
 브라우저 UI에서 사용할 수 있는 최소 `fetch` 예시다. token 값은 사용자가 입력한 값을 런타임에 넣고, 코드나 문서에 하드코딩하지 않는다.
