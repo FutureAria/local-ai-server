@@ -786,6 +786,14 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_operations_runbook.py tests/test_readme_quick_start.py tests/test_api_docs_payloads.py tests/test_public_release_summary.py` 결과는 `29 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `240 passed, 1 warning`이다.
 
+### Runtime endpoint count drift check self-check
+
+- `tests/test_ui_bridge_examples.py`가 `docs/UI_BRIDGE_EXAMPLES.md`의 `GET /project/api-inventory` 예시 count와 실제 `build_api_inventory(app.routes)`의 `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count`를 비교하도록 보강했다.
+- `docs/UI_BRIDGE_EXAMPLES.md`와 `docs/API.md`에 runtime endpoint count drift check 기준을 명시했다.
+- README, `docs/PROJECT_SUMMARY.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`, `docs/RELEASE_CHECKLIST.md`의 다음 개선 문구를 "확장"에서 "유지"로 바꿔 이미 반영된 상태와 맞췄다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_api_docs_payloads.py tests/test_readme_quick_start.py` 결과는 `26 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `240 passed, 1 warning`이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.

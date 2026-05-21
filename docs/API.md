@@ -135,6 +135,7 @@ curl http://127.0.0.1:8000/project/next
 ### `GET /project/api-inventory`
 
 현재 FastAPI endpoint 목록, tag, HTTP method, API key 보호 여부를 read-only로 조회한다. 브라우저 UI나 CLI가 어떤 endpoint를 연결해야 하는지 확인할 때 사용한다.
+UI bridge 예시 문서의 `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count`는 runtime endpoint count drift check로 실제 FastAPI route 수와 비교한다.
 
 ```bash
 curl http://127.0.0.1:8000/project/api-inventory

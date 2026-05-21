@@ -141,6 +141,7 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
 ## `GET /project/api-inventory`
 
 UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 여부를 read-only로 확인할 때 사용한다. 이 endpoint는 API 목록만 반환하며 shell 실행, 파일 수정, 브라우저 조작을 수행하지 않는다.
+아래 `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count` 예시는 runtime endpoint count drift check 대상이다. FastAPI route가 추가되거나 제거되면 문서 예시와 테스트를 함께 갱신한다.
 
 ```json
 {

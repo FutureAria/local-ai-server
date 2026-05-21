@@ -106,7 +106,7 @@ local-ai vector-rebuild-preview
 
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
-- [ ] endpoint/response field 계약 테스트를 runtime endpoint count drift check까지 확장
+- [ ] endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
 - [ ] upload/search/ask-with-docs end-to-end 재검증 결과를 sanitized smoke summary로 기록
 - [ ] 대용량 색인 job/status API progress response schema preview-only 계약 기준 실제 queue 활성화 조건 문서 유지
 - [ ] Chroma 누락 vector 재생성 preview-only endpoint 기준 실제 rebuild 활성화 조건 문서 유지

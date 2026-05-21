@@ -295,7 +295,7 @@ optional dependency 설치 시 지원:
 
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
-1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트를 runtime endpoint count drift check까지 확장
+1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
 2. 실제 사용자 `.md`/`.txt` 문서로 upload/search/ask-with-docs end-to-end 재검증 결과를 sanitized smoke summary로 기록
 3. 대용량 색인 job/status API progress response schema preview-only 계약을 기준으로 실제 queue 활성화 조건 문서 유지
 4. Chroma 누락 vector 재생성 preview-only endpoint를 기준으로 실제 rebuild 활성화 조건 문서 유지
