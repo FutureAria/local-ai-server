@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `225 passed` |
+| `.venv/bin/pytest` | `227 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -679,6 +679,13 @@
 - `tests/test_readme_quick_start.py`가 Highlights 섹션의 핵심 프로젝트 요약 문구를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py` 결과는 `23 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `225 passed, 1 warning`이다.
+
+### Runtime docs inventory self-check
+
+- `tests/test_public_docs_contract.py`가 FastAPI runtime API inventory의 모든 endpoint가 `docs/API.md`에 문서화되어 있는지 검증하도록 보강했다.
+- 같은 테스트가 Typer runtime CLI command 전체가 README와 `docs/API.md`에 빠짐없이 노출되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_api_docs_payloads.py tests/test_readme_quick_start.py` 결과는 `25 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `227 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

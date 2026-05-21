@@ -5,6 +5,7 @@ from typer.main import get_command
 
 import cli.main as cli_main
 from app.main import app
+from app.services.project_status_service import build_api_inventory
 
 
 DOCS = {
@@ -215,6 +216,31 @@ def test_project_continuation_contract_is_documented_in_public_docs() -> None:
         assert command in texts["readme"], f"{command} missing from README"
         assert command in texts["api"], f"{command} missing from API docs"
         assert command in texts["summary"], f"{command} missing from project summary"
+
+
+def test_runtime_api_inventory_is_documented_in_api_reference() -> None:
+    api_text = DOCS["api"].read_text(encoding="utf-8")
+    runtime_endpoints = {
+        f"{method} {endpoint['path']}"
+        for endpoint in build_api_inventory(app.routes)["endpoints"]
+        for method in endpoint["methods"]
+    }
+
+    missing = sorted(endpoint for endpoint in runtime_endpoints if f"`{endpoint}`" not in api_text)
+    assert not missing
+
+
+def test_runtime_cli_commands_are_documented_in_readme_and_api_reference() -> None:
+    readme = DOCS["readme"].read_text(encoding="utf-8")
+    api_text = DOCS["api"].read_text(encoding="utf-8")
+    command = get_command(cli_main.app)
+    runtime_commands = {f"local-ai {name}" for name in command.commands}
+
+    missing_from_readme = sorted(cli_command for cli_command in runtime_commands if cli_command not in readme)
+    missing_from_api = sorted(cli_command for cli_command in runtime_commands if cli_command not in api_text)
+
+    assert not missing_from_readme
+    assert not missing_from_api
 
 
 def test_public_docs_keep_safety_boundaries_visible() -> None:

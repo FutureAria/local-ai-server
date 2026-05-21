@@ -206,7 +206,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `225 passed`
+  - `.venv/bin/pytest`: `227 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -224,6 +224,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_operations_runbook.py`와 `tests/test_readme_quick_start.py`를 보강해 검증 명령별 저장 영향이 README/운영 Runbook에 드러나는지 확인한다.
 - `tests/test_readme_quick_start.py`를 추가해 README 상단 Quick Start, Verification, Safe Boundaries, Key Docs 계약을 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 README 상단 Highlights가 프로젝트 핵심과 안전 경계를 압축해 보여주는지 검증한다.
+- `tests/test_public_docs_contract.py`를 보강해 런타임 FastAPI endpoint와 Typer CLI command가 README/API 문서에서 누락되지 않도록 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 README 상단 Local Assistant Quick Flow와 preview/dry-run 안전 문구를 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 CLI assistant REPL 도움말과 README 명령 목록 정합성을 검증한다.
 - `tests/test_ui_connect_guide.py`를 추가해 UI 연결값, startup flow, 안전 경계 문서 계약을 검증한다.
