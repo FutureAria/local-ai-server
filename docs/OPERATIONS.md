@@ -112,6 +112,14 @@ python scripts/public_release_check.py --root .
 
 아래 순서는 로컬 서버를 실제로 켠 뒤 API와 CLI가 서로 맞는지 확인하는 안전한 점검 흐름이다. 브라우저 클릭/입력/전송 자동화, shell 실제 실행, 파일 생성/수정/삭제 자동화, 운영 배포는 포함하지 않는다.
 
+### 검증 명령 저장 영향 요약
+
+| 명령 | 서버 필요 | Ollama 필요 | 저장 영향 |
+|---|---:|---:|---|
+| `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
+
 ### 1. 빠른 정적 검증
 
 코드와 문서가 공개 가능한 상태인지 먼저 확인한다.

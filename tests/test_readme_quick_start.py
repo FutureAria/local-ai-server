@@ -48,6 +48,21 @@ def test_readme_verification_documents_safe_check_commands() -> None:
         assert command in text
 
 
+def test_readme_verification_explains_storage_impact() -> None:
+    text = README.read_text(encoding="utf-8")
+    section = text.split("## Verification", 1)[1].split("## Local Assistant Quick Flow", 1)[0]
+
+    for phrase in [
+        "검증 명령의 저장 영향",
+        "서버 필요",
+        "Ollama 필요",
+        "read-only 검증. 파일/DB 수정 없음",
+        "assistant 세션/메시지 기록만 SQLite에 추가될 수 있음",
+        "SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가",
+    ]:
+        assert phrase in section
+
+
 def test_readme_documents_minimal_local_assistant_flow_near_top() -> None:
     text = README.read_text(encoding="utf-8")
     quick_flow_index = text.index("## Local Assistant Quick Flow")

@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `222 passed` |
+| `.venv/bin/pytest` | `224 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -664,6 +664,14 @@
 - README와 `docs/PROJECT_SUMMARY.md`에는 `배포 완료` 같은 과장 표현이 없는지도 함께 검증한다. `SECURITY.md`의 공개 전 체크리스트 문구는 예외로 둔다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_security_docs_contract.py` 결과는 `18 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `222 passed, 1 warning`이다.
+
+### Verification storage impact self-check
+
+- README 상단 `Verification` 섹션에 local CI, assistant bridge smoke, document/RAG smoke의 서버 필요 여부, Ollama 필요 여부, 저장 영향을 표로 추가했다.
+- `docs/OPERATIONS.md`의 로컬 운영 Runbook에도 같은 저장 영향 요약을 추가했다.
+- `tests/test_readme_quick_start.py`와 `tests/test_operations_runbook.py`가 smoke 명령의 read-only 여부와 SQLite/Chroma/uploads 저장 영향 설명을 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_operations_runbook.py tests/test_public_docs_contract.py` 결과는 `23 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `224 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

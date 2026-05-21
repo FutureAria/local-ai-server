@@ -38,6 +38,14 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 ```
 
+검증 명령의 저장 영향:
+
+| 명령 | 서버 필요 | Ollama 필요 | 저장 영향 |
+|---|---:|---:|---|
+| `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
+| `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
+
 ## Local Assistant Quick Flow
 
 서버가 실행 중이면 아래 순서만으로 "내 문서 / 내 폴더 기준 로컬 비서" 흐름을 바로 확인할 수 있습니다.

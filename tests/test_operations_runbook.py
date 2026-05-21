@@ -42,6 +42,21 @@ def test_operations_runbook_documents_safe_local_check_order() -> None:
         assert item in text
 
 
+def test_operations_runbook_documents_verification_storage_impact() -> None:
+    text = Path("docs/OPERATIONS.md").read_text(encoding="utf-8")
+    runbook = text.split("## 로컬 운영 Runbook", maxsplit=1)[1].split("### 1. 빠른 정적 검증", maxsplit=1)[0]
+
+    for phrase in [
+        "검증 명령 저장 영향 요약",
+        "서버 필요",
+        "Ollama 필요",
+        "read-only 검증. 파일/DB 수정 없음",
+        "assistant 세션/메시지 기록만 SQLite에 추가될 수 있음",
+        "SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가",
+    ]:
+        assert phrase in runbook
+
+
 def test_operations_runbook_keeps_risky_actions_out_of_automation() -> None:
     text = Path("docs/OPERATIONS.md").read_text(encoding="utf-8")
     runbook = text.split("## 로컬 운영 Runbook", maxsplit=1)[1].split("## 백업 기준", maxsplit=1)[0]
