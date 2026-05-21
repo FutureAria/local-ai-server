@@ -862,6 +862,13 @@ python scripts/local_ci_check.py --root . --json
 
 이 스크립트는 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행합니다. 실패가 발생하면 그 단계에서 멈추며, 시스템 의존성 설치나 배포는 수행하지 않습니다.
 
+내부 실행 단계는 아래와 같습니다.
+
+- `python -m pytest`
+- `python -m compileall app cli scripts`
+- `python scripts/public_release_check.py --root . --json`
+- `git diff --check`
+
 ## E2E Smoke Test
 
 서버와 Ollama 모델이 실행 중일 때 임시 Markdown 문서로 `health → upload → search → ask-with-docs → feedback → stats` 흐름을 확인할 수 있습니다.

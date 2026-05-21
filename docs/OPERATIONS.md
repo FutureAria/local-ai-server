@@ -122,6 +122,13 @@ python scripts/local_ci_check.py --root .
 
 이 명령은 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행한다. 실패하면 그 단계에서 멈춘다.
 
+내부 실행 단계:
+
+- `python -m pytest`
+- `python -m compileall app cli scripts`
+- `python scripts/public_release_check.py --root . --json`
+- `git diff --check`
+
 ### 2. 서버 시작
 
 서버는 로컬에서만 접근하도록 `127.0.0.1`에 bind한다.

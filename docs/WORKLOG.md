@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `208 passed` |
+| `.venv/bin/pytest` | `209 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -609,7 +609,14 @@
 - `local-ai health`, `doctor`, `ask`, `ask-docs`, `search`, documents, assistant bridge, project, agent 명령이 기대한 FastAPI endpoint를 호출하는지 한 번에 검증한다.
 - REPL 명령과 로컬 파일 export처럼 backend HTTP 호출이 아닌 명령은 기존 별도 테스트와 기능 범위에 맡긴다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_cli.py` 결과는 `18 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `208 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 당시 내부 `pytest` 결과는 `208 passed, 1 warning`이다.
+
+### Local CI docs command self-check
+
+- README와 `docs/OPERATIONS.md`에 `scripts/local_ci_check.py` 내부 실행 단계인 `python -m pytest`, `python -m compileall app cli scripts`, `python scripts/public_release_check.py --root . --json`, `git diff --check`를 명시했다.
+- `tests/test_operations_runbook.py`가 `scripts.local_ci_check.build_check_commands()`의 실제 단계 이름을 기준으로 README, `docs/OPERATIONS.md`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`의 검증 명령 문구를 대조하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_operations_runbook.py tests/test_local_ci_check.py tests/test_readme_quick_start.py` 결과는 `11 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `209 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

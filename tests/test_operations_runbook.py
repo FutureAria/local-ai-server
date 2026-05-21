@@ -1,5 +1,25 @@
 from pathlib import Path
 
+import scripts.local_ci_check as local_ci
+
+
+LOCAL_CI_DOCUMENTS = [
+    Path("README.md"),
+    Path("docs/OPERATIONS.md"),
+    Path("docs/RELEASE_CHECKLIST.md"),
+    Path("docs/PUBLIC_RELEASE_SUMMARY.md"),
+]
+
+LOCAL_CI_DOC_SNIPPETS = {
+    "pytest": ["python -m pytest", ".venv/bin/pytest"],
+    "compileall": ["python -m compileall app cli scripts", ".venv/bin/python -m compileall app cli scripts"],
+    "public-release-check": [
+        "python scripts/public_release_check.py --root . --json",
+        ".venv/bin/python scripts/public_release_check.py --root . --json",
+    ],
+    "git-diff-check": ["git diff --check"],
+}
+
 
 def test_operations_runbook_documents_safe_local_check_order() -> None:
     text = Path("docs/OPERATIONS.md").read_text(encoding="utf-8")
@@ -32,3 +52,14 @@ def test_operations_runbook_keeps_risky_actions_out_of_automation() -> None:
     assert "운영 배포" in runbook
     assert "자동 삭제는 수행하지 않는다" in runbook
     assert "실제 repair/delete/rebuild를 실행하지 말고" in runbook
+
+
+def test_local_ci_docs_match_script_step_contract() -> None:
+    step_names = [item["name"] for item in local_ci.build_check_commands(Path("."))]
+
+    assert step_names == list(LOCAL_CI_DOC_SNIPPETS)
+    for path in LOCAL_CI_DOCUMENTS:
+        text = path.read_text(encoding="utf-8")
+        assert "python scripts/local_ci_check.py --root ." in text
+        for step_name, accepted_snippets in LOCAL_CI_DOC_SNIPPETS.items():
+            assert any(snippet in text for snippet in accepted_snippets), f"{path} missing {step_name} command"
