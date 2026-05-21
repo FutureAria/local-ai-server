@@ -95,6 +95,7 @@ PROJECT_CLI_COMMANDS = [
 
 PUBLIC_DOC_LINKS = [
     "docs/API.md",
+    "docs/FINAL_REPORT.md",
     "docs/OPERATIONS.md",
     "docs/UI_CONNECT_GUIDE.md",
     "docs/UI_CONTRACT_CHEATSHEET.md",
@@ -113,6 +114,7 @@ PUBLIC_MARKDOWN_FILES = [
     Path("README.md"),
     Path("SECURITY.md"),
     Path("docs/API.md"),
+    Path("docs/FINAL_REPORT.md"),
     Path("docs/PROJECT_SUMMARY.md"),
     Path("docs/OPERATIONS.md"),
     Path("docs/RELEASE_CHECKLIST.md"),

@@ -171,6 +171,7 @@ def test_readme_key_docs_links_public_project_docs() -> None:
 
     for link in [
         "docs/API.md",
+        "docs/FINAL_REPORT.md",
         "docs/PROJECT_SUMMARY.md",
         "docs/OPERATIONS.md",
         "docs/RELEASE_CHECKLIST.md",

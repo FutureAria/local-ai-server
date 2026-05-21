@@ -114,6 +114,7 @@ local-ai assistant
 ## Key Docs
 
 - 전체 API 계약: [docs/API.md](docs/API.md)
+- 최종 결과 보고: [docs/FINAL_REPORT.md](docs/FINAL_REPORT.md)
 - 최종 요약: [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)
 - 로컬 운영 Runbook: [docs/OPERATIONS.md](docs/OPERATIONS.md)
 - GitHub 공개 전 체크리스트: [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
