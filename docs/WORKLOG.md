@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `241 passed` |
+| `.venv/bin/pytest` | `242 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -816,6 +816,13 @@
 - 기존 markdown link resolver가 README, SECURITY, API, PROJECT_SUMMARY, OPERATIONS, RELEASE_CHECKLIST, PUBLIC_RELEASE_SUMMARY, UI 문서, handoff/worklog 내부 링크가 실제 파일로 resolve되는지 계속 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_operations_runbook.py` 결과는 `27 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `241 passed, 1 warning`이다.
+
+### Public release status snapshot self-check
+
+- `docs/PUBLIC_RELEASE_SUMMARY.md`에 README와 같은 공개용 상태 스냅샷을 추가해 구현됨, preview-only, 하지 않음 상태를 구분했다.
+- `tests/test_public_release_summary.py`가 로컬 API 서버, 문서 기반 RAG, CLI 로컬 비서, Agent 실행 엔진, 배포/외부 자동화 상태 문구를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py` 결과는 `32 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `242 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

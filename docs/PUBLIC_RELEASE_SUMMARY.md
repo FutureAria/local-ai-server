@@ -28,6 +28,16 @@
 - Feedback 저장과 SFT JSONL export
 - API, 보안, 운영, QA, handoff 문서
 
+## 공개용 상태 스냅샷
+
+| 구분 | 상태 | 공개 설명 |
+|---|---|---|
+| 로컬 API 서버 | 구현됨 | FastAPI, SQLite, Chroma, Ollama local API 기준으로 실행한다. |
+| 문서 기반 RAG | 구현됨 | 로컬 문서 업로드, 폴더 색인, 검색, 문서 기반 답변을 지원한다. |
+| CLI 로컬 비서 | 구현됨 | Typer CLI와 `local-ai assistant` REPL이 FastAPI 백엔드를 호출한다. |
+| Agent 실행 엔진 | preview-only | 승인/거절 상태와 조건부 read-only preview 중심이며 실제 shell/file/browser 실행은 하지 않는다. |
+| 배포/외부 자동화 | 하지 않음 | 운영 배포, 브라우저 조작, 파일 자동 수정/삭제, 외부 LLM API 연결은 현재 범위 밖이다. |
+
 ## 기능 경계 요약
 
 | 구분 | 공개 설명 |
@@ -65,7 +75,7 @@ python scripts/local_ci_check.py --root .
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `241 passed`
+- `.venv/bin/pytest`: `242 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

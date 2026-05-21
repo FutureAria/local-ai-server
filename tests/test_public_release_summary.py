@@ -36,6 +36,26 @@ def test_public_release_summary_declares_public_boundaries() -> None:
     assert "LOCAL_API_KEY=" not in text
 
 
+def test_public_release_summary_separates_done_preview_and_out_of_scope() -> None:
+    text = SUMMARY.read_text(encoding="utf-8")
+    snapshot = text.split("## 공개용 상태 스냅샷", 1)[1].split("## 기능 경계 요약", 1)[0]
+
+    for phrase in [
+        "로컬 API 서버",
+        "구현됨",
+        "문서 기반 RAG",
+        "CLI 로컬 비서",
+        "Agent 실행 엔진",
+        "preview-only",
+        "배포/외부 자동화",
+        "하지 않음",
+        "실제 shell/file/browser 실행은 하지 않는다",
+        "운영 배포",
+        "외부 LLM API",
+    ]:
+        assert phrase in snapshot
+
+
 def test_public_release_summary_keeps_private_data_and_verification_visible() -> None:
     text = SUMMARY.read_text(encoding="utf-8")
 
