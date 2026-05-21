@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `218 passed` |
+| `.venv/bin/pytest` | `219 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -633,6 +633,14 @@
 - 같은 테스트가 `PUBLIC_RELEASE_PRIVATE_DATA` 기준으로 `.gitignore`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`의 제외 경로 문서화가 일치하는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_security_docs_contract.py` 결과는 `18 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `218 passed, 1 warning`이다.
+
+### Local assistant quick flow self-check
+
+- README 상단에 `Local Assistant Quick Flow`를 추가해 `local-ai doctor → index-preview → index → ask-docs → assistant` 순서로 내 문서/내 폴더 기준 로컬 비서를 바로 확인할 수 있게 했다.
+- `local-ai assistant` 안에서 자주 쓰는 `/search JWT`, `/docs`, `/status`, `/next`, `/summary` 명령과 위험 작업이 preview/dry-run에 머문다는 경계를 함께 명시했다.
+- `tests/test_readme_quick_start.py`가 quick flow 섹션의 위치와 핵심 명령/안전 문구를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py` 결과는 `19 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `219 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

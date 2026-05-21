@@ -10,6 +10,7 @@ def test_readme_has_top_level_onboarding_sections() -> None:
     for heading in [
         "## Quick Start",
         "## Verification",
+        "## Local Assistant Quick Flow",
         "## Safe Boundaries",
         "## Key Docs",
     ]:
@@ -43,6 +44,34 @@ def test_readme_verification_documents_safe_check_commands() -> None:
         "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000",
     ]:
         assert command in text
+
+
+def test_readme_documents_minimal_local_assistant_flow_near_top() -> None:
+    text = README.read_text(encoding="utf-8")
+    quick_flow_index = text.index("## Local Assistant Quick Flow")
+    safe_boundaries_index = text.index("## Safe Boundaries")
+
+    assert quick_flow_index < safe_boundaries_index
+    for command in [
+        "local-ai doctor",
+        "local-ai index-preview ./notes",
+        "local-ai index ./notes",
+        'local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"',
+        "local-ai assistant",
+    ]:
+        assert command in text
+
+    for phrase in [
+        "/search JWT",
+        "/docs",
+        "/status",
+        "/next",
+        "/summary",
+        "preview 또는 dry-run",
+        "브라우저 클릭",
+        "파일 생성/수정/삭제",
+    ]:
+        assert phrase in text
 
 
 def test_readme_keeps_safe_boundaries_visible_near_top() -> None:

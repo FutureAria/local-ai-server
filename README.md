@@ -38,6 +38,20 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 ```
 
+## Local Assistant Quick Flow
+
+서버가 실행 중이면 아래 순서만으로 "내 문서 / 내 폴더 기준 로컬 비서" 흐름을 바로 확인할 수 있습니다.
+
+```bash
+local-ai doctor
+local-ai index-preview ./notes
+local-ai index ./notes
+local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
+local-ai assistant
+```
+
+`local-ai assistant` 안에서는 일반 질문을 바로 입력하거나, `/search JWT`, `/docs`, `/status`, `/next`, `/summary`처럼 짧은 명령으로 현재 문서와 서버 상태를 확인할 수 있습니다. 실제 shell 실행, 브라우저 클릭, 파일 생성/수정/삭제는 하지 않고, 위험 작업은 preview 또는 dry-run으로만 다룹니다.
+
 ## Safe Boundaries
 
 - 런타임 LLM/embedding 호출은 Ollama local API만 사용합니다.
