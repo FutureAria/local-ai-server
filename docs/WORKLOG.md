@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `232 passed` |
+| `.venv/bin/pytest` | `233 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -722,6 +722,14 @@
 - `tests/test_portfolio_docs_contract.py`가 README와 PROJECT_SUMMARY의 다음 개선 경계가 함께 유지되는지 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `29 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `232 passed, 1 warning`이다.
+
+### Public release next-improvement boundary self-check
+
+- `docs/PUBLIC_RELEASE_SUMMARY.md`에 공개 후 다음 개선 경계를 추가해 README/PROJECT_SUMMARY와 같은 안전 개선, 승인 필요 개선을 표시했다.
+- `docs/RELEASE_CHECKLIST.md`에 공개 후 다음 개선 경계 확인 항목을 추가했다.
+- `tests/test_public_release_summary.py`가 RELEASE_CHECKLIST와 PUBLIC_RELEASE_SUMMARY의 다음 개선 경계가 함께 유지되는지 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_security_docs_contract.py` 결과는 `25 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `233 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

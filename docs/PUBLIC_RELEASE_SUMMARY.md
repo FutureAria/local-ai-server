@@ -65,7 +65,7 @@ python scripts/local_ci_check.py --root .
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `232 passed`
+- `.venv/bin/pytest`: `233 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
@@ -80,11 +80,30 @@ python scripts/local_ci_check.py --root .
 - 운영 배포, 클라우드 리소스 생성, Oracle 리소스 연결은 수행하지 않았다.
 - 다중 사용자 auth/RBAC, HTTPS termination은 제공하지 않는다.
 
+## 공개 후 다음 개선 경계
+
+Codex가 바로 이어서 할 수 있는 안전한 개선:
+
+1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 보강
+2. 실제 사용자 `.md`/`.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증
+3. 대용량 색인 job/status API 설계와 progress response schema 초안 작성
+4. Chroma 누락 vector 재생성 명령의 preview-only 설계
+5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
+
+별도 승인 또는 보안 리뷰가 필요한 개선:
+
+1. 실제 repair/delete/rebuild 실행 명령
+2. 실제 브라우저 click/fill/submit 자동화
+3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
+4. OCR loader, JavaScript 렌더링, 외부 URL 크롤링
+5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
+
 ## 공개 전 마지막 확인
 
 - [ ] `docs/RELEASE_CHECKLIST.md` 확인
 - [ ] `SECURITY.md` 확인
 - [ ] `README.md`의 배포 상태가 로컬 실행 기준으로 표시되어 있는지 확인
 - [ ] README와 Project Summary의 기능 경계 표가 현재 구현과 맞는지 확인
+- [ ] README, Project Summary, Public Release Summary의 다음 개선 경계가 서로 맞는지 확인
 - [ ] `python scripts/public_release_check.py --root . --json` 결과 확인
 - [ ] 민감 파일이 staging되지 않았는지 `git status --short`로 확인

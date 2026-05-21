@@ -97,6 +97,25 @@ local-ai integrity
 - [ ] 현재 구현은 로컬 실행 기준이라고 명확하다.
 - [ ] 클라우드/Oracle 배포는 실행하지 않았다고 명확하다.
 - [ ] 운영 배포가 필요하면 별도 보안/운영 리뷰 후 결정한다고 명확하다.
+- [ ] README, Project Summary, Public Release Summary의 다음 개선 경계가 서로 맞는다.
+
+## 8. 공개 후 다음 개선 경계
+
+Codex가 바로 이어서 할 수 있는 안전한 개선:
+
+- [ ] endpoint/response field 계약 테스트 보강
+- [ ] upload/search/ask-with-docs end-to-end 재검증
+- [ ] 대용량 색인 job/status API와 progress response schema 초안 작성
+- [ ] Chroma 누락 vector 재생성 명령의 preview-only 설계
+- [ ] assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
+
+별도 승인 또는 보안 리뷰가 필요한 개선:
+
+- [ ] 실제 repair/delete/rebuild 실행 명령
+- [ ] 브라우저 click/fill/submit 자동화
+- [ ] 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
+- [ ] OCR loader, JavaScript 렌더링, 외부 URL 크롤링
+- [ ] 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
 
 ## Stop Conditions
 
