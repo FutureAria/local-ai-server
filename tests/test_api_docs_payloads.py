@@ -1,10 +1,11 @@
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, get_args, get_origin
 
 from pydantic import BaseModel
 
+from app.main import app
 from app.schemas.agent import AgentPlanRequest
 from app.schemas.ask import AskRequest, AskWithDocsRequest
 from app.schemas.assistant import (
@@ -37,6 +38,64 @@ REQUEST_SCHEMAS: dict[str, type[BaseModel]] = {
 }
 
 
+def _response_model_fields(response_model: Any) -> set[str]:
+    origin = get_origin(response_model)
+    if origin is list:
+        args = get_args(response_model)
+        response_model = args[0] if args else None
+    if isinstance(response_model, type) and issubclass(response_model, BaseModel):
+        return set(response_model.model_fields)
+    return set()
+
+
+def _runtime_response_fields_by_endpoint() -> dict[str, set[str]]:
+    fields_by_endpoint: dict[str, set[str]] = {}
+    for route in app.routes:
+        path = getattr(route, "path", "")
+        methods = getattr(route, "methods", set()) - {"HEAD", "OPTIONS"}
+        response_fields = _response_model_fields(getattr(route, "response_model", None))
+        if not path or not methods or not response_fields:
+            continue
+        for method in methods:
+            fields_by_endpoint[f"{method} {path}"] = response_fields
+    return fields_by_endpoint
+
+
+def _extract_documented_response_fields(text: str) -> dict[str, set[str]]:
+    headings = list(re.finditer(r"^### `(?P<method>[A-Z]+) (?P<path>[^`]+)`", text, flags=re.M))
+    documented: dict[str, set[str]] = {}
+    for index, heading in enumerate(headings):
+        section_start = heading.end()
+        section_end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        section = text[section_start:section_end]
+        marker = "응답 핵심 필드:"
+        if marker not in section:
+            continue
+
+        fields: set[str] = set()
+        for line in section.split(marker, 1)[1].splitlines():
+            if not line.strip():
+                continue
+            if not line.startswith("- `"):
+                if fields:
+                    break
+                continue
+            raw_field = line.strip()[2:].strip("`")
+            fields.add(_top_level_response_field(raw_field))
+
+        if fields:
+            endpoint = f"{heading.group('method')} {heading.group('path')}"
+            documented[endpoint] = fields
+    return documented
+
+
+def _top_level_response_field(raw_field: str) -> str:
+    field = raw_field.split("=", 1)[0]
+    field = field.split(".", 1)[0]
+    field = field.split("[]", 1)[0]
+    return field
+
+
 def _extract_post_payload_examples(text: str) -> list[tuple[str, dict[str, Any]]]:
     examples: list[tuple[str, dict[str, Any]]] = []
     for block in re.findall(r"```bash\n(.*?)\n```", text, flags=re.S):
@@ -66,3 +125,20 @@ def test_api_docs_post_payload_examples_match_request_schemas() -> None:
 
     documented_schema_paths = set(REQUEST_SCHEMAS)
     assert documented_schema_paths <= seen_paths
+
+
+def test_api_docs_response_core_fields_match_response_models() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    runtime_fields = _runtime_response_fields_by_endpoint()
+    documented_fields = _extract_documented_response_fields(text)
+
+    assert documented_fields, "docs/API.md should include response field summaries"
+    checked_endpoints = 0
+    for endpoint, fields in documented_fields.items():
+        if endpoint not in runtime_fields:
+            continue
+        checked_endpoints += 1
+        invalid_fields = fields - runtime_fields[endpoint]
+        assert not invalid_fields, f"{endpoint} documents fields not present in response model: {sorted(invalid_fields)}"
+
+    assert checked_endpoints >= 10
