@@ -182,8 +182,6 @@ curl -X POST http://127.0.0.1:8000/project/shell-dry-run \
 - `would_execute=false`
 - `reason`
 
-## Ask
-
 ## Assistant
 
 ### `GET /assistant/capabilities`
@@ -434,6 +432,8 @@ curl -X POST http://127.0.0.1:8000/assistant/project-root/validate \
   -H "Content-Type: application/json" \
   -d '{"project_root":"/Users/juyoung/local-ai-server"}'
 ```
+
+## Ask
 
 ### `POST /ask`
 

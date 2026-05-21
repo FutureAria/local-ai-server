@@ -142,3 +142,34 @@ def test_api_docs_response_core_fields_match_response_models() -> None:
         assert not invalid_fields, f"{endpoint} documents fields not present in response model: {sorted(invalid_fields)}"
 
     assert checked_endpoints >= 10
+
+
+def test_api_docs_top_level_sections_have_expected_order() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    headings = [match.group(1) for match in re.finditer(r"^## (.+)$", text, flags=re.M)]
+
+    expected_order = [
+        "인증",
+        "Rate Limit",
+        "CORS",
+        "Health",
+        "Project Status",
+        "Assistant",
+        "Ask",
+        "Documents",
+        "Search",
+        "Chat Logs",
+        "Feedback",
+        "Agent",
+        "CLI 대응",
+        "Smoke Script",
+        "Local CI Check",
+    ]
+    positions = {heading: headings.index(heading) for heading in expected_order}
+
+    assert len(headings) == len(set(headings))
+    assert [positions[heading] for heading in expected_order] == sorted(positions.values())
+    assert positions["Assistant"] < positions["Ask"] < positions["Documents"]
+    ask_section = text.split("## Ask", 1)[1].split("## Documents", 1)[0]
+    assert "### `POST /ask`" in ask_section
+    assert "### `POST /ask-with-docs`" in ask_section

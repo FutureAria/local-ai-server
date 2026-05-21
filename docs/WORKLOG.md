@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `220 passed` |
+| `.venv/bin/pytest` | `221 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -649,6 +649,13 @@
 - `tests/test_readme_quick_start.py`가 `ASSISTANT_REPL_HELP_LINES` 기준으로 README의 assistant REPL 명령 목록이 빠짐없이 문서화되는지 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `36 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `220 passed, 1 warning`이다.
+
+### API section order self-check
+
+- `docs/API.md`에서 빈 `## Ask` 섹션이 `## Assistant` 앞에 보이던 흐름을 정리하고, 실제 `/ask`, `/ask-with-docs` 설명이 `## Ask` 아래에 오도록 수정했다.
+- `tests/test_api_docs_payloads.py`가 top-level API 섹션 순서와 `Ask` 섹션의 endpoint 배치를 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_public_docs_contract.py tests/test_api_contracts.py` 결과는 `24 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `221 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
