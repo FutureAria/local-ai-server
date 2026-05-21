@@ -230,6 +230,74 @@ curl -X POST http://127.0.0.1:8000/ask \
   -d '{"question":"Spring Boot가 뭐야?","temperature":0.2}'
 ```
 
+## API endpoint inventory
+
+현재 공개 문서에서 다루는 FastAPI endpoint 목록입니다. 상세 payload와 응답 필드는 [docs/API.md](docs/API.md)를 기준으로 확인합니다.
+
+Health/Ask/Search:
+
+- `GET /health`
+- `GET /health/ollama`
+- `POST /ask`
+- `POST /ask-with-docs`
+- `POST /search`
+
+Documents:
+
+- `POST /documents/upload`
+- `GET /documents`
+- `GET /documents/supported-types`
+- `GET /documents/stats`
+- `GET /documents/integrity`
+- `GET /documents/repair-preview`
+- `GET /documents/{document_id}`
+- `GET /documents/{document_id}/chunks`
+- `DELETE /documents/{document_id}`
+- `POST /documents/index-folder`
+- `POST /documents/index-folder-preview`
+
+Chat/Feedback:
+
+- `GET /chat-logs`
+- `GET /chat-logs/{chat_log_id}`
+- `GET /feedback`
+- `POST /feedback`
+
+Agent/Project:
+
+- `POST /agent/plan`
+- `GET /agent/runs`
+- `GET /agent/runs/{run_id}`
+- `GET /agent/runs/{run_id}/results`
+- `GET /agent/runs/{run_id}/actions`
+- `POST /agent/runs/{run_id}/dry-run`
+- `POST /agent/runs/{run_id}/approve`
+- `POST /agent/runs/{run_id}/reject`
+- `POST /agent/runs/{run_id}/execute`
+- `GET /project/status`
+- `GET /project/next`
+- `GET /project/api-inventory`
+- `GET /project/shell-policy`
+- `POST /project/shell-dry-run`
+
+Assistant UI bridge:
+
+- `GET /assistant/capabilities`
+- `POST /assistant/action-preview`
+- `GET /assistant/ui-contract`
+- `GET /assistant/startup`
+- `GET /assistant/ping`
+- `GET /assistant/config`
+- `GET /assistant/status`
+- `GET /assistant/dashboard`
+- `POST /assistant/bootstrap`
+- `POST /assistant/sessions`
+- `GET /assistant/sessions`
+- `GET /assistant/sessions/{session_id}`
+- `GET /assistant/sessions/{session_id}/messages`
+- `POST /assistant/message`
+- `POST /assistant/project-root/validate`
+
 ## 문서 업로드
 
 기본 텍스트 문서는 `.txt`, `.md`, `.html`, `.htm`을 지원합니다. HTML은 UTF-8 파일에서 본문 텍스트를 추출하고 `script`, `style`, `head` 내용은 제외합니다. PDF/DOCX는 `pip install -e ".[dev,documents]"`로 optional dependency를 설치한 경우 사용할 수 있습니다.

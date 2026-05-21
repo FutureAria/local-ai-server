@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `203 passed` |
+| `.venv/bin/pytest` | `205 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -578,7 +578,15 @@
 - README 루트 기준 링크와 `docs/*.md` 내부 상대 링크를 각각 source file 기준으로 해석한다.
 - external URL, mailto, page anchor는 파일 존재 검증 대상에서 제외한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `17 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `203 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 당시 내부 `pytest` 결과는 `203 passed, 1 warning`이다.
+
+### FastAPI route and Typer command documentation self-check
+
+- README에 실제 FastAPI endpoint 전체를 그룹별로 볼 수 있는 `API endpoint inventory` 섹션을 추가했다.
+- `tests/test_public_docs_contract.py`가 `app.main.app.routes`에서 실제 FastAPI endpoint 목록을 읽어 README, `docs/API.md`, `docs/PROJECT_SUMMARY.md`에 모두 문서화되어 있는지 검증하도록 보강했다.
+- 같은 테스트 파일에서 Typer command 목록을 실제 `cli.main.app`에서 읽어 README, `docs/API.md`, `docs/PROJECT_SUMMARY.md`에 모두 문서화되어 있는지 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `11 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `205 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

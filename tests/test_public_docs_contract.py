@@ -1,6 +1,11 @@
 import re
 from pathlib import Path
 
+from typer.main import get_command
+
+import cli.main as cli_main
+from app.main import app
+
 
 DOCS = {
     "readme": Path("README.md"),
@@ -118,6 +123,7 @@ PUBLIC_MARKDOWN_FILES = [
 ]
 
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+INTERNAL_FASTAPI_PATHS = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
 
 
 def _link_target_exists(source: Path, raw_target: str) -> bool:
@@ -252,3 +258,33 @@ def test_release_checklist_covers_publication_gates() -> None:
     for item in required_commands + sensitive_paths + stop_conditions:
         assert item in text
     assert "LOCAL_API_KEY=" not in text
+
+
+def test_all_fastapi_routes_are_documented_in_public_docs() -> None:
+    texts = {name: path.read_text(encoding="utf-8") for name, path in DOCS.items()}
+    endpoints = []
+
+    for route in app.routes:
+        path = getattr(route, "path", "")
+        methods = getattr(route, "methods", set())
+        if path in INTERNAL_FASTAPI_PATHS:
+            continue
+        for method in sorted(methods - {"HEAD", "OPTIONS"}):
+            endpoints.append(f"{method} {path}")
+
+    assert endpoints
+    for endpoint in endpoints:
+        assert endpoint in texts["readme"], f"{endpoint} missing from README"
+        assert endpoint in texts["api"], f"{endpoint} missing from API docs"
+        assert endpoint in texts["summary"], f"{endpoint} missing from project summary"
+
+
+def test_all_typer_commands_are_documented_in_public_docs() -> None:
+    texts = {name: path.read_text(encoding="utf-8") for name, path in DOCS.items()}
+    commands = [f"local-ai {name}" for name in sorted(get_command(cli_main.app).commands)]
+
+    assert commands
+    for command in commands:
+        assert command in texts["readme"], f"{command} missing from README"
+        assert command in texts["api"], f"{command} missing from API docs"
+        assert command in texts["summary"], f"{command} missing from project summary"
