@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `243 passed` |
+| `.venv/bin/pytest` | `244 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -831,6 +831,13 @@
 - `tests/test_portfolio_docs_contract.py`가 `docs/FINAL_REPORT.md`의 최종 보고 섹션, 주요 endpoint/CLI/검증 명령, 현재 한계, 다음 개선, 과장 금지 문구를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `33 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `243 passed, 1 warning`, public release check는 `scanned_files=111`, finding 없음이다.
+
+### Assistant UI contract inventory guard
+
+- `tests/test_api_contracts.py`에 `/assistant/ui-contract`의 `startup_sequence`, `refresh_endpoints`, `message_flow`가 실제 `/project/api-inventory` route 목록과 일치하는지 검증하는 테스트를 추가했다.
+- assistant endpoint는 API inventory에서 `requires_api_key=true`, read-only `/project/api-inventory`는 `requires_api_key=false`로 유지되는지 함께 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_ui_bridge_examples.py tests/test_ui_qa_checklist.py` 결과는 `21 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `244 passed, 1 warning`, public release check는 finding 없음이다.
 
 ### 응답 형식 업데이트
 

@@ -4,6 +4,8 @@ from fastapi.testclient import TestClient
 
 from app.api.dependencies import get_document_service, get_rag_service, get_search_service
 from app.main import app
+from app.services.assistant_service import AssistantService
+from app.services.project_status_service import build_api_inventory
 
 
 class FakeRagService:
@@ -306,3 +308,27 @@ def test_project_status_contract() -> None:
     assert shell_dry_run_response.json()["would_execute"] is False
     assert blocked_shell_response.status_code == 200
     assert blocked_shell_response.json()["status"] == "blocked"
+
+
+def test_assistant_ui_contract_paths_match_api_inventory() -> None:
+    contract = AssistantService().ui_contract()
+    inventory = build_api_inventory(app.routes)
+    endpoints = {(endpoint["path"], method): endpoint for endpoint in inventory["endpoints"] for method in endpoint["methods"]}
+
+    contract_calls = (
+        contract["startup_sequence"]
+        + contract["refresh_endpoints"]
+        + contract["message_flow"]
+    )
+
+    for call in contract_calls:
+        endpoint = endpoints.get((call["path"], call["method"]))
+        assert endpoint is not None, f"{call['method']} {call['path']} is missing from API inventory"
+        if call["path"].startswith("/assistant/"):
+            assert endpoint["requires_api_key"] is True
+
+    project_inventory = endpoints[("/project/api-inventory", "GET")]
+    assert project_inventory["requires_api_key"] is False
+
+    blocked_actions = set(contract["blocked_actions"])
+    assert {"browser_interaction", "file_write_delete", "shell_execution"} <= blocked_actions
