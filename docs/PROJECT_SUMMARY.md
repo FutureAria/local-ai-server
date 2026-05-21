@@ -206,7 +206,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `231 passed`
+- `.venv/bin/pytest`: `232 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능
@@ -290,10 +290,18 @@ optional dependency 설치 시 지원:
 
 ## 다음 추천 개선
 
-1. 실제 사용자 문서로 upload/search/ask-with-docs end-to-end 재검증
-2. 대용량 색인 job/status API 설계
-3. Chroma 누락 vector 재생성 명령 설계
-4. OCR loader 도입 여부 검토
-5. 자동 로그 rotation 정책 검토
-6. README와 API 문서 Claude Sonnet 리뷰
-7. 실제 배포가 필요하면 보안/운영 리뷰 후 별도 결정
+Codex가 바로 이어서 할 수 있는 안전한 개선:
+
+1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 계속 보강
+2. 실제 사용자 `.md`/`.txt` 문서로 upload/search/ask-with-docs end-to-end 재검증
+3. 대용량 색인 job/status API 설계와 progress response schema 초안 작성
+4. Chroma 누락 vector 재생성 명령의 preview-only 설계
+5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
+
+별도 승인 또는 보안 리뷰가 필요한 개선:
+
+1. 실제 repair/delete/rebuild 실행 명령
+2. 실제 브라우저 click/fill/submit 자동화
+3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
+4. OCR loader, JavaScript 렌더링, 외부 URL 크롤링
+5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit

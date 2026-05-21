@@ -206,7 +206,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `231 passed`
+  - `.venv/bin/pytest`: `232 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -229,6 +229,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_ui_qa_checklist.py`를 보강해 수동 QA 체크리스트가 `/assistant/ui-contract`의 startup sequence, refresh endpoint, message flow, response type, blocked action을 빠뜨리지 않도록 검증한다.
 - `tests/test_ui_connect_guide.py`를 보강해 UI 연결 가이드의 `/assistant/startup`과 `/assistant/bootstrap` 응답 필드 설명이 실제 Pydantic response schema와 어긋나지 않도록 검증한다.
 - `tests/test_smoke_script.py`를 보강해 UI 연결 가이드의 assistant bridge smoke expected output이 실제 smoke summary field와 어긋나지 않도록 검증한다.
+- `tests/test_portfolio_docs_contract.py`를 보강해 README와 PROJECT_SUMMARY의 다음 추천 개선이 최신 API 상태와 안전 경계를 같이 반영하는지 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 README 상단 Local Assistant Quick Flow와 preview/dry-run 안전 문구를 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 CLI assistant REPL 도움말과 README 명령 목록 정합성을 검증한다.
 - `tests/test_ui_connect_guide.py`를 추가해 UI 연결값, startup flow, 안전 경계 문서 계약을 검증한다.

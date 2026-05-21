@@ -76,3 +76,38 @@ def test_public_docs_share_current_limit_boundaries() -> None:
 
     assert "배포 완료" not in README.read_text(encoding="utf-8")
     assert "배포 완료" not in PROJECT_SUMMARY.read_text(encoding="utf-8")
+
+
+def test_readme_and_project_summary_share_next_improvement_boundaries() -> None:
+    docs = {
+        "README.md": README.read_text(encoding="utf-8"),
+        "docs/PROJECT_SUMMARY.md": PROJECT_SUMMARY.read_text(encoding="utf-8"),
+    }
+
+    required_terms = [
+        "## 다음 추천 개선",
+        "Codex가 바로 이어서 할 수 있는 안전한 개선",
+        "별도 승인 또는 보안 리뷰가 필요한 개선",
+        "endpoint/response field 계약 테스트",
+        "upload/search/ask-with-docs end-to-end",
+        "대용량 색인 job/status API",
+        "progress response schema",
+        "preview-only",
+        "assistant bridge smoke expected output",
+        "UI 수동 QA 체크리스트",
+        "실제 repair/delete/rebuild",
+        "브라우저 click/fill/submit 자동화",
+        "shell 실행",
+        "파일 생성/수정/삭제 자동화",
+        "OCR loader",
+        "JavaScript 렌더링",
+        "외부 URL 크롤링",
+        "운영 배포",
+        "HTTPS termination",
+        "다중 사용자 권한 관리",
+        "분산 rate limit",
+    ]
+
+    for path, text in docs.items():
+        for term in required_terms:
+            assert term in text, f"{path} missing next improvement boundary: {term}"
