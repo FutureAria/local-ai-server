@@ -20,6 +20,15 @@ DEFAULT_EXCLUDED_DIRS = {
     "venv",
 }
 
+PUBLIC_RELEASE_PRIVATE_DATA = (
+    ".env",
+    "data/local_ai.sqlite3",
+    "data/chroma/",
+    "data/uploads/",
+    "data/logs/",
+    "data/*.jsonl",
+)
+
 SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)\.env($|\.)"),
     re.compile(r"(^|/)data/local_ai\.sqlite3($|[-\w.])"),

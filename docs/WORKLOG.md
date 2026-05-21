@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `210 passed` |
+| `.venv/bin/pytest` | `218 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -625,6 +625,14 @@
 - `docs/OPERATIONS.md`의 문서/RAG smoke 설명에 `health → upload → search → ask-with-docs → feedback → stats` 순서를 명시했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_operations_runbook.py tests/test_readme_quick_start.py` 결과는 `13 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `210 passed, 1 warning`이다.
+
+### Public release private data self-check
+
+- `scripts/public_release_check.py`에 GitHub 공개 제외 대상인 로컬 private data 목록을 `PUBLIC_RELEASE_PRIVATE_DATA`로 분리했다.
+- `tests/test_public_release_check.py`가 `.env`, SQLite DB/WAL, Chroma index, uploads, logs, JSONL export 예시를 모두 high finding으로 감지하는지 검증하도록 보강했다.
+- 같은 테스트가 `PUBLIC_RELEASE_PRIVATE_DATA` 기준으로 `.gitignore`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`의 제외 경로 문서화가 일치하는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_security_docs_contract.py` 결과는 `18 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `218 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 
