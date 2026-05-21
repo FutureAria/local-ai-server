@@ -1,4 +1,8 @@
+from pathlib import Path
+
 import scripts.smoke_test_api as smoke
+
+SMOKE_DOCS = ["README.md", "docs/OPERATIONS.md"]
 
 
 class FakeResponse:
@@ -69,14 +73,7 @@ def test_smoke_script_calls_expected_api_flow(monkeypatch) -> None:
     summary = smoke.run_smoke_test("http://server.test/")
 
     assert summary["ok"] is True
-    assert [step["step"] for step in summary["steps"]] == [
-        "health",
-        "upload",
-        "search",
-        "ask-with-docs",
-        "feedback",
-        "stats",
-    ]
+    assert [step["step"] for step in summary["steps"]] == smoke.DOCUMENT_RAG_SMOKE_FLOW
     assert calls[1]["headers"] == {"X-API-Key": "secret"}
     assert calls[3]["json"]["question"] == "내 문서 기준으로 access token은 어디로 전달해?"
 
@@ -93,15 +90,7 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
     summary = smoke.run_assistant_bridge_smoke_test("http://server.test/", project_root="/tmp/project")
 
     assert summary["ok"] is True
-    assert [step["step"] for step in summary["steps"]] == [
-        "assistant-startup",
-        "api-inventory",
-        "assistant-bootstrap",
-        "assistant-action-preview",
-        "assistant-message",
-        "assistant-sessions",
-        "assistant-messages",
-    ]
+    assert [step["step"] for step in summary["steps"]] == smoke.ASSISTANT_BRIDGE_SMOKE_FLOW
     assert calls == [
         {"method": "GET", "url": "http://server.test/assistant/startup", "headers": {"X-API-Key": "secret"}},
         {"method": "GET", "url": "http://server.test/project/api-inventory"},
@@ -165,11 +154,7 @@ def test_assistant_bridge_preflight_detects_wrong_server(monkeypatch) -> None:
     summary = smoke.run_assistant_bridge_preflight("http://server.test/")
 
     assert summary["ok"] is False
-    assert [step["step"] for step in summary["steps"]] == [
-        "health",
-        "assistant-startup",
-        "api-inventory",
-    ]
+    assert [step["step"] for step in summary["steps"]] == smoke.ASSISTANT_BRIDGE_PREFLIGHT_FLOW
     assert summary["steps"][1]["status"] == 404
     assert "Another server may be using this base URL" in summary["steps"][1]["hint"]
     assert "different --base-url" in summary["hint"]
@@ -187,3 +172,30 @@ def test_assistant_bridge_preflight_passes_for_expected_server(monkeypatch) -> N
 
     assert summary["ok"] is True
     assert [step["status"] for step in summary["steps"]] == [200, 200, 200]
+
+
+def test_smoke_flow_docs_match_script_contract() -> None:
+    document_flow = " → ".join(smoke.DOCUMENT_RAG_SMOKE_FLOW)
+    assistant_readme_flow = (
+        "assistant-startup → api-inventory → assistant-bootstrap → action-preview → "
+        "assistant-message(auto/status intent) → sessions → messages"
+    )
+    assistant_endpoint_tokens = [
+        "GET /assistant/startup",
+        "GET /project/api-inventory",
+        "POST /assistant/bootstrap",
+        "POST /assistant/action-preview",
+        "POST /assistant/message",
+        "GET /assistant/sessions",
+        "GET /assistant/sessions/{session_id}/messages",
+    ]
+
+    readme = Path("README.md").read_text(encoding="utf-8")
+    assert document_flow in readme
+    assert assistant_readme_flow in readme
+
+    for path in SMOKE_DOCS:
+        text = Path(path).read_text(encoding="utf-8")
+        assert document_flow in text, f"{path} missing document smoke flow"
+        for token in assistant_endpoint_tokens:
+            assert token in text, f"{path} missing {token}"

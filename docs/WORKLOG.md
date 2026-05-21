@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `209 passed` |
+| `.venv/bin/pytest` | `210 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -616,7 +616,15 @@
 - README와 `docs/OPERATIONS.md`에 `scripts/local_ci_check.py` 내부 실행 단계인 `python -m pytest`, `python -m compileall app cli scripts`, `python scripts/public_release_check.py --root . --json`, `git diff --check`를 명시했다.
 - `tests/test_operations_runbook.py`가 `scripts.local_ci_check.build_check_commands()`의 실제 단계 이름을 기준으로 README, `docs/OPERATIONS.md`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`의 검증 명령 문구를 대조하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_operations_runbook.py tests/test_local_ci_check.py tests/test_readme_quick_start.py` 결과는 `11 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `209 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 당시 내부 `pytest` 결과는 `209 passed, 1 warning`이다.
+
+### Smoke flow documentation self-check
+
+- `scripts/smoke_test_api.py`에 document/RAG smoke, assistant bridge preflight, assistant bridge smoke 순서를 상수로 분리했다.
+- `tests/test_smoke_script.py`가 실제 smoke flow 상수와 README, `docs/OPERATIONS.md`의 smoke 설명이 일치하는지 검증하도록 보강했다.
+- `docs/OPERATIONS.md`의 문서/RAG smoke 설명에 `health → upload → search → ask-with-docs → feedback → stats` 순서를 명시했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_operations_runbook.py tests/test_readme_quick_start.py` 결과는 `13 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `210 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

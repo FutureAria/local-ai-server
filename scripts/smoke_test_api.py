@@ -14,6 +14,31 @@ refresh token은 재발급에 사용한다.
 이 문서는 local-ai-server E2E smoke test용 임시 문서다.
 """
 
+DOCUMENT_RAG_SMOKE_FLOW = [
+    "health",
+    "upload",
+    "search",
+    "ask-with-docs",
+    "feedback",
+    "stats",
+]
+
+ASSISTANT_BRIDGE_PREFLIGHT_FLOW = [
+    "health",
+    "assistant-startup",
+    "api-inventory",
+]
+
+ASSISTANT_BRIDGE_SMOKE_FLOW = [
+    "assistant-startup",
+    "api-inventory",
+    "assistant-bootstrap",
+    "assistant-action-preview",
+    "assistant-message",
+    "assistant-sessions",
+    "assistant-messages",
+]
+
 
 def _headers() -> dict[str, str]:
     api_key = os.getenv("LOCAL_API_KEY")

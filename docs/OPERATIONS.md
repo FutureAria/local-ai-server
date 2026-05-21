@@ -167,7 +167,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 
 ### 4. 문서/RAG smoke
 
-Ollama와 Chroma까지 포함한 문서 기반 흐름은 별도로 확인한다.
+Ollama와 Chroma까지 포함한 문서 기반 흐름은 별도로 확인한다. 실행 흐름은 `health → upload → search → ask-with-docs → feedback → stats` 순서다.
 
 ```bash
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
