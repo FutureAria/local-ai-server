@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `205 passed` |
+| `.venv/bin/pytest` | `206 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -586,7 +586,14 @@
 - `tests/test_public_docs_contract.py`가 `app.main.app.routes`에서 실제 FastAPI endpoint 목록을 읽어 README, `docs/API.md`, `docs/PROJECT_SUMMARY.md`에 모두 문서화되어 있는지 검증하도록 보강했다.
 - 같은 테스트 파일에서 Typer command 목록을 실제 `cli.main.app`에서 읽어 README, `docs/API.md`, `docs/PROJECT_SUMMARY.md`에 모두 문서화되어 있는지 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py` 결과는 `11 passed, 1 warning`이다.
-- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `205 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 당시 내부 `pytest` 결과는 `205 passed, 1 warning`이다.
+
+### Protected endpoint runtime documentation self-check
+
+- `tests/test_security_docs_contract.py`가 `build_api_inventory(app.routes)`의 `requires_api_key=true` 목록을 기준으로 README, `SECURITY.md`, `docs/API.md`의 보호 endpoint 목록이 모두 일치하는지 검증하도록 보강했다.
+- 보호 endpoint parser는 `GET`, `POST`, `PUT`, `PATCH`, `DELETE`로 시작하는 bullet만 endpoint로 인정해 일반 필드 목록과 혼동하지 않게 했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_security_docs_contract.py tests/test_security.py tests/test_public_docs_contract.py` 결과는 `52 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `206 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

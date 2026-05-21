@@ -1,16 +1,28 @@
 from pathlib import Path
 
+from app.main import app
+from app.services.project_status_service import build_api_inventory
+
 
 README = Path("README.md")
 SECURITY = Path("SECURITY.md")
+API_DOCS = Path("docs/API.md")
 RELEASE_CHECKLIST = Path("docs/RELEASE_CHECKLIST.md")
+HTTP_METHODS = ("GET ", "POST ", "PUT ", "PATCH ", "DELETE ")
 
 
 def _extract_protected_endpoints(text: str) -> list[str]:
     start = text.index("보호 endpoint:")
     end = text.index("주의:", start) if "주의:" in text[start:] else text.index("```bash", start)
     section = text[start:end]
-    return [line.strip()[2:].strip("`") for line in section.splitlines() if line.startswith("- `")]
+    endpoints = []
+    for line in section.splitlines():
+        if not line.startswith("- `"):
+            continue
+        endpoint = line.strip()[2:].strip("`")
+        if endpoint.startswith(HTTP_METHODS):
+            endpoints.append(endpoint)
+    return endpoints
 
 
 def test_readme_and_security_protected_endpoint_lists_match() -> None:
@@ -18,6 +30,19 @@ def test_readme_and_security_protected_endpoint_lists_match() -> None:
     security = SECURITY.read_text(encoding="utf-8")
 
     assert set(_extract_protected_endpoints(readme)) == set(_extract_protected_endpoints(security))
+
+
+def test_protected_endpoint_docs_match_runtime_api_inventory() -> None:
+    runtime_protected = {
+        f"{method} {endpoint['path']}"
+        for endpoint in build_api_inventory(app.routes)["endpoints"]
+        if endpoint["requires_api_key"]
+        for method in endpoint["methods"]
+    }
+
+    for path in [README, SECURITY, API_DOCS]:
+        documented = set(_extract_protected_endpoints(path.read_text(encoding="utf-8")))
+        assert documented == runtime_protected, f"{path} protected endpoint list is out of sync"
 
 
 def test_security_docs_share_high_risk_stop_conditions() -> None:
