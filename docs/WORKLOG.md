@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `219 passed` |
+| `.venv/bin/pytest` | `220 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -641,6 +641,14 @@
 - `tests/test_readme_quick_start.py`가 quick flow 섹션의 위치와 핵심 명령/안전 문구를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py` 결과는 `19 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `219 passed, 1 warning`이다.
+
+### CLI assistant help documentation self-check
+
+- `cli/main.py`의 assistant/agent REPL 도움말을 각각 `ASSISTANT_REPL_HELP_LINES`, `AGENT_REPL_HELP_LINES` 상수로 분리했다.
+- README의 `local-ai assistant` 명령 목록에 실제 도움말에 있던 `/api-inventory`, `/capabilities`, `/root <project_root>` 누락을 반영했다.
+- `tests/test_readme_quick_start.py`가 `ASSISTANT_REPL_HELP_LINES` 기준으로 README의 assistant REPL 명령 목록이 빠짐없이 문서화되는지 검증하도록 보강했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `36 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `220 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

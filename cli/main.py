@@ -16,6 +16,49 @@ UPLOAD_CONTENT_TYPES = {
     ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
 
+ASSISTANT_REPL_HELP_LINES = [
+    "일반 문장: /ask-with-docs로 문서 기반 답변",
+    "/ask <질문>",
+    "/search <검색어>",
+    "/docs",
+    "/stats",
+    "/roots",
+    "/index-preview <folder>",
+    "/index <folder>",
+    "/agent <지시>",
+    "/runs",
+    "/run <id>",
+    "/actions <id>",
+    "/dry-run <id>",
+    "/approve <id>",
+    "/execute <id>",
+    "/results <id>",
+    "/shell-policy",
+    "/shell-dry-run <command>",
+    "/api-inventory",
+    "/capabilities",
+    "/root <project_root>",
+    "/summary",
+    "/status",
+    "/next",
+    "/quit",
+]
+
+AGENT_REPL_HELP_LINES = [
+    "일반 문장: agent plan 생성",
+    "/runs",
+    "/run <id>",
+    "/actions <id>",
+    "/dry-run <id>",
+    "/approve <id>",
+    "/reject <id>",
+    "/execute <id>",
+    "/results <id>",
+    "/status",
+    "/next",
+    "/quit",
+]
+
 
 def _base_url() -> str:
     return os.getenv("LOCAL_AI_SERVER_URL", "http://127.0.0.1:8000").rstrip("/")
@@ -101,54 +144,11 @@ def _print_recommended_next_model(model: dict) -> None:
 
 
 def _assistant_help() -> str:
-    return "\n".join(
-        [
-            "일반 문장: /ask-with-docs로 문서 기반 답변",
-            "/ask <질문>",
-            "/search <검색어>",
-            "/docs",
-            "/stats",
-            "/roots",
-            "/index-preview <folder>",
-            "/index <folder>",
-            "/agent <지시>",
-            "/runs",
-            "/run <id>",
-            "/actions <id>",
-            "/dry-run <id>",
-            "/approve <id>",
-            "/execute <id>",
-            "/results <id>",
-            "/shell-policy",
-            "/shell-dry-run <command>",
-            "/api-inventory",
-            "/capabilities",
-            "/root <project_root>",
-            "/summary",
-            "/status",
-            "/next",
-            "/quit",
-        ]
-    )
+    return "\n".join(ASSISTANT_REPL_HELP_LINES)
 
 
 def _agent_help() -> str:
-    return "\n".join(
-        [
-            "일반 문장: agent plan 생성",
-            "/runs",
-            "/run <id>",
-            "/actions <id>",
-            "/dry-run <id>",
-            "/approve <id>",
-            "/reject <id>",
-            "/execute <id>",
-            "/results <id>",
-            "/status",
-            "/next",
-            "/quit",
-        ]
-    )
+    return "\n".join(AGENT_REPL_HELP_LINES)
 
 
 def _allowed_roots_payload() -> dict:

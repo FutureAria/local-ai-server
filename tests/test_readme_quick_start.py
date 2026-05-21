@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from cli.main import ASSISTANT_REPL_HELP_LINES
+
 
 README = Path("README.md")
 
@@ -72,6 +74,16 @@ def test_readme_documents_minimal_local_assistant_flow_near_top() -> None:
         "파일 생성/수정/삭제",
     ]:
         assert phrase in text
+
+
+def test_readme_documents_all_assistant_repl_help_commands() -> None:
+    text = README.read_text(encoding="utf-8")
+    repl_section = text.split("`local-ai assistant` 안에서는", 1)[1].split("## LOCAL_API_KEY", 1)[0]
+
+    for line in ASSISTANT_REPL_HELP_LINES:
+        if not line.startswith("/"):
+            continue
+        assert line in repl_section
 
 
 def test_readme_keeps_safe_boundaries_visible_near_top() -> None:

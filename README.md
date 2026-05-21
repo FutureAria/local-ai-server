@@ -494,6 +494,9 @@ local-ai assistant
 /results <id>
 /shell-policy
 /shell-dry-run <command>
+/api-inventory
+/capabilities
+/root <project_root>
 /summary
 /status
 /next
