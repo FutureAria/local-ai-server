@@ -200,6 +200,30 @@ def test_index_folder_preview_endpoint_contract_with_mock() -> None:
     assert body["embedding_batches_estimated"] == 1
 
 
+def test_index_folder_job_preview_endpoint_contract_with_mock() -> None:
+    app.dependency_overrides[get_document_service] = lambda: FakeDocumentService()
+    client = TestClient(app)
+    response = client.post("/documents/index-folder-job-preview", json={"folder_path": "/tmp/notes", "recursive": True})
+    app.dependency_overrides.clear()
+    assert response.status_code == 200
+    body = response.json()
+    assert body["job_id"] == "preview-only"
+    assert body["status"] == "planned"
+    assert body["dry_run"] is True
+    assert body["would_enqueue"] is False
+    assert body["status_endpoint"] == "/documents/index-jobs/{job_id}"
+    assert body["progress"] == {
+        "total_files": 1,
+        "processed_files": 0,
+        "indexed_documents": 0,
+        "skipped_files": 0,
+        "chunks_created": 0,
+        "embedding_batches_total": 1,
+        "embedding_batches_completed": 0,
+        "percent": 0.0,
+    }
+
+
 def test_index_folder_endpoint_contract_includes_file_details_with_mock() -> None:
     app.dependency_overrides[get_document_service] = lambda: FakeDocumentService()
     client = TestClient(app)

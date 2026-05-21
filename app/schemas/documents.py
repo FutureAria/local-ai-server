@@ -111,6 +111,29 @@ class IndexFolderPreviewResponse(BaseModel):
     note: str
 
 
+class IndexJobProgress(BaseModel):
+    total_files: int
+    processed_files: int
+    indexed_documents: int
+    skipped_files: int
+    chunks_created: int
+    embedding_batches_total: int
+    embedding_batches_completed: int
+    percent: float = Field(ge=0, le=100)
+
+
+class IndexFolderJobPreviewResponse(BaseModel):
+    job_id: str
+    status: str
+    folder_path: str
+    recursive: bool
+    dry_run: bool = True
+    would_enqueue: bool = False
+    progress: IndexJobProgress
+    status_endpoint: str
+    note: str
+
+
 class DocumentStatsResponse(BaseModel):
     documents_count: int
     chunks_count: int

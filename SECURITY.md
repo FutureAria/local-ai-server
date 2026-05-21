@@ -23,6 +23,7 @@
 - `POST /search`
 - `POST /documents/upload`
 - `POST /documents/index-folder-preview`
+- `POST /documents/index-folder-job-preview`
 - `POST /documents/index-folder`
 - `DELETE /documents/{document_id}`
 - `POST /feedback`

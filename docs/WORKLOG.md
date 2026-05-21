@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `233 passed` |
+| `.venv/bin/pytest` | `235 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -739,6 +739,15 @@
 - `tests/test_smoke_script.py`가 Markdown/Text sample 업로드, content type, 문서 안내 문구를 검증하도록 보강했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_operations_runbook.py tests/test_readme_quick_start.py tests/test_api_docs_payloads.py` 결과는 `22 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `233 passed, 1 warning`이다.
+
+### Index folder job/status preview schema self-check
+
+- `POST /documents/index-folder-job-preview`를 추가해 대용량 폴더 색인 job/status API의 progress response schema를 preview-only로 확인할 수 있게 했다.
+- 이 endpoint는 기존 folder preview 결과를 바탕으로 `job_id=preview-only`, `status=planned`, `would_enqueue=false`, `dry_run=true`, `progress`를 반환하며 queue 생성, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않는다.
+- README, `SECURITY.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 endpoint 목록과 보호 endpoint 목록을 갱신했다.
+- `tests/test_api_contracts.py`, `tests/test_security.py`, `tests/test_api_docs_payloads.py`를 보강해 endpoint response contract, API key 보호, request/response field 문서 계약을 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_api_docs_payloads.py tests/test_public_docs_contract.py tests/test_security.py tests/test_security_docs_contract.py` 결과는 `69 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `235 passed, 1 warning`이다.
 
 ### 응답 형식 업데이트
 

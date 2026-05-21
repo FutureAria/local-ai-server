@@ -23,6 +23,7 @@ class FakeSearchService:
             {"files": {"file": ("note.md", b"# Note", "text/markdown")}},
         ),
         ("post", "/documents/index-folder-preview", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
+        ("post", "/documents/index-folder-job-preview", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
         ("post", "/documents/index-folder", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
         ("delete", "/documents/1", {}),
         ("post", "/feedback", {"json": {"request_id": "1", "rating": "good"}}),

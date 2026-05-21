@@ -65,7 +65,7 @@ python scripts/local_ci_check.py --root .
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `233 passed`
+- `.venv/bin/pytest`: `235 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
@@ -86,7 +86,7 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 
 1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 보강
 2. 실제 사용자 `.md`/`.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증
-3. 대용량 색인 job/status API 설계와 progress response schema 초안 작성
+3. 대용량 색인 job/status API progress response schema 기준 실제 queue 도입 조건 문서화
 4. Chroma 누락 vector 재생성 명령의 preview-only 설계
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
 

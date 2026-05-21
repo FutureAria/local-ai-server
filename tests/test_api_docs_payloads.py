@@ -30,6 +30,7 @@ REQUEST_SCHEMAS: dict[str, type[BaseModel]] = {
     "/ask": AskRequest,
     "/ask-with-docs": AskWithDocsRequest,
     "/documents/index-folder-preview": IndexFolderRequest,
+    "/documents/index-folder-job-preview": IndexFolderRequest,
     "/documents/index-folder": IndexFolderRequest,
     "/search": SearchRequest,
     "/feedback": FeedbackRequest,

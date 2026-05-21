@@ -11,6 +11,7 @@ from app.schemas.documents import (
     DocumentStatsResponse,
     DocumentSummary,
     DocumentUploadResponse,
+    IndexFolderJobPreviewResponse,
     IndexFolderPreviewResponse,
     IndexFolderRequest,
     IndexFolderResponse,
@@ -149,3 +150,43 @@ def index_folder_preview(
         return document_service.preview_index_folder(request.folder_path, recursive=request.recursive)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post(
+    "/index-folder-job-preview",
+    response_model=IndexFolderJobPreviewResponse,
+    dependencies=[Depends(require_api_key)],
+)
+def index_folder_job_preview(
+    request: IndexFolderRequest,
+    document_service: DocumentService = Depends(get_document_service),
+) -> dict:
+    try:
+        preview = document_service.preview_index_folder(request.folder_path, recursive=request.recursive)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    total_files = preview["files_count"]
+    return {
+        "job_id": "preview-only",
+        "status": "planned",
+        "folder_path": preview["folder_path"],
+        "recursive": preview["recursive"],
+        "dry_run": True,
+        "would_enqueue": False,
+        "progress": {
+            "total_files": total_files,
+            "processed_files": 0,
+            "indexed_documents": 0,
+            "skipped_files": preview["skipped_files_count"],
+            "chunks_created": 0,
+            "embedding_batches_total": preview["embedding_batches_estimated"],
+            "embedding_batches_completed": 0,
+            "percent": 0,
+        },
+        "status_endpoint": "/documents/index-jobs/{job_id}",
+        "note": (
+            "대용량 색인 job/status API의 preview-only 응답입니다. "
+            "현재 요청은 queue 생성, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않습니다."
+        ),
+    }

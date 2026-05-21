@@ -29,6 +29,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /search`
 - `POST /documents/upload`
 - `POST /documents/index-folder-preview`
+- `POST /documents/index-folder-job-preview`
 - `POST /documents/index-folder`
 - `DELETE /documents/{document_id}`
 - `POST /feedback`
@@ -519,6 +520,30 @@ curl -X POST http://127.0.0.1:8000/documents/index-folder-preview \
 - `files`
 - `skipped_files`
 - `dry_run=true`
+
+### `POST /documents/index-folder-job-preview`
+
+대용량 폴더 색인을 나중에 job/status API로 분리할 때 사용할 progress response schema를 preview-only로 확인한다. 이 endpoint는 queue 생성, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/documents/index-folder-job-preview \
+  -H "Content-Type: application/json" \
+  -d '{"folder_path":"./notes","recursive":true}'
+```
+
+응답 핵심 필드:
+
+- `job_id`
+- `status`
+- `folder_path`
+- `recursive`
+- `dry_run`
+- `would_enqueue`
+- `progress`
+- `status_endpoint`
+- `note`
+
+`progress`에는 `total_files`, `processed_files`, `indexed_documents`, `skipped_files`, `chunks_created`, `embedding_batches_total`, `embedding_batches_completed`, `percent`가 포함된다.
 
 ### `POST /documents/index-folder`
 
