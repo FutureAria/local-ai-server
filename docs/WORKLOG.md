@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `254 passed` |
+| `.venv/bin/pytest` | `257 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -888,6 +888,15 @@
 - `tests/test_tasks_doc.py`를 보강해 자동화된 safe contract 항목은 완료 상태, 실제 사용자 문서 E2E는 미완료 상태로 유지되는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_tasks_doc.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `20 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `254 passed, 1 warning`, public release check는 `scanned_files=117`, finding 없음이다.
+
+### User document E2E smoke plan
+
+- `docs/USER_DOCUMENT_E2E_PLAN.md`를 추가해 실제 사용자 `.md`/`.txt` 문서 기준 upload/search/ask-with-docs E2E 실행 전 승인 조건, 저장 영향, paste-safe summary 기준, stop condition을 문서화했다.
+- 실제 사용자 문서 E2E는 SQLite, Chroma, `data/uploads/`에 테스트 데이터를 추가할 수 있으므로 `docs/TASKS.md`에서는 미완료 상태를 유지했다.
+- README `Key Docs`, `docs/PROJECT_SUMMARY.md`, public docs link contract에 `docs/USER_DOCUMENT_E2E_PLAN.md`를 연결했다.
+- `tests/test_user_document_e2e_plan.py`를 추가해 승인 조건, 저장 영향, `--sanitized-summary`, secret 미노출, TASKS 미완료 유지 계약을 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_user_document_e2e_plan.py tests/test_public_docs_contract.py tests/test_tasks_doc.py` 결과는 `19 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `257 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
