@@ -5,7 +5,7 @@
 - Recommended AI: Codex
 - Recommended model: Codex GPT-5.5
 - Reason: 로컬 전용 FastAPI/Ollama/SQLite/Chroma 백엔드 구현과 검증은 Codex가 안전하게 계속 처리 가능
-- Next task: 브라우저 조작 없이 `/assistant/startup`, `/assistant/ui-contract`, `/assistant/action-preview`, `/assistant/bootstrap`, `/assistant/message`, `/assistant/sessions`, `/assistant/sessions/{session_id}/messages`, `/project/api-inventory` API 계약과 문서 QA 기준 보강
+- Next task: 사용자 승인과 실제 `.md`/`.txt` 경로가 준비되면 `docs/USER_DOCUMENT_E2E_PLAN.md` 기준으로 문서/RAG E2E를 실행하고 paste-safe summary만 기록. 승인 전에는 문서/테스트/API 계약 polish만 진행
 - User action required: 없음. 단, 실제 브라우저 렌더링 확인, 메시지 전송, 시스템 의존성 설치, 파일 삭제, 운영 배포, 외부 LLM API 활성화는 사용자 승인 또는 수동 확인 전 진행 불가
 
 ## 프로젝트 루트
@@ -36,6 +36,7 @@ git status
 - SFT JSONL export
 - README, AGENTS, API, PROJECT_SUMMARY, CLAUDE_REVIEW_HANDOFF, WORKLOG, OPERATIONS, SECURITY 문서
 - `docs/TASKS.md`에 safe-next, manual-check, review-required, blocked 작업 경계 정리
+- 실제 사용자 문서 E2E 실행 전 승인/저장 영향/paste-safe 기준 문서 `docs/USER_DOCUMENT_E2E_PLAN.md`
 - GitHub 공개용 현재 상태 요약 문서 `docs/PUBLIC_RELEASE_SUMMARY.md`
 
 ## 먼저 읽을 파일
@@ -44,6 +45,7 @@ git status
 - `SECURITY.md`
 - `README.md`
 - `docs/TASKS.md`
+- `docs/USER_DOCUMENT_E2E_PLAN.md`
 - `docs/API.md`
 - `docs/UI_BRIDGE_EXAMPLES.md`
 - `docs/UI_CONNECT_GUIDE.md`
@@ -156,6 +158,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - LangChain을 추가하지 말 것.
 - 프론트엔드를 만들지 말 것.
 - 원본 색인 대상 파일을 삭제하거나 수정하지 말 것.
+- 사용자 승인과 실제 `.md`/`.txt` 경로 없이 실제 사용자 문서 E2E smoke를 실행하지 말 것.
 - secret, API key, DB password를 출력하지 말 것.
 - 운영 배포, 클라우드 리소스 변경, DB migration을 사용자 승인 없이 하지 말 것.
 
@@ -171,17 +174,17 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - Recommended AI: Codex
 - Recommended model: Codex GPT-5.5
 - Reason: README/docs 최종 정합성 점검은 Codex가 안전하게 처리 가능
-- Next task: 실제 사용자 문서 기반 E2E 검증 또는 선택형 개선 범위 결정
-- User action required: 없음. 단, 외부 STT/TTS/realtime tool call/browser interaction 활성화는 사용자 승인 전 진행 불가
+- Next task: 승인된 실제 `.md`/`.txt` 경로가 있으면 `docs/USER_DOCUMENT_E2E_PLAN.md`에 따라 E2E smoke를 실행하고 sanitized summary만 기록. 경로/승인이 없으면 문서/테스트/API 계약 polish만 진행
+- User action required: 실제 사용자 문서 E2E를 원하면 `.md` 또는 `.txt` 파일 경로와 저장 영향 승인 필요. 외부 STT/TTS/realtime tool call/browser interaction 활성화는 사용자 승인 전 진행 불가
 ```
 
 ## 다음 추천 작업
 
 Codex가 바로 이어서 할 수 있는 안전 작업:
 
-1. `docs/UI_QA_CHECKLIST.md`와 `docs/UI_BRIDGE_EXAMPLES.md`의 endpoint/response field 정합성 점검
+1. `docs/USER_DOCUMENT_E2E_PLAN.md`, `docs/TASKS.md`, `docs/WORKLOG.md`의 승인/저장 영향/paste-safe summary 문구 정합성 유지
 2. `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 assistant endpoint와 CLI 목록 교차 검증
-3. `tests/test_public_docs_contract.py`, `tests/test_ui_qa_checklist.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
+3. `tests/test_public_docs_contract.py`, `tests/test_user_document_e2e_plan.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
 4. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
 5. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
 
@@ -194,7 +197,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 5. UI에서 `POST /assistant/action-preview` 위험도/필요 입력값 표시 확인
 6. UI에서 `POST /assistant/message` 실제 메시지 전송과 `ui` 힌트 렌더링 확인
 7. UI에서 `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 대화 목록과 paging 확인
-8. 실제 사용자 `.md` 또는 `.txt` 문서 업로드 검증
+8. 사용자 승인과 실제 `.md` 또는 `.txt` 경로를 받은 뒤 실제 사용자 문서 업로드 검증
 9. `/search` 실제 embedding + Chroma 검색 재확인
 10. `/ask-with-docs` 실제 RAG 답변 품질 확인
 11. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
@@ -208,7 +211,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `257 passed`
+  - `.venv/bin/pytest`: `258 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공

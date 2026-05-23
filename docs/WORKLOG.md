@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `257 passed` |
+| `.venv/bin/pytest` | `258 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -897,6 +897,14 @@
 - `tests/test_user_document_e2e_plan.py`를 추가해 승인 조건, 저장 영향, `--sanitized-summary`, secret 미노출, TASKS 미완료 유지 계약을 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_user_document_e2e_plan.py tests/test_public_docs_contract.py tests/test_tasks_doc.py` 결과는 `19 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `257 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
+
+### Next handoff E2E approval boundary
+
+- `docs/NEXT_CHAT_HANDOFF.md`에 `docs/USER_DOCUMENT_E2E_PLAN.md`를 먼저 읽을 파일과 현재 상태에 추가했다.
+- 실제 사용자 문서 E2E는 사용자 승인과 실제 `.md`/`.txt` 경로가 있을 때만 실행하고, 승인 전에는 문서/테스트/API 계약 polish만 진행하도록 handoff 문구를 정리했다.
+- `tests/test_next_chat_handoff.py`를 보강해 실제 사용자 문서 E2E가 승인/경로/저장 영향/paste-safe summary 조건을 요구하는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_user_document_e2e_plan.py tests/test_public_docs_contract.py` 결과는 `21 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `258 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
