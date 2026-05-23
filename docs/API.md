@@ -902,6 +902,12 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
 ```
 
+승인된 실제 `.md` 또는 `.txt` 문서로 확인할 때는 `--document`를 사용한다. 이 모드는 SQLite, Chroma, `data/uploads/`에 기록을 추가할 수 있으므로 사용자 승인 후에만 실행한다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-notes.md --sanitized-summary
+```
+
 sanitized smoke summary는 `safe_to_paste=true`, `mode=document-rag`, `steps[].status`, `documents_count`, `results_count`, `sources_count`, `chunks_count`, `excluded_fields`를 포함하고, 질문/답변 원문, request id, header, 로컬 project root, stored path는 제외한다.
 
 브라우저 조작 없는 Assistant UI bridge smoke test:

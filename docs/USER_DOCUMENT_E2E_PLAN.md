@@ -41,7 +41,7 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000
 별도 터미널에서 승인된 문서만 대상으로 smoke를 실행한다.
 
 ```bash
-python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-notes.md --sanitized-summary
 ```
 
 `LOCAL_API_KEY`가 설정된 서버라면 CLI 또는 HTTP client가 `X-API-Key`를 보내도록 환경변수를 맞춘다. key 값 자체는 문서, 로그, GitHub, 채팅에 붙이지 않는다.

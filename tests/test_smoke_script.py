@@ -90,6 +90,43 @@ def test_smoke_script_calls_expected_api_flow(monkeypatch) -> None:
     assert calls[4]["json"]["question"] == "내 문서 기준으로 access token은 어디로 전달해?"
 
 
+def test_smoke_script_accepts_approved_user_document(monkeypatch, tmp_path) -> None:
+    calls: list[dict] = []
+    approved_doc = tmp_path / "approved-notes.md"
+    approved_doc.write_text("# Approved notes\n\naccess token은 header로 전달한다.", encoding="utf-8")
+
+    def client_factory(timeout: float) -> FakeClient:
+        return FakeClient(calls)
+
+    monkeypatch.setattr(smoke.httpx, "Client", client_factory)
+
+    summary = smoke.run_smoke_test("http://server.test/", document_paths=[str(approved_doc)])
+    safe = smoke.build_sanitized_smoke_summary(summary)
+
+    assert summary["document_source"] == "user-provided"
+    assert summary["user_documents_count"] == 1
+    assert calls[1]["files"]["file"][0] == "approved-notes.md"
+    assert calls[1]["files"]["file"][2] == "text/markdown"
+    assert safe["document_source"] == "user-provided"
+    assert safe["user_documents_count"] == 1
+    assert safe["steps"][1]["documents"] == [{"chunks_created": 1}]
+    assert "approved-notes.md" not in str(safe)
+
+
+def test_smoke_script_rejects_unsupported_user_document(tmp_path) -> None:
+    unsupported_doc = tmp_path / "notes.pdf"
+    unsupported_doc.write_bytes(b"%PDF")
+
+    try:
+        smoke.run_smoke_test("http://server.test/", document_paths=[str(unsupported_doc)])
+    except RuntimeError as exc:
+        assert "unsupported document type" in str(exc)
+        assert ".md" in str(exc)
+        assert ".txt" in str(exc)
+    else:
+        raise AssertionError("unsupported document should fail before any HTTP call")
+
+
 def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
     calls: list[dict] = []
 

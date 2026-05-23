@@ -15,7 +15,7 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
 
     assert ".venv/bin/pytest" in text
-    assert "258 passed" in text
+    assert "260 passed" in text
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert "git diff --check" in text
@@ -48,11 +48,9 @@ def test_next_chat_handoff_links_task_board_boundaries() -> None:
     assert "blocked 작업 경계" in text
 
 
-def test_next_chat_handoff_requires_approval_for_real_user_document_e2e() -> None:
+def test_next_chat_handoff_tracks_completed_real_user_document_e2e() -> None:
     text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
 
-    assert "사용자 승인과 실제 `.md`/`.txt` 경로" in text
-    assert "paste-safe summary" in text
-    assert "sanitized summary" in text
-    assert "저장 영향 승인 필요" in text
-    assert "승인 전에는 문서/테스트/API 계약 polish만 진행" in text
+    assert "실제 사용자 문서 E2E는 완료됨" in text
+    assert "완료된 실제 사용자 문서 E2E summary 정합성 유지" in text
+    assert "추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md` 또는 `.txt` 경로를 받은 뒤 실행" in text

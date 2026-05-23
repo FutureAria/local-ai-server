@@ -26,6 +26,11 @@ SAMPLE_DOCUMENTS = [
     ("smoke-architecture-notes.txt", SAMPLE_TEXT_TEXT, "text/plain"),
 ]
 
+SUPPORTED_USER_DOCUMENT_TYPES = {
+    ".md": "text/markdown",
+    ".txt": "text/plain",
+}
+
 DOCUMENT_RAG_SMOKE_FLOW = [
     "health",
     "upload",
@@ -84,6 +89,22 @@ def _write_sample_documents(temp_dir: str) -> list[tuple[Path, str]]:
     return sample_files
 
 
+def _prepare_user_documents(document_paths: list[str]) -> list[tuple[Path, str]]:
+    prepared_documents = []
+    for raw_path in document_paths:
+        path = Path(raw_path).expanduser().resolve()
+        if not path.exists():
+            raise RuntimeError(f"document does not exist: {path}")
+        if not path.is_file():
+            raise RuntimeError(f"document is not a file: {path}")
+        media_type = SUPPORTED_USER_DOCUMENT_TYPES.get(path.suffix.lower())
+        if media_type is None:
+            supported = ", ".join(sorted(SUPPORTED_USER_DOCUMENT_TYPES))
+            raise RuntimeError(f"unsupported document type: {path.suffix or '(none)'}; supported: {supported}")
+        prepared_documents.append((path, media_type))
+    return prepared_documents
+
+
 def run_assistant_bridge_preflight(base_url: str, timeout: float = 30.0) -> dict:
     base_url = base_url.rstrip("/")
     headers = _headers()
@@ -118,102 +139,121 @@ def run_assistant_bridge_preflight(base_url: str, timeout: float = 30.0) -> dict
     return summary
 
 
-def run_smoke_test(base_url: str, timeout: float = 120.0) -> dict:
+def _upload_and_run_rag_flow(
+    client: httpx.Client,
+    base_url: str,
+    headers: dict[str, str],
+    documents: list[tuple[Path, str]],
+    summary: dict,
+) -> None:
+    uploaded_documents = []
+    for document_path, media_type in documents:
+        with document_path.open("rb") as file:
+            upload = client.post(
+                f"{base_url}/documents/upload",
+                files={"file": (document_path.name, file, media_type)},
+                headers=headers,
+            )
+        _raise_for_status(f"upload {document_path.name}", upload)
+        upload_body = upload.json()
+        uploaded_documents.append(
+            {
+                "filename": upload_body.get("filename", document_path.name),
+                "document_id": upload_body["document_id"],
+                "chunks_created": upload_body["chunks_created"],
+            }
+        )
+    summary["steps"].append(
+        {
+            "step": "upload",
+            "status": 200,
+            "documents_count": len(uploaded_documents),
+            "documents": uploaded_documents,
+        }
+    )
+
+    search = client.post(
+        f"{base_url}/search",
+        json={"query": "Authorization header access token", "top_k": 3},
+        headers=headers,
+    )
+    _raise_for_status("search", search)
+    search_body = search.json()
+    summary["steps"].append(
+        {
+            "step": "search",
+            "status": search.status_code,
+            "results_count": len(search_body.get("results", [])),
+        }
+    )
+
+    ask_docs = client.post(
+        f"{base_url}/ask-with-docs",
+        json={"question": "내 문서 기준으로 access token은 어디로 전달해?", "top_k": 3},
+        headers=headers,
+    )
+    _raise_for_status("ask-with-docs", ask_docs)
+    ask_body = ask_docs.json()
+    summary["steps"].append(
+        {
+            "step": "ask-with-docs",
+            "status": ask_docs.status_code,
+            "request_id": ask_body["request_id"],
+            "sources_count": len(ask_body.get("sources", [])),
+        }
+    )
+
+    feedback = client.post(
+        f"{base_url}/feedback",
+        json={"request_id": ask_body["request_id"], "rating": "good", "note": "smoke test"},
+        headers=headers,
+    )
+    _raise_for_status("feedback", feedback)
+    feedback_body = feedback.json()
+    summary["steps"].append(
+        {
+            "step": "feedback",
+            "status": feedback.status_code,
+            "feedback_id": feedback_body["feedback_id"],
+        }
+    )
+
+    stats = client.get(f"{base_url}/documents/stats")
+    _raise_for_status("stats", stats)
+    stats_body = stats.json()
+    summary["steps"].append(
+        {
+            "step": "stats",
+            "status": stats.status_code,
+            "documents_count": stats_body["documents_count"],
+            "chunks_count": stats_body["chunks_count"],
+        }
+    )
+
+
+def run_smoke_test(base_url: str, timeout: float = 120.0, document_paths: list[str] | None = None) -> dict:
     base_url = base_url.rstrip("/")
     headers = _headers()
-    summary: dict = {"base_url": base_url, "sample_documents": [item[0] for item in SAMPLE_DOCUMENTS], "steps": []}
+    summary: dict = {"base_url": base_url, "steps": []}
+
+    if document_paths:
+        documents = _prepare_user_documents(document_paths)
+        summary["document_source"] = "user-provided"
+        summary["user_documents_count"] = len(documents)
+    else:
+        summary["document_source"] = "sample"
+        summary["sample_documents"] = [item[0] for item in SAMPLE_DOCUMENTS]
 
     with tempfile.TemporaryDirectory(prefix="local-ai-smoke-") as temp_dir:
-        sample_files = _write_sample_documents(temp_dir)
+        if not document_paths:
+            documents = _write_sample_documents(temp_dir)
 
         with httpx.Client(timeout=timeout) as client:
             health = client.get(f"{base_url}/health")
             _raise_for_status("health", health)
             summary["steps"].append({"step": "health", "status": health.status_code})
 
-            uploaded_documents = []
-            for sample_file, media_type in sample_files:
-                with sample_file.open("rb") as file:
-                    upload = client.post(
-                        f"{base_url}/documents/upload",
-                        files={"file": (sample_file.name, file, media_type)},
-                        headers=headers,
-                    )
-                _raise_for_status(f"upload {sample_file.name}", upload)
-                upload_body = upload.json()
-                uploaded_documents.append(
-                    {
-                        "filename": upload_body.get("filename", sample_file.name),
-                        "document_id": upload_body["document_id"],
-                        "chunks_created": upload_body["chunks_created"],
-                    }
-                )
-            summary["steps"].append(
-                {
-                    "step": "upload",
-                    "status": 200,
-                    "documents_count": len(uploaded_documents),
-                    "documents": uploaded_documents,
-                }
-            )
-
-            search = client.post(
-                f"{base_url}/search",
-                json={"query": "Authorization header access token", "top_k": 3},
-                headers=headers,
-            )
-            _raise_for_status("search", search)
-            search_body = search.json()
-            summary["steps"].append(
-                {
-                    "step": "search",
-                    "status": search.status_code,
-                    "results_count": len(search_body.get("results", [])),
-                }
-            )
-
-            ask_docs = client.post(
-                f"{base_url}/ask-with-docs",
-                json={"question": "내 문서 기준으로 access token은 어디로 전달해?", "top_k": 3},
-                headers=headers,
-            )
-            _raise_for_status("ask-with-docs", ask_docs)
-            ask_body = ask_docs.json()
-            summary["steps"].append(
-                {
-                    "step": "ask-with-docs",
-                    "status": ask_docs.status_code,
-                    "request_id": ask_body["request_id"],
-                    "sources_count": len(ask_body.get("sources", [])),
-                }
-            )
-
-            feedback = client.post(
-                f"{base_url}/feedback",
-                json={"request_id": ask_body["request_id"], "rating": "good", "note": "smoke test"},
-                headers=headers,
-            )
-            _raise_for_status("feedback", feedback)
-            feedback_body = feedback.json()
-            summary["steps"].append(
-                {
-                    "step": "feedback",
-                    "status": feedback.status_code,
-                    "feedback_id": feedback_body["feedback_id"],
-                }
-            )
-
-            stats = client.get(f"{base_url}/documents/stats")
-            _raise_for_status("stats", stats)
-            stats_body = stats.json()
-            summary["steps"].append(
-                {
-                    "step": "stats",
-                    "status": stats.status_code,
-                    "documents_count": stats_body["documents_count"],
-                    "chunks_count": stats_body["chunks_count"],
-                }
-            )
+            _upload_and_run_rag_flow(client, base_url, headers, documents, summary)
 
     summary["ok"] = True
     return summary
@@ -345,6 +385,9 @@ def build_sanitized_smoke_summary(summary: dict) -> dict:
 
     if "sample_documents" in summary:
         sanitized["sample_documents"] = summary["sample_documents"]
+    if summary.get("document_source") == "user-provided":
+        sanitized["document_source"] = "user-provided"
+        sanitized["user_documents_count"] = summary.get("user_documents_count")
     if "assistant_bridge" in summary:
         sanitized["assistant_bridge"] = build_sanitized_smoke_summary(summary["assistant_bridge"])
 
@@ -374,13 +417,18 @@ def build_sanitized_smoke_summary(summary: dict) -> dict:
             if key in step:
                 safe_step[key] = step[key]
         if step_name == "upload":
-            safe_step["documents"] = [
-                {
-                    "filename": item.get("filename"),
-                    "chunks_created": item.get("chunks_created"),
-                }
-                for item in step.get("documents", [])
-            ]
+            if summary.get("document_source") == "user-provided":
+                safe_step["documents"] = [
+                    {"chunks_created": item.get("chunks_created")} for item in step.get("documents", [])
+                ]
+            else:
+                safe_step["documents"] = [
+                    {
+                        "filename": item.get("filename"),
+                        "chunks_created": item.get("chunks_created"),
+                    }
+                    for item in step.get("documents", [])
+                ]
         sanitized["steps"].append(safe_step)
 
     return sanitized
@@ -410,13 +458,19 @@ def main() -> None:
         action="store_true",
         help="Print a paste-safe summary without prompt text, answer text, request ids, headers, or local project paths.",
     )
+    parser.add_argument(
+        "--document",
+        action="append",
+        default=[],
+        help="Approved real .md or .txt document path to upload for document/RAG smoke. Can be passed multiple times.",
+    )
     args = parser.parse_args()
     if args.assistant_bridge_preflight:
         result = run_assistant_bridge_preflight(args.base_url)
     elif args.assistant_bridge_only:
         result = run_assistant_bridge_smoke_test(args.base_url, project_root=args.project_root)
     else:
-        result = run_smoke_test(args.base_url)
+        result = run_smoke_test(args.base_url, document_paths=args.document)
         if args.include_assistant_bridge:
             result["assistant_bridge"] = run_assistant_bridge_smoke_test(args.base_url, project_root=args.project_root)
     if args.sanitized_summary:

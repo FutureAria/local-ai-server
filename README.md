@@ -62,6 +62,12 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
 ```
 
+승인된 실제 `.md` 또는 `.txt` 문서로 확인할 때는 `--document`를 사용합니다. 이 명령은 SQLite, Chroma, `data/uploads/`에 테스트 데이터를 추가할 수 있으므로 사용자 승인 후에만 실행합니다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-notes.md --sanitized-summary
+```
+
 `--sanitized-summary`는 질문/답변 원문, request id, header, 로컬 project root, stored path를 제외하고 `safe_to_paste=true`, `mode`, `excluded_fields`, step별 status/count만 남깁니다.
 
 검증 명령의 저장 영향:
@@ -1056,7 +1062,7 @@ ollama pull nomic-embed-text
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
 1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
-2. 실제 사용자 `.md`/`.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증 결과를 sanitized smoke summary로 기록
+2. 승인된 실제 사용자 `.md`/`.txt` 문서 E2E smoke summary가 민감 정보 없이 유지되는지 검증
 3. 대용량 색인 job/status API progress response schema preview-only 계약을 기준으로 실제 queue 활성화 조건 문서 유지
 4. Chroma 누락 vector 재생성 preview-only endpoint를 기준으로 실제 rebuild 활성화 조건 문서 유지
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지

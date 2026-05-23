@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `258 passed` |
+| `.venv/bin/pytest` | `260 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -905,6 +905,39 @@
 - `tests/test_next_chat_handoff.py`를 보강해 실제 사용자 문서 E2E가 승인/경로/저장 영향/paste-safe summary 조건을 요구하는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_user_document_e2e_plan.py tests/test_public_docs_contract.py` 결과는 `21 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `258 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
+
+### Approved user document E2E smoke
+
+- `scripts/smoke_test_api.py`에 `--document` 옵션을 추가해 승인된 실제 `.md`/`.txt` 문서로 document/RAG smoke를 실행할 수 있게 했다.
+- `--document` 실행의 sanitized summary는 `document_source=user-provided`, `user_documents_count`만 남기고 로컬 경로와 파일명은 제외한다.
+- 사용자 승인 후 공개용 프로젝트 문서인 `docs/PROJECT_SUMMARY.md`를 대상으로 `upload → search → ask-with-docs → feedback → stats` E2E를 실행했다.
+- 첫 실행은 `LOCAL_API_KEY` header 누락으로 `401 Unauthorized`가 발생했고, 키 값을 출력하지 않은 채 로컬 `.env`를 로드해 재실행했다.
+- 실제 E2E 실행은 SQLite, Chroma, `data/uploads/`에 테스트 데이터를 추가했다. 원본 문서는 삭제하거나 수정하지 않았다.
+- paste-safe summary:
+
+```json
+{
+  "ok": true,
+  "mode": "document-rag",
+  "base_url": "http://127.0.0.1:8000",
+  "steps": [
+    {"step": "health", "status": 200},
+    {"step": "upload", "status": 200, "documents_count": 1, "documents": [{"chunks_created": 11}]},
+    {"step": "search", "status": 200, "results_count": 3},
+    {"step": "ask-with-docs", "status": 200, "sources_count": 3},
+    {"step": "feedback", "status": 200, "feedback_id": 1},
+    {"step": "stats", "status": 200, "documents_count": 5, "chunks_count": 36}
+  ],
+  "safe_to_paste": true,
+  "excluded_fields": ["answer", "content", "headers", "note", "project_root", "question", "request_id", "stored_path"],
+  "document_source": "user-provided",
+  "user_documents_count": 1
+}
+```
+
+- `docs/TASKS.md`의 실제 사용자 문서 E2E 항목을 완료 상태로 갱신했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_user_document_e2e_plan.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_portfolio_docs_contract.py tests/test_readme_quick_start.py` 결과는 `37 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `260 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
