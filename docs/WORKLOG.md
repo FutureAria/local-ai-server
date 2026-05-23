@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `249 passed` |
+| `.venv/bin/pytest` | `250 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -863,6 +863,13 @@
 - `tests/test_smoke_summary_examples.py`를 추가해 예시 JSON이 document-rag와 assistant-bridge mode를 모두 포함하고, secret/local path/prompt/answer/content를 본문에 포함하지 않는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_public_docs_contract.py tests/test_tasks_doc.py` 결과는 `17 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `249 passed, 1 warning`, public release check는 `scanned_files=115`, finding 없음이다.
+
+### Smoke summary runtime count guard
+
+- `tests/test_smoke_summary_examples.py`를 보강해 `docs/SMOKE_SUMMARY_EXAMPLES.md`의 assistant bridge `api-inventory` count가 실제 `build_api_inventory(app.routes)` 결과와 일치하는지 검증한다.
+- `docs/TASKS.md`의 runtime endpoint count drift check 항목을 완료 상태로 갱신했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_tasks_doc.py` 결과는 `5 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `250 passed, 1 warning`, public release check는 `scanned_files=115`, finding 없음이다.
 
 ### 응답 형식 업데이트
 

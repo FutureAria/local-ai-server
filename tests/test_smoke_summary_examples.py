@@ -2,6 +2,9 @@ import json
 import re
 from pathlib import Path
 
+from app.main import app
+from app.services.project_status_service import build_api_inventory
+
 
 DOC = Path("docs/SMOKE_SUMMARY_EXAMPLES.md")
 
@@ -71,3 +74,12 @@ def test_smoke_summary_examples_cover_document_and_assistant_modes() -> None:
         "assistant-messages",
     }
     assert any(step.get("response_type") == "status" for step in assistant["steps"])
+
+
+def test_assistant_smoke_summary_api_inventory_counts_match_runtime() -> None:
+    _, assistant = _json_blocks()
+    runtime = build_api_inventory(app.routes)
+    inventory_step = next(step for step in assistant["steps"] if step["step"] == "api-inventory")
+
+    assert inventory_step["endpoints_count"] == runtime["endpoints_count"]
+    assert inventory_step["protected_endpoints_count"] == runtime["protected_endpoints_count"]
