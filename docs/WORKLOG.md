@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `244 passed` |
+| `.venv/bin/pytest` | `246 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -838,6 +838,15 @@
 - assistant endpoint는 API inventory에서 `requires_api_key=true`, read-only `/project/api-inventory`는 `requires_api_key=false`로 유지되는지 함께 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_ui_bridge_examples.py tests/test_ui_qa_checklist.py` 결과는 `21 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `244 passed, 1 warning`, public release check는 finding 없음이다.
+
+### Safe task board
+
+- `docs/TASKS.md`를 추가해 완료된 핵심 작업, Codex가 바로 할 수 있는 안전 작업, 사용자 수동 확인 작업, 보안 리뷰/승인이 필요한 작업, stop condition을 한 파일에 정리했다.
+- README `Key Docs`와 `docs/PROJECT_SUMMARY.md` 관련 문서 목록에 `docs/TASKS.md`를 연결했다.
+- `tests/test_tasks_doc.py`를 추가해 task board가 safe-next/manual-check/review-required 경계를 유지하고 공개 문서에서 링크되는지 검증한다.
+- `tests/test_public_docs_contract.py`의 공개 문서 링크/markdown 링크 검사 대상에도 `docs/TASKS.md`를 포함했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_tasks_doc.py tests/test_public_docs_contract.py` 결과는 `15 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `246 passed, 1 warning`, public release check는 `scanned_files=113`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
