@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `250 passed` |
+| `.venv/bin/pytest` | `253 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -870,6 +870,15 @@
 - `docs/TASKS.md`의 runtime endpoint count drift check 항목을 완료 상태로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_tasks_doc.py` 결과는 `5 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `250 passed, 1 warning`, public release check는 `scanned_files=115`, finding 없음이다.
+
+### Preview activation policy
+
+- `docs/PREVIEW_ACTIVATION_POLICY.md`를 추가해 `index-folder-job-preview`, `vector-rebuild-preview`, `repair-preview`의 현재 preview-only 계약과 실제 queue/rebuild/repair 활성화 전 조건을 분리해 문서화했다.
+- README `Key Docs`, `docs/PROJECT_SUMMARY.md`, public docs link contract에 `docs/PREVIEW_ACTIVATION_POLICY.md`를 연결했다.
+- `docs/TASKS.md`의 preview-only queue/rebuild 계약 유지 항목을 완료 상태로 갱신했다.
+- `tests/test_preview_activation_policy.py`를 추가해 preview-only 필드, 활성화 gate, stop condition, 공개 문서 링크를 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_preview_activation_policy.py tests/test_public_docs_contract.py tests/test_tasks_doc.py tests/test_repair_preview.py tests/test_document_stats.py` 결과는 `24 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `253 passed, 1 warning`, public release check는 `scanned_files=117`, finding 없음이다.
 
 ### 응답 형식 업데이트
 

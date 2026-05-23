@@ -119,6 +119,7 @@ local-ai assistant
 - 작업 보드: [docs/TASKS.md](docs/TASKS.md)
 - 로컬 운영 Runbook: [docs/OPERATIONS.md](docs/OPERATIONS.md)
 - Smoke summary 예시: [docs/SMOKE_SUMMARY_EXAMPLES.md](docs/SMOKE_SUMMARY_EXAMPLES.md)
+- Preview 활성화 정책: [docs/PREVIEW_ACTIVATION_POLICY.md](docs/PREVIEW_ACTIVATION_POLICY.md)
 - GitHub 공개 전 체크리스트: [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)
 - 공개 상태 요약: [docs/PUBLIC_RELEASE_SUMMARY.md](docs/PUBLIC_RELEASE_SUMMARY.md)
 - UI 연결 가이드: [docs/UI_CONNECT_GUIDE.md](docs/UI_CONNECT_GUIDE.md)

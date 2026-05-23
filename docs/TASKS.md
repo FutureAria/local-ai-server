@@ -37,8 +37,8 @@
 - [ ] assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 기준으로 유지
 - [x] `scripts/smoke_test_api.py --sanitized-summary` 결과 예시가 원문/secret/local path를 제외하는지 계속 검증
 - [ ] 실제 사용자 `.md` 또는 `.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증 결과를 paste-safe summary로 기록
-- [ ] 대용량 색인 job/status API progress response schema를 preview-only 계약 기준으로 문서화 유지
-- [ ] Chroma 누락 vector 재생성 preview-only endpoint 기준 실제 rebuild 활성화 조건 문서 유지
+- [x] 대용량 색인 job/status API progress response schema를 preview-only 계약 기준으로 문서화 유지
+- [x] Chroma 누락 vector 재생성 preview-only endpoint 기준 실제 rebuild 활성화 조건 문서 유지
 - [ ] `docs/NEXT_CHAT_HANDOFF.md`와 이 문서의 safe/manual/review 경계 정합성 유지
 
 ## 사용자 수동 확인 작업
