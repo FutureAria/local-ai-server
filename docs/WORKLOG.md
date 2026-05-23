@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `247 passed` |
+| `.venv/bin/pytest` | `249 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -854,6 +854,15 @@
 - `tests/test_next_chat_handoff.py`를 보강해 handoff가 task board와 작업 경계 문구를 계속 포함하는지 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_tasks_doc.py` 결과는 `6 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `247 passed, 1 warning`, public release check는 `scanned_files=113`, finding 없음이다.
+
+### Sanitized smoke summary examples
+
+- `docs/SMOKE_SUMMARY_EXAMPLES.md`를 추가해 document/RAG smoke와 assistant bridge smoke의 paste-safe summary 예시를 기록했다.
+- 예시는 `safe_to_paste=true`, `excluded_fields`, step별 status/count만 포함하고 질문/답변 원문, request id, header, API key, 로컬 project root, stored path를 제외한다.
+- README `Key Docs`, `docs/PROJECT_SUMMARY.md`, public docs link contract에 `docs/SMOKE_SUMMARY_EXAMPLES.md`를 연결했다.
+- `tests/test_smoke_summary_examples.py`를 추가해 예시 JSON이 document-rag와 assistant-bridge mode를 모두 포함하고, secret/local path/prompt/answer/content를 본문에 포함하지 않는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_public_docs_contract.py tests/test_tasks_doc.py` 결과는 `17 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `249 passed, 1 warning`, public release check는 `scanned_files=115`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
