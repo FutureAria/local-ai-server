@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `253 passed` |
+| `.venv/bin/pytest` | `254 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -879,6 +879,15 @@
 - `tests/test_preview_activation_policy.py`를 추가해 preview-only 필드, 활성화 gate, stop condition, 공개 문서 링크를 검증한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_preview_activation_policy.py tests/test_public_docs_contract.py tests/test_tasks_doc.py tests/test_repair_preview.py tests/test_document_stats.py` 결과는 `24 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `253 passed, 1 warning`, public release check는 `scanned_files=117`, finding 없음이다.
+
+### Safe task board completion state
+
+- `docs/TASKS.md`에서 자동 테스트로 이미 유지 중인 안전 항목을 완료 상태로 갱신했다.
+- 완료 처리한 항목은 endpoint/response field 계약, runtime endpoint count drift, assistant bridge smoke expected output/UI QA checklist, sanitized smoke summary, preview-only queue/rebuild activation policy, handoff/task boundary 정합성이다.
+- 실제 사용자 `.md`/`.txt` 문서 기반 E2E 재검증은 SQLite/Chroma/uploads 저장 영향이 있어 미완료 상태로 유지했다.
+- `tests/test_tasks_doc.py`를 보강해 자동화된 safe contract 항목은 완료 상태, 실제 사용자 문서 E2E는 미완료 상태로 유지되는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_tasks_doc.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `20 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `254 passed, 1 warning`, public release check는 `scanned_files=117`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
