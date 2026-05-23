@@ -35,6 +35,7 @@ git status
 - Typer CLI
 - SFT JSONL export
 - README, AGENTS, API, PROJECT_SUMMARY, CLAUDE_REVIEW_HANDOFF, WORKLOG, OPERATIONS, SECURITY 문서
+- `docs/TASKS.md`에 safe-next, manual-check, review-required, blocked 작업 경계 정리
 - GitHub 공개용 현재 상태 요약 문서 `docs/PUBLIC_RELEASE_SUMMARY.md`
 
 ## 먼저 읽을 파일
@@ -42,6 +43,7 @@ git status
 - `AGENTS.md`
 - `SECURITY.md`
 - `README.md`
+- `docs/TASKS.md`
 - `docs/API.md`
 - `docs/UI_BRIDGE_EXAMPLES.md`
 - `docs/UI_CONNECT_GUIDE.md`
@@ -206,7 +208,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `246 passed`
+  - `.venv/bin/pytest`: `247 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -225,6 +227,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `tests/test_readme_quick_start.py`를 추가해 README 상단 Quick Start, Verification, Safe Boundaries, Key Docs 계약을 검증한다.
 - `tests/test_readme_quick_start.py`를 보강해 README 상단 Highlights가 프로젝트 핵심과 안전 경계를 압축해 보여주는지 검증한다.
 - `tests/test_public_docs_contract.py`를 보강해 런타임 FastAPI endpoint와 Typer CLI command가 README/API 문서에서 누락되지 않도록 검증한다.
+- `tests/test_tasks_doc.py`를 추가해 `docs/TASKS.md`가 safe-next/manual-check/review-required 작업 경계와 stop condition을 유지하는지 검증한다.
 - `tests/test_ui_bridge_examples.py`를 보강해 `/assistant/ui-contract` 예시의 response type, refresh endpoint, blocked action이 실제 service 계약과 일치하는지 검증한다.
 - `tests/test_ui_qa_checklist.py`를 보강해 수동 QA 체크리스트가 `/assistant/ui-contract`의 startup sequence, refresh endpoint, message flow, response type, blocked action을 빠뜨리지 않도록 검증한다.
 - `tests/test_ui_connect_guide.py`를 보강해 UI 연결 가이드의 `/assistant/startup`과 `/assistant/bootstrap` 응답 필드 설명이 실제 Pydantic response schema와 어긋나지 않도록 검증한다.

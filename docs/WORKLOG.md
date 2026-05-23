@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `246 passed` |
+| `.venv/bin/pytest` | `247 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -847,6 +847,13 @@
 - `tests/test_public_docs_contract.py`의 공개 문서 링크/markdown 링크 검사 대상에도 `docs/TASKS.md`를 포함했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_tasks_doc.py tests/test_public_docs_contract.py` 결과는 `15 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `246 passed, 1 warning`, public release check는 `scanned_files=113`, finding 없음이다.
+
+### Handoff task board link
+
+- `docs/NEXT_CHAT_HANDOFF.md`의 먼저 읽을 파일과 현재 상태에 `docs/TASKS.md`를 추가해 다음 세션이 task board의 safe-next/manual-check/review-required 경계를 먼저 확인하도록 했다.
+- `tests/test_next_chat_handoff.py`를 보강해 handoff가 task board와 작업 경계 문구를 계속 포함하는지 검증한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_tasks_doc.py` 결과는 `6 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `247 passed, 1 warning`, public release check는 `scanned_files=113`, finding 없음이다.
 
 ### 응답 형식 업데이트
 
