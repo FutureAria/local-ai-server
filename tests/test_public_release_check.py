@@ -118,6 +118,8 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
         "setup.ps1",
         "setup.bat",
         "setup.cmd",
+        "export.csv",
+        "export.tsv",
     ],
 )
 def test_public_release_check_scans_common_config_and_script_files(
