@@ -36,6 +36,7 @@ CORE_CLI_COMMANDS = [
     "local-ai assistant-messages",
     "local-ai ask-docs",
     "local-ai index-preview",
+    "local-ai index-job-preview",
     "local-ai integrity",
     "local-ai vector-rebuild-preview",
     "local-ai agent-plan",

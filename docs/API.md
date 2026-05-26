@@ -873,6 +873,7 @@ local-ai ask-docs "질문"
 local-ai search "검색어"
 local-ai upload ./notes/backend.md
 local-ai index-preview ./notes
+local-ai index-job-preview ./notes
 local-ai index ./notes
 local-ai docs
 local-ai document-types

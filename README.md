@@ -90,6 +90,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /pa
 ```bash
 local-ai doctor
 local-ai index-preview ./notes
+local-ai index-job-preview ./notes
 local-ai index ./notes
 local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 local-ai assistant
@@ -483,6 +484,7 @@ local-ai upload ./notes/backend.md
 local-ai search "JWT"
 local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 local-ai index-preview ./backend-study
+local-ai index-job-preview ./backend-study
 local-ai index ./backend-study
 local-ai docs
 local-ai docs --source-type upload --file-type md --query backend

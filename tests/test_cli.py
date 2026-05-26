@@ -33,6 +33,7 @@ DIRECT_HTTP_CLI_ROUTE_CASES = [
     (["search", "JWT"], "POST", "/search"),
     (["index", "/tmp/notes"], "POST", "/documents/index-folder"),
     (["index-preview", "/tmp/notes"], "POST", "/documents/index-folder-preview"),
+    (["index-job-preview", "/tmp/notes"], "POST", "/documents/index-folder-job-preview"),
     (["docs"], "GET", "/documents"),
     (["document-types"], "GET", "/documents/supported-types"),
     (["chunks", "1"], "GET", "/documents/1/chunks"),

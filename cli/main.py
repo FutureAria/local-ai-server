@@ -418,6 +418,15 @@ def index_folder_preview(folder_path: Path, recursive: bool = True) -> None:
         )
 
 
+@app.command("index-job-preview")
+def index_folder_job_preview(folder_path: Path, recursive: bool = True) -> None:
+    payload = {"folder_path": str(folder_path), "recursive": recursive}
+    with httpx.Client(timeout=120.0) as client:
+        _print_response(
+            client.post(f"{_base_url()}/documents/index-folder-job-preview", json=payload, headers=_headers())
+        )
+
+
 @app.command("docs")
 def docs(
     source_type: str | None = None,

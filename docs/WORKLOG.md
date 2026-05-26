@@ -1035,3 +1035,12 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `15 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `276 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `276 passed, 1 warning`, public release check는 `scanned_files=120`, finding 없음이다.
+
+### Index job preview CLI contract
+
+- 2026-05-26 18:33 KST 기준으로 preview-only 대용량 색인 job/status endpoint에 대응하는 `local-ai index-job-preview` 명령을 추가했다.
+- CLI는 백엔드 비즈니스 로직을 중복하지 않고 `POST /documents/index-folder-job-preview`를 HTTP로 호출한다.
+- README, API reference, PROJECT_SUMMARY의 CLI 목록에 `local-ai index-job-preview`를 추가해 `docs/PREVIEW_ACTIVATION_POLICY.md`의 명령 표와 맞췄다.
+- `tests/test_cli.py`와 `tests/test_public_docs_contract.py`가 새 CLI 명령의 endpoint mapping과 공개 문서 노출을 검증한다.
+- 실제 queue 생성, SQLite 저장, embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_cli.py tests/test_public_docs_contract.py tests/test_readme_quick_start.py` 결과는 `42 passed, 1 warning`이다.
