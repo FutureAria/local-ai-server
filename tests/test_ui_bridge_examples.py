@@ -9,7 +9,11 @@ from app.schemas.assistant import (
     AssistantStartupResponse,
     AssistantUiContractResponse,
 )
-from app.schemas.documents import DocumentVectorRebuildPreviewResponse, IndexFolderJobPreviewResponse
+from app.schemas.documents import (
+    DocumentRepairPreviewResponse,
+    DocumentVectorRebuildPreviewResponse,
+    IndexFolderJobPreviewResponse,
+)
 from app.services.assistant_service import AssistantService
 from app.services.project_status_service import build_api_inventory
 
@@ -46,6 +50,9 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert '"job_id": "preview-only"' in text
     assert '"would_enqueue": false' in text
     assert '"embedding_batches_total": 2' in text
+    assert '"status": "needs_repair"' in text
+    assert '"action": "review_missing_file"' in text
+    assert '"action": "review_orphan_vector"' in text
     assert '"status": "needs_rebuild"' in text
     assert '"chunks_missing_vectors_count": 2' in text
     assert '"action": "rebuild_vector"' in text
@@ -146,6 +153,22 @@ def test_ui_bridge_vector_rebuild_preview_example_matches_schema() -> None:
     assert validated.embedding_batches_estimated == 1
     assert validated.actions_count == 2
     assert {action.action for action in validated.actions} == {"rebuild_vector"}
+    assert all(action.requires_user_approval for action in validated.actions)
+
+
+def test_ui_bridge_repair_preview_example_matches_schema() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+    example = _json_block_after_heading(text, "GET /documents/repair-preview")
+    validated = DocumentRepairPreviewResponse.model_validate(example)
+
+    assert validated.status == "needs_repair"
+    assert validated.dry_run is True
+    assert validated.actions_count == 3
+    assert {action.action for action in validated.actions} == {
+        "review_missing_file",
+        "rebuild_vector",
+        "review_orphan_vector",
+    }
     assert all(action.requires_user_approval for action in validated.actions)
 
 

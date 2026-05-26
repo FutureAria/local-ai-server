@@ -16,6 +16,7 @@ from app.schemas.assistant import (
     ProjectRootValidateRequest,
 )
 from app.schemas.documents import (
+    DocumentRepairPreviewResponse,
     DocumentVectorRebuildPreviewResponse,
     IndexFolderJobPreviewResponse,
     IndexFolderRequest,
@@ -167,6 +168,23 @@ def test_api_docs_vector_rebuild_preview_response_example_matches_schema() -> No
     assert all(action.action == "rebuild_vector" for action in validated.actions)
     assert all(action.requires_user_approval for action in validated.actions)
     assert "실제 Ollama embedding 생성" in validated.note
+
+
+def test_api_docs_repair_preview_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/repair-preview")
+    validated = DocumentRepairPreviewResponse.model_validate(example)
+
+    assert validated.status == "needs_repair"
+    assert validated.dry_run is True
+    assert validated.actions_count == 3
+    assert {action.action for action in validated.actions} == {
+        "review_missing_file",
+        "rebuild_vector",
+        "review_orphan_vector",
+    }
+    assert all(action.requires_user_approval for action in validated.actions)
+    assert "실제 파일 삭제" in validated.note
 
 
 def test_api_docs_response_core_fields_match_response_models() -> None:

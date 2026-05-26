@@ -1062,3 +1062,13 @@
 - `tests/test_api_docs_payloads.py`와 `tests/test_ui_bridge_examples.py`가 문서 JSON 예시를 `DocumentVectorRebuildPreviewResponse` schema로 직접 검증한다.
 - 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정, repair/delete/rebuild 실행, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_ui_bridge_examples.py tests/test_ui_connect_guide.py tests/test_ui_contract_cheatsheet.py tests/test_repair_preview.py tests/test_document_stats.py` 결과는 `28 passed, 1 warning`이다.
+
+### Repair preview response schema examples
+
+- 2026-05-26 18:46 KST 기준으로 `GET /documents/repair-preview`의 read-only response example을 API reference와 UI bridge examples에 추가했다.
+- 예시는 `status=needs_repair`, `dry_run=true`, `actions_count`, `actions[].action`, `actions[].requires_user_approval=true`를 명시한다.
+- `review_missing_file`, `rebuild_vector`, `review_orphan_vector` 후보를 모두 보여주되 실제 파일 삭제, DB 수정, Chroma 수정은 수행하지 않는다고 문서화했다.
+- UI_CONNECT_GUIDE와 UI_CONTRACT_CHEATSHEET도 같은 repair preview 표시 필드를 강조하도록 갱신했다.
+- `tests/test_api_docs_payloads.py`와 `tests/test_ui_bridge_examples.py`가 문서 JSON 예시를 `DocumentRepairPreviewResponse` schema로 직접 검증한다.
+- 실제 repair/delete/rebuild, DB 수정, Chroma write/delete, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_ui_bridge_examples.py tests/test_ui_connect_guide.py tests/test_ui_contract_cheatsheet.py tests/test_repair_preview.py tests/test_document_stats.py tests/test_preview_activation_policy.py` 결과는 `33 passed, 1 warning`이다.

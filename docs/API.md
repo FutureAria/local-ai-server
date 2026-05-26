@@ -672,6 +672,48 @@ curl http://127.0.0.1:8000/documents/integrity
 curl http://127.0.0.1:8000/documents/repair-preview
 ```
 
+응답 예시:
+
+```json
+{
+  "status": "needs_repair",
+  "dry_run": true,
+  "actions_count": 3,
+  "actions": [
+    {
+      "action": "review_missing_file",
+      "target_type": "document",
+      "target_id": 1,
+      "reason": "stored_path가 존재하지 않습니다: /Users/example/local-ai-server/data/uploads/missing.md",
+      "requires_user_approval": true
+    },
+    {
+      "action": "rebuild_vector",
+      "target_type": "chunk",
+      "target_id": 10,
+      "reason": "SQLite chunk는 있지만 Chroma vector가 없습니다.",
+      "requires_user_approval": true
+    },
+    {
+      "action": "review_orphan_vector",
+      "target_type": "chroma_vector",
+      "target_id": 99,
+      "reason": "Chroma vector는 있지만 SQLite chunk가 없습니다.",
+      "requires_user_approval": true
+    }
+  ],
+  "note": "미리보기 전용입니다. 실제 파일 삭제, DB 수정, Chroma 수정은 수행하지 않습니다."
+}
+```
+
+응답 핵심 필드:
+
+- `status`
+- `dry_run`
+- `actions_count`
+- `actions`
+- `note`
+
 ### `GET /documents/vector-rebuild-preview`
 
 Chroma vector가 누락된 SQLite chunk만 대상으로 재생성 후보를 반환한다. 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정은 수행하지 않는다.
