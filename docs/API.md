@@ -511,8 +511,51 @@ curl -X POST http://127.0.0.1:8000/documents/index-folder-preview \
   -d '{"folder_path":"./notes","recursive":true}'
 ```
 
+응답 예시:
+
+```json
+{
+  "folder_path": "/Users/example/notes",
+  "recursive": true,
+  "files_count": 2,
+  "skipped_files_count": 1,
+  "chunks_estimated": 5,
+  "embedding_batch_size": 8,
+  "embedding_batches_estimated": 1,
+  "token_estimate": 1200,
+  "files": [
+    {
+      "path": "/Users/example/notes/backend.md",
+      "filename": "backend.md",
+      "file_type": "md",
+      "chunks_estimated": 3,
+      "embedding_batches_estimated": 1,
+      "token_estimate": 700
+    },
+    {
+      "path": "/Users/example/notes/security.txt",
+      "filename": "security.txt",
+      "file_type": "txt",
+      "chunks_estimated": 2,
+      "embedding_batches_estimated": 1,
+      "token_estimate": 500
+    }
+  ],
+  "skipped_files": [
+    {
+      "path": "/Users/example/notes/broken.pdf",
+      "reason": "PDF에서 추출 가능한 텍스트가 없습니다."
+    }
+  ],
+  "dry_run": true,
+  "note": "미리보기 전용입니다. 파일 수정, DB 저장, embedding 생성, Chroma 저장은 수행하지 않습니다."
+}
+```
+
 응답 핵심 필드:
 
+- `folder_path`
+- `recursive`
 - `files_count`
 - `skipped_files_count`
 - `chunks_estimated`

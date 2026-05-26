@@ -21,6 +21,7 @@ from app.schemas.documents import (
     DocumentStatsResponse,
     DocumentVectorRebuildPreviewResponse,
     IndexFolderJobPreviewResponse,
+    IndexFolderPreviewResponse,
     IndexFolderRequest,
     SupportedDocumentTypesResponse,
 )
@@ -156,6 +157,23 @@ def test_api_docs_index_job_preview_response_example_matches_schema() -> None:
     assert validated.progress.embedding_batches_completed == 0
     assert validated.progress.percent == 0
     assert "queue 생성" in validated.note
+
+
+def test_api_docs_index_folder_preview_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "POST /documents/index-folder-preview")
+    validated = IndexFolderPreviewResponse.model_validate(example)
+
+    assert validated.folder_path == "/Users/example/notes"
+    assert validated.recursive is True
+    assert validated.files_count == 2
+    assert validated.skipped_files_count == 1
+    assert validated.chunks_estimated == 5
+    assert validated.embedding_batches_estimated == 1
+    assert validated.dry_run is True
+    assert {file.file_type for file in validated.files} == {"md", "txt"}
+    assert validated.skipped_files[0].path.endswith("broken.pdf")
+    assert "embedding 생성" in validated.note
 
 
 def test_api_docs_supported_types_response_example_matches_schema() -> None:
