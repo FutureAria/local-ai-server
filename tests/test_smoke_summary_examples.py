@@ -92,6 +92,15 @@ def test_smoke_summary_examples_match_sanitized_summary_shape() -> None:
             assert set(step) == STEP_KEYS[step_name]
 
 
+def test_smoke_summary_usage_rules_document_all_excluded_fields() -> None:
+    text = DOC.read_text(encoding="utf-8")
+    usage_rules = text.split("## 사용 규칙", 1)[1]
+
+    assert "SANITIZED_SUMMARY_EXCLUDED_FIELDS" in usage_rules
+    for field in smoke.SANITIZED_SUMMARY_EXCLUDED_FIELDS:
+        assert f"`{field}`" in usage_rules
+
+
 def test_assistant_smoke_summary_api_inventory_counts_match_runtime() -> None:
     _, assistant = _json_blocks()
     runtime = build_api_inventory(app.routes)

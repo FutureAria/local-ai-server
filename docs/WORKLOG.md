@@ -1210,3 +1210,16 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `24 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `305 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `305 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### Smoke sanitized summary excluded-field guard
+
+- 2026-05-26 19:57 KST 기준으로 `scripts/smoke_test_api.py --sanitized-summary`의 paste-safe 계약을 더 촘촘히 검증하도록 테스트를 보강했다.
+- `tests/test_smoke_script.py`가 raw summary에 포함된 `question`, `answer`, `content`, `headers`, `note`, `api_key`, `project_root`, `request_id`, `stored_path`, `document_id`, `chunk_id` key와 민감 값이 sanitized summary 본문에서 재귀적으로 제거되는지 확인한다.
+- `tests/test_smoke_summary_examples.py`가 `docs/SMOKE_SUMMARY_EXAMPLES.md` 사용 규칙에 `SANITIZED_SUMMARY_EXCLUDED_FIELDS` 전체 목록이 문서화되어 있는지 확인한다.
+- `docs/SMOKE_SUMMARY_EXAMPLES.md`의 사용 규칙을 script 상수와 같은 excluded field 목록 기준으로 명확히 보강했다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `307 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_smoke_summary_examples.py` 결과는 `18 passed, 1 warning`이다.
+- targeted contract self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_smoke_summary_examples.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `36 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `307 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `307 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.

@@ -140,7 +140,8 @@
 ## 사용 규칙
 
 - `safe_to_paste=true`가 없으면 공개 문서나 작업 기록에 붙이지 않는다.
-- `excluded_fields`에 `request_id`, `headers`, `api_key`, `project_root`, `stored_path`가 포함되어 있는지 확인한다.
+- `excluded_fields`는 `scripts/smoke_test_api.py`의 `SANITIZED_SUMMARY_EXCLUDED_FIELDS`와 같아야 한다.
+- `excluded_fields`에는 `question`, `answer`, `content`, `headers`, `note`, `api_key`, `project_root`, `request_id`, `stored_path`, `document_id`, `chunk_id`가 포함되어야 한다.
 - 문서/RAG smoke는 SQLite, Chroma, `data/uploads/`에 테스트 데이터를 추가할 수 있다.
 - Assistant bridge smoke는 SQLite에 assistant session/message 기록을 추가할 수 있다.
 - `.env`, 실제 `LOCAL_API_KEY`, 로컬 절대 경로, 문서 원문, 답변 원문은 기록하지 않는다.

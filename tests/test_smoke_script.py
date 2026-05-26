@@ -5,6 +5,20 @@ import scripts.smoke_test_api as smoke
 SMOKE_DOCS = ["README.md", "docs/OPERATIONS.md"]
 
 
+def _collect_dict_keys(value) -> set[str]:
+    if isinstance(value, dict):
+        keys = set(value)
+        for child in value.values():
+            keys.update(_collect_dict_keys(child))
+        return keys
+    if isinstance(value, list):
+        keys: set[str] = set()
+        for child in value:
+            keys.update(_collect_dict_keys(child))
+        return keys
+    return set()
+
+
 class FakeResponse:
     def __init__(self, status_code: int, payload: dict) -> None:
         self.status_code = status_code
@@ -227,6 +241,89 @@ def test_sanitized_smoke_summary_omits_sensitive_or_noisy_fields(monkeypatch) ->
     assert "document_id" not in encoded
     assert "Authorization header access token" not in encoded
     assert "secret" not in encoded
+
+
+def test_sanitized_summary_removes_configured_excluded_keys_recursively() -> None:
+    raw_summary = {
+        "ok": True,
+        "base_url": "http://server.test",
+        "sample_documents": ["safe.md"],
+        "headers": {"X-API-Key": "secret"},
+        "api_key": "secret",
+        "project_root": "/Users/juyoung/local-ai-server",
+        "steps": [
+            {
+                "step": "upload",
+                "status": 200,
+                "documents_count": 1,
+                "documents": [
+                    {
+                        "filename": "safe.md",
+                        "chunks_created": 1,
+                        "document_id": 123,
+                        "chunk_id": 456,
+                        "stored_path": "/Users/juyoung/local-ai-server/data/uploads/safe.md",
+                        "content": "private document body",
+                    }
+                ],
+            },
+            {
+                "step": "ask-with-docs",
+                "status": 200,
+                "request_id": "789",
+                "question": "private question",
+                "answer": "private answer",
+                "content": "private retrieved chunk",
+                "note": "private note",
+                "sources_count": 1,
+            },
+        ],
+        "assistant_bridge": {
+            "ok": True,
+            "base_url": "http://server.test",
+            "project_root": "/Users/juyoung/local-ai-server",
+            "steps": [
+                {
+                    "step": "assistant-message",
+                    "status": 200,
+                    "session_id": "session-1",
+                    "request_id": "abc",
+                    "question": "private assistant input",
+                    "answer": "private assistant output",
+                    "response_type": "status",
+                }
+            ],
+        },
+    }
+
+    safe = smoke.build_sanitized_smoke_summary(raw_summary)
+    safe_without_excluded = dict(safe)
+    safe_without_excluded.pop("excluded_fields", None)
+    encoded = str(safe_without_excluded)
+    keys = _collect_dict_keys(safe_without_excluded)
+
+    for key in smoke.SANITIZED_SUMMARY_EXCLUDED_FIELDS:
+        assert key not in keys
+
+    for fragment in [
+        "secret",
+        "/Users/juyoung",
+        "private question",
+        "private answer",
+        "private document body",
+        "private retrieved chunk",
+        "private assistant input",
+        "private assistant output",
+        "789",
+        "abc",
+    ]:
+        assert fragment not in encoded
+
+    assert safe["safe_to_paste"] is True
+    assert safe["assistant_bridge"]["safe_to_paste"] is True
+    assert safe["steps"][0]["documents"] == [{"filename": "safe.md", "chunks_created": 1}]
+    assert safe["steps"][1]["sources_count"] == 1
+    assert safe["assistant_bridge"]["steps"][0]["response_type"] == "status"
 
 
 def test_sanitized_assistant_summary_omits_project_root(monkeypatch) -> None:
