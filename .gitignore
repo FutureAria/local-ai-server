@@ -18,6 +18,9 @@ venv/
 .gcloud/
 .azure/
 .kube/
+credentials.json
+client_secret*.json
+service-account*.json
 *.key
 *.pem
 *.crt
