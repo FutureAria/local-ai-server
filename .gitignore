@@ -8,6 +8,10 @@ venv/
 .env
 .env.*
 !.env.example
+.envrc
+.npmrc
+.pypirc
+.netrc
 *.key
 *.pem
 *.crt

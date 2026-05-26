@@ -23,6 +23,10 @@ DEFAULT_EXCLUDED_DIRS = {
 PUBLIC_RELEASE_PRIVATE_DATA = (
     ".env",
     ".env.*",
+    ".envrc",
+    ".npmrc",
+    ".pypirc",
+    ".netrc",
     "*.key",
     "*.pem",
     "*.crt",
@@ -46,6 +50,10 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
 
 SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)\.env($|\.)", re.IGNORECASE),
+    re.compile(r"(^|/)\.envrc$", re.IGNORECASE),
+    re.compile(r"(^|/)\.npmrc$", re.IGNORECASE),
+    re.compile(r"(^|/)\.pypirc$", re.IGNORECASE),
+    re.compile(r"(^|/)\.netrc$", re.IGNORECASE),
     re.compile(r"(^|/)[^/]+\.key$", re.IGNORECASE),
     re.compile(r"(^|/)[^/]+\.pem$", re.IGNORECASE),
     re.compile(r"(^|/)[^/]+\.crt$", re.IGNORECASE),

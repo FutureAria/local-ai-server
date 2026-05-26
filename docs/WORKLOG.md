@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-26 23:57 KST
+
+### Public release credential dotfile guard
+
+- `.gitignore`, `scripts/public_release_check.py`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`, `SECURITY.md`가 `.envrc`, `.npmrc`, `.pypirc`, `.netrc` credential dotfile을 GitHub 공개 전 제외 대상으로 함께 다루도록 맞췄다.
+- `tests/test_public_release_check.py`가 direnv, npm, PyPI, netrc credential 파일 후보를 high finding으로 감지하고 `.gitignore`/release checklist/public summary 문서 계약과 일치하는지 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `359 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py` | `66 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `359 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 23:54 KST
 
 ### Public release provider and certificate guard
