@@ -19,6 +19,7 @@ from app.schemas.documents import (
     DocumentIntegrityResponse,
     DocumentRepairPreviewResponse,
     DocumentStatsResponse,
+    DocumentUploadResponse,
     DocumentVectorRebuildPreviewResponse,
     IndexFolderResponse,
     IndexFolderJobPreviewResponse,
@@ -158,6 +159,16 @@ def test_api_docs_index_job_preview_response_example_matches_schema() -> None:
     assert validated.progress.embedding_batches_completed == 0
     assert validated.progress.percent == 0
     assert "queue 생성" in validated.note
+
+
+def test_api_docs_document_upload_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "POST /documents/upload")
+    validated = DocumentUploadResponse.model_validate(example)
+
+    assert validated.document_id == 1
+    assert validated.filename == "backend.md"
+    assert validated.chunks_created == 3
 
 
 def test_api_docs_index_folder_preview_response_example_matches_schema() -> None:

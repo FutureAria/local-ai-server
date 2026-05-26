@@ -1105,3 +1105,10 @@
 - `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `IndexFolderResponse` schema로 직접 검증한다.
 - 실제 폴더 색인, SQLite 저장, Ollama embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_document_service.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `59 passed, 1 warning`이다.
+
+### Document upload response schema example
+
+- 2026-05-26 19:02 KST 기준으로 `POST /documents/upload` response example의 핵심 필드 목록을 API reference에 추가했다.
+- 기존 upload response example을 `DocumentUploadResponse` schema로 직접 검증하는 테스트를 추가했다.
+- 실제 파일 업로드, SQLite 저장, Ollama embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `56 passed, 1 warning`이다.

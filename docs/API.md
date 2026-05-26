@@ -501,6 +501,12 @@ curl -X POST http://127.0.0.1:8000/documents/upload \
 }
 ```
 
+응답 핵심 필드:
+
+- `document_id`
+- `filename`
+- `chunks_created`
+
 ### `POST /documents/index-folder-preview`
 
 실제 저장 전에 폴더 색인 예상 작업량을 read-only로 확인한다. 원본 파일 수정, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않는다.
