@@ -115,6 +115,9 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
         "main.tf",
         "terraform.tfvars",
         "terragrunt.hcl",
+        "setup.ps1",
+        "setup.bat",
+        "setup.cmd",
     ],
 )
 def test_public_release_check_scans_common_config_and_script_files(
