@@ -265,6 +265,21 @@ def test_runtime_cli_commands_are_documented_in_readme_and_api_reference() -> No
     assert not missing_from_api
 
 
+def test_api_reference_cli_block_matches_typer_commands() -> None:
+    api_text = DOCS["api"].read_text(encoding="utf-8")
+    cli_section = api_text.split("## CLI 대응", 1)[1]
+    block_match = re.search(r"```bash\n(.*?)\n```", cli_section, flags=re.S)
+    assert block_match is not None
+
+    documented_commands = {
+        match.group(1)
+        for match in re.finditer(r"(?m)^local-ai\s+([a-z][a-z0-9-]*)", block_match.group(1))
+    }
+    runtime_commands = set(get_command(cli_main.app).commands)
+
+    assert documented_commands == runtime_commands
+
+
 def test_readme_and_project_summary_contract_snapshots_match_runtime() -> None:
     runtime = build_api_inventory(app.routes)
     commands = get_command(cli_main.app).commands

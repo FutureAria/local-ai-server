@@ -1355,3 +1355,12 @@
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `45 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### API reference CLI block runtime guard
+
+- 2026-05-26 21:19 KST 기준으로 `tests/test_public_docs_contract.py`가 `docs/API.md`의 `## CLI 대응` bash block에 적힌 `local-ai` command set과 실제 Typer command set이 정확히 같은지 검증하도록 보강했다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `313 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_cli.py` 결과는 `46 passed, 1 warning`이다.
+- targeted docs-count self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py tests/test_readme_quick_start.py tests/test_cli.py` 결과는 `65 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `313 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
