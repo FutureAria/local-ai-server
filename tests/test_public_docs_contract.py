@@ -147,6 +147,7 @@ PUBLIC_MARKDOWN_FILES = [
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 INTERNAL_FASTAPI_PATHS = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
 LOCAL_AI_COMMAND_RE = re.compile(r"(?<![\w-])local-ai\s+([a-z][a-z0-9-]*)")
+ENDPOINT_TOKEN_RE = re.compile(r"`(GET|POST|DELETE|PUT|PATCH) ([^`]+)`")
 
 
 def _link_target_exists(source: Path, raw_target: str) -> bool:
@@ -262,6 +263,10 @@ def test_runtime_api_inventory_is_documented_in_api_reference() -> None:
         for method in endpoint["methods"]
     }
     assert all(f"`{endpoint}`" in public_read_only_section for endpoint in public_endpoints)
+    documented_public_endpoints = {
+        f"{method} {path}" for method, path in ENDPOINT_TOKEN_RE.findall(public_read_only_section)
+    }
+    assert documented_public_endpoints == public_endpoints
 
 
 def test_runtime_cli_commands_are_documented_in_readme_and_api_reference() -> None:
@@ -310,6 +315,14 @@ def test_readme_and_project_summary_contract_snapshots_match_runtime() -> None:
         assert "## Runtime Contract Snapshot" in text
         for label, value in expected_rows.items():
             assert f"| {label} | {value} |" in text
+
+    api_text = DOCS["api"].read_text(encoding="utf-8")
+    public_read_only_section = api_text.split("현재 API key 없이 읽을 수 있는 public read-only endpoint는", 1)[1].split(
+        "이다.",
+        1,
+    )[0]
+    documented_public_count = len(ENDPOINT_TOKEN_RE.findall(public_read_only_section))
+    assert documented_public_count == expected_rows["Public endpoints"]
 
 
 def test_public_docs_keep_safety_boundaries_visible() -> None:

@@ -1372,3 +1372,11 @@
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_security.py tests/test_api_contracts.py` 결과는 `70 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `313 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### Public endpoint snapshot cross-check guard
+
+- 2026-05-26 21:26 KST 기준으로 `tests/test_public_docs_contract.py`가 API reference public read-only endpoint 문장의 endpoint set이 runtime inventory의 public endpoint set과 정확히 같은지 검증하도록 보강했다.
+- 같은 테스트가 README와 `docs/PROJECT_SUMMARY.md`의 `Public endpoints` snapshot 값이 API reference public endpoint 문장 개수와도 일치하는지 확인한다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_security.py tests/test_api_contracts.py` 결과는 `70 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `313 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
