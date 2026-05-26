@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-26 23:00 KST
+
+### Public release JSON and YAML secret guard
+
+- `scripts/public_release_check.py`가 `.env` 형식뿐 아니라 JSON/YAML의 quoted `api_key`, unquoted `token`, `secret`, `password` 후보도 감지하도록 보강했다.
+- 코드 변수명인 `requires_api_key` 같은 일반 문자열을 오탐하지 않도록 colon 기반 패턴은 quoted JSON 값 또는 한 줄 YAML 값으로 제한했다.
+- `tests/test_public_release_check.py`가 JSON/YAML secret 후보와 placeholder 허용 계약을 함께 검증한다.
+- 공개 요약 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `322 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_local_ci_check.py` | `19 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `322 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:56 KST
 
 ### Public release placeholder guard
