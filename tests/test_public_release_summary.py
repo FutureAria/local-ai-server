@@ -80,6 +80,7 @@ def test_public_release_summary_keeps_private_data_and_verification_visible() ->
         ".venv/bin/pytest",
         ".venv/bin/python -m compileall app cli scripts",
         ".venv/bin/python scripts/public_release_check.py --root . --json",
+        ".venv/bin/python scripts/local_ci_check.py --root .",
         "git diff --check",
     ]
 

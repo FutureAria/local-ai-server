@@ -18,6 +18,7 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     assert "314 passed" in text
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
+    assert ".venv/bin/python scripts/local_ci_check.py --root ." in text
     assert "git diff --check" in text
     assert "message(auto/status intent)" in text
     assert "message(status)" not in text

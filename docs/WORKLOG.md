@@ -1,5 +1,20 @@
 # WORKLOG
 
+## 2026-05-26 21:48 KST
+
+### Release verification command guard
+
+- `docs/PUBLIC_RELEASE_SUMMARY.md`, `docs/RELEASE_CHECKLIST.md`, `docs/NEXT_CHAT_HANDOFF.md`의 최종 검증 명령에서 `scripts/local_ci_check.py` 실행 예시를 `.venv/bin/python` 기준으로 통일했다.
+- `tests/test_public_release_summary.py`와 `tests/test_next_chat_handoff.py`가 release/handoff 문서에 `.venv/bin/python scripts/local_ci_check.py --root .`를 유지하도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_summary.py tests/test_next_chat_handoff.py tests/test_tasks_doc.py tests/test_operations_runbook.py tests/test_public_docs_contract.py` | `37 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `314 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 21:45 KST
 
 ### UI QA checklist contract guard

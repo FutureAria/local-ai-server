@@ -25,7 +25,7 @@
 .venv/bin/python -m compileall app cli scripts
 .venv/bin/python scripts/public_release_check.py --root . --json
 git diff --check
-python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root .
 ```
 
 통과 기준:
@@ -34,7 +34,7 @@ python scripts/local_ci_check.py --root .
 - [ ] compileall이 성공한다.
 - [ ] public release check가 `ok=true`를 반환한다.
 - [ ] `git diff --check`가 whitespace 오류를 출력하지 않는다.
-- [ ] `python scripts/local_ci_check.py --root .`가 통과한다.
+- [ ] `.venv/bin/python scripts/local_ci_check.py --root .`가 통과한다.
 - [ ] `tests/test_smoke_script.py`가 sanitized smoke summary 계약을 검증한다.
 - [ ] `tests/test_ui_bridge_examples.py`가 runtime endpoint count drift check를 검증한다.
 - [ ] `tests/test_public_docs_contract.py`가 README/Project Summary Runtime Contract Snapshot 값을 실제 API/CLI/smoke flow inventory와 비교한다.

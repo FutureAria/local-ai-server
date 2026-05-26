@@ -222,7 +222,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
-  - `python scripts/local_ci_check.py --root .`: 성공
+  - `.venv/bin/python scripts/local_ci_check.py --root .`: 성공
 
 ## 최근 테스트 보강
 

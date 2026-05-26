@@ -84,7 +84,7 @@
 .venv/bin/python -m compileall app cli scripts
 .venv/bin/python scripts/public_release_check.py --root . --json
 git diff --check
-python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root .
 ```
 
 현재 검증 상태:
@@ -93,7 +93,7 @@ python scripts/local_ci_check.py --root .
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
-- `python scripts/local_ci_check.py --root .`: 성공
+- `.venv/bin/python scripts/local_ci_check.py --root .`: 성공
 
 ## 명확한 한계
 
@@ -133,5 +133,5 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 - [ ] `README.md`의 배포 상태가 로컬 실행 기준으로 표시되어 있는지 확인
 - [ ] README와 Project Summary의 기능 경계 표가 현재 구현과 맞는지 확인
 - [ ] README, Project Summary, Public Release Summary의 다음 개선 경계가 서로 맞는지 확인
-- [ ] `python scripts/public_release_check.py --root . --json` 결과 확인
+- [ ] `.venv/bin/python scripts/public_release_check.py --root . --json` 결과 확인
 - [ ] 민감 파일이 staging되지 않았는지 `git status --short`로 확인
