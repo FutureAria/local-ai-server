@@ -77,6 +77,8 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
     "data/*.jsonl",
     "*.tfstate",
     "*.tfstate.*",
+    "Pulumi.*.yaml",
+    "Pulumi.*.json",
 )
 
 SENSITIVE_PATH_PATTERNS = [
@@ -126,6 +128,7 @@ SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)[^/]+\.log$", re.IGNORECASE),
     re.compile(r"(^|/)data/.*\.jsonl$"),
     re.compile(r"(^|/)[^/]+\.tfstate($|\.)", re.IGNORECASE),
+    re.compile(r"(^|/)Pulumi\.[^/]+\.(yaml|json)$"),
 ]
 
 SECRET_TEXT_PATTERNS = [

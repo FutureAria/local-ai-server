@@ -85,6 +85,7 @@
 - `logs/`, `*.log`
 - `data/*.jsonl`
 - `*.tfstate`, `*.tfstate.*`
+- `Pulumi.*.yaml`, `Pulumi.*.json`
 - 개인 문서 원문
 - API key, token, password, private key, certificate, credential
 
@@ -102,7 +103,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `408 passed`
+- `.venv/bin/pytest`: `410 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

@@ -71,6 +71,8 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
         ("data/sft_dataset.jsonl", "{}\n"),
         ("terraform.tfstate", "{}"),
         ("terraform.tfstate.backup", "{}"),
+        ("Pulumi.dev.yaml", "config: {}"),
+        ("Pulumi.prod.json", "{}"),
     ],
 )
 def test_public_release_check_flags_all_private_data_patterns(
@@ -281,6 +283,8 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
         "data/*.jsonl": ["data/*.jsonl"],
         "*.tfstate": ["*.tfstate"],
         "*.tfstate.*": ["*.tfstate.*"],
+        "Pulumi.*.yaml": ["Pulumi.*.yaml"],
+        "Pulumi.*.json": ["Pulumi.*.json"],
     }
 
     assert set(PUBLIC_RELEASE_PRIVATE_DATA) == set(gitignore_coverage)
