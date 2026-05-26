@@ -129,6 +129,20 @@ local-ai assistant
 | 브라우저/파일/배포 | 금지 | 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 클라우드/Oracle 리소스 변경은 구현하지 않았습니다. |
 | 외부 API | 금지 | 외부 LLM API와 cloud vector DB는 사용하지 않습니다. 명시 URL read-only fetch는 LLM API 연동이나 크롤링/브라우저 이동이 아닙니다. |
 
+## Runtime Contract Snapshot
+
+| 항목 | 현재 값 | 기준 |
+|---|---:|---|
+| FastAPI endpoints | 51 | `build_api_inventory(app.routes).endpoints_count` |
+| Protected endpoints | 35 | `build_api_inventory(app.routes).protected_endpoints_count` |
+| Public endpoints | 16 | `build_api_inventory(app.routes).public_endpoints_count` |
+| Typer CLI commands | 52 | `typer.main.get_command(cli.main.app).commands` |
+| Document/RAG smoke steps | 6 | `DOCUMENT_RAG_SMOKE_FLOW` |
+| Assistant bridge smoke steps | 7 | `ASSISTANT_BRIDGE_SMOKE_FLOW` |
+| Assistant bridge preflight steps | 3 | `ASSISTANT_BRIDGE_PREFLIGHT_FLOW` |
+
+이 표는 README의 요약 숫자가 실제 route, CLI command, smoke flow와 어긋나지 않도록 pytest로 검증합니다.
+
 ## Key Docs
 
 - 전체 API 계약: [docs/API.md](docs/API.md)

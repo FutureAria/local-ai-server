@@ -6,6 +6,7 @@ from typer.main import get_command
 import cli.main as cli_main
 from app.main import app
 from app.services.project_status_service import build_api_inventory
+from scripts import smoke_test_api as smoke
 
 
 DOCS = {
@@ -262,6 +263,26 @@ def test_runtime_cli_commands_are_documented_in_readme_and_api_reference() -> No
 
     assert not missing_from_readme
     assert not missing_from_api
+
+
+def test_readme_and_project_summary_contract_snapshots_match_runtime() -> None:
+    runtime = build_api_inventory(app.routes)
+    commands = get_command(cli_main.app).commands
+    expected_rows = {
+        "FastAPI endpoints": runtime["endpoints_count"],
+        "Protected endpoints": runtime["protected_endpoints_count"],
+        "Public endpoints": runtime["public_endpoints_count"],
+        "Typer CLI commands": len(commands),
+        "Document/RAG smoke steps": len(smoke.DOCUMENT_RAG_SMOKE_FLOW),
+        "Assistant bridge smoke steps": len(smoke.ASSISTANT_BRIDGE_SMOKE_FLOW),
+        "Assistant bridge preflight steps": len(smoke.ASSISTANT_BRIDGE_PREFLIGHT_FLOW),
+    }
+
+    for path in [DOCS["readme"], DOCS["summary"]]:
+        text = path.read_text(encoding="utf-8")
+        assert "## Runtime Contract Snapshot" in text
+        for label, value in expected_rows.items():
+            assert f"| {label} | {value} |" in text
 
 
 def test_public_docs_keep_safety_boundaries_visible() -> None:
