@@ -1018,3 +1018,10 @@
 - CLI 안에 OCR readiness 판단 로직을 중복 구현하지 않고, 백엔드 응답을 JSON으로 출력하는 기존 구조를 유지했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_cli.py tests/test_document_service.py tests/test_document_loader.py` 결과는 `40 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `276 passed, 1 warning`이다.
+
+### OCR plan public doc link
+
+- `docs/OCR_INTEGRATION_PLAN.md`를 README Key Docs와 `docs/PROJECT_SUMMARY.md` 관련 문서 목록에 추가했다.
+- public docs link contract와 README key docs test에 OCR plan 문서 링크를 포함해 누락 드리프트를 방지했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py` 결과는 `28 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `276 passed, 1 warning`이다.

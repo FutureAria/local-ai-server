@@ -173,6 +173,7 @@ def test_readme_key_docs_links_public_project_docs() -> None:
         "docs/API.md",
         "docs/FINAL_REPORT.md",
         "docs/PROJECT_SUMMARY.md",
+        "docs/OCR_INTEGRATION_PLAN.md",
         "docs/OPERATIONS.md",
         "docs/RELEASE_CHECKLIST.md",
         "docs/PUBLIC_RELEASE_SUMMARY.md",

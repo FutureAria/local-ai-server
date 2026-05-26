@@ -269,6 +269,7 @@ optional dependency 설치 시 지원:
 - `README.md`
 - `docs/API.md`
 - `docs/TASKS.md`
+- `docs/OCR_INTEGRATION_PLAN.md`
 - `docs/USER_DOCUMENT_E2E_PLAN.md`
 - `docs/SMOKE_SUMMARY_EXAMPLES.md`
 - `docs/PREVIEW_ACTIVATION_POLICY.md`

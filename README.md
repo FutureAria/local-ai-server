@@ -127,6 +127,7 @@ local-ai assistant
 - 최종 결과 보고: [docs/FINAL_REPORT.md](docs/FINAL_REPORT.md)
 - 최종 요약: [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)
 - 작업 보드: [docs/TASKS.md](docs/TASKS.md)
+- OCR 통합 계획: [docs/OCR_INTEGRATION_PLAN.md](docs/OCR_INTEGRATION_PLAN.md)
 - 실제 사용자 문서 E2E 계획: [docs/USER_DOCUMENT_E2E_PLAN.md](docs/USER_DOCUMENT_E2E_PLAN.md)
 - 로컬 운영 Runbook: [docs/OPERATIONS.md](docs/OPERATIONS.md)
 - Smoke summary 예시: [docs/SMOKE_SUMMARY_EXAMPLES.md](docs/SMOKE_SUMMARY_EXAMPLES.md)
