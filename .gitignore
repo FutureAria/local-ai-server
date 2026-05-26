@@ -18,6 +18,8 @@ data/chroma/*
 !data/chroma/.gitkeep
 data/*.sqlite3
 data/*.sqlite3-*
+data/*.sqlite
+data/*.db
 data/*.jsonl
 data/logs/*
 !data/logs/.gitkeep
