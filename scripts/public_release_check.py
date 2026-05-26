@@ -36,12 +36,12 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
 )
 
 SENSITIVE_PATH_PATTERNS = [
-    re.compile(r"(^|/)\.env($|\.)"),
-    re.compile(r"(^|/)[^/]+\.key$"),
-    re.compile(r"(^|/)[^/]+\.pem$"),
-    re.compile(r"(^|/)[^/]+\.p12$"),
-    re.compile(r"(^|/)[^/]+\.pfx$"),
-    re.compile(r"(^|/)id_(rsa|dsa|ecdsa|ed25519)$"),
+    re.compile(r"(^|/)\.env($|\.)", re.IGNORECASE),
+    re.compile(r"(^|/)[^/]+\.key$", re.IGNORECASE),
+    re.compile(r"(^|/)[^/]+\.pem$", re.IGNORECASE),
+    re.compile(r"(^|/)[^/]+\.p12$", re.IGNORECASE),
+    re.compile(r"(^|/)[^/]+\.pfx$", re.IGNORECASE),
+    re.compile(r"(^|/)id_(rsa|dsa|ecdsa|ed25519)$", re.IGNORECASE),
     re.compile(r"(^|/)data/local_ai\.sqlite3($|[-\w.])"),
     re.compile(r"(^|/)data/chroma/"),
     re.compile(r"(^|/)data/uploads/"),
@@ -125,7 +125,7 @@ def _git_visible_files(root: Path) -> list[Path] | None:
 
 
 def _check_sensitive_path(relative: str) -> Finding | None:
-    if relative == ".env.example":
+    if relative.lower() == ".env.example":
         return None
     if relative.endswith(".gitkeep"):
         return None
