@@ -38,6 +38,20 @@
 | Agent 실행 엔진 | preview-only | 승인/거절 상태와 조건부 read-only preview 중심이며 실제 shell/file/browser 실행은 하지 않는다. |
 | 배포/외부 자동화 | 하지 않음 | 운영 배포, 브라우저 조작, 파일 자동 수정/삭제, 외부 LLM API 연결은 현재 범위 밖이다. |
 
+## Release Contract Snapshot
+
+| 항목 | 현재 값 | 기준 |
+|---|---:|---|
+| FastAPI endpoints | 51 | `build_api_inventory(app.routes).endpoints_count` |
+| Protected endpoints | 35 | `build_api_inventory(app.routes).protected_endpoints_count` |
+| Public endpoints | 16 | `build_api_inventory(app.routes).public_endpoints_count` |
+| Typer CLI commands | 52 | `typer.main.get_command(cli.main.app).commands` |
+| Document/RAG smoke steps | 6 | `DOCUMENT_RAG_SMOKE_FLOW` |
+| Assistant bridge smoke steps | 7 | `ASSISTANT_BRIDGE_SMOKE_FLOW` |
+| Assistant bridge preflight steps | 3 | `ASSISTANT_BRIDGE_PREFLIGHT_FLOW` |
+
+이 표는 공개 문서가 실제 route, CLI command, smoke flow와 어긋나지 않도록 테스트로 검증한다.
+
 ## 기능 경계 요약
 
 | 구분 | 공개 설명 |

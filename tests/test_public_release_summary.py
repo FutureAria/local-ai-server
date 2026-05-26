@@ -1,5 +1,12 @@
 from pathlib import Path
 
+from typer.main import get_command
+
+import cli.main as cli_main
+from app.main import app
+from app.services.project_status_service import build_api_inventory
+from scripts import smoke_test_api as smoke
+
 
 SUMMARY = Path("docs/PUBLIC_RELEASE_SUMMARY.md")
 
@@ -80,6 +87,26 @@ def test_public_release_summary_keeps_private_data_and_verification_visible() ->
         assert item in text
 
     assert "passed" in text
+
+
+def test_public_release_summary_contract_snapshot_matches_runtime() -> None:
+    text = SUMMARY.read_text(encoding="utf-8")
+    runtime = build_api_inventory(app.routes)
+    commands = get_command(cli_main.app).commands
+
+    expected_rows = {
+        "FastAPI endpoints": runtime["endpoints_count"],
+        "Protected endpoints": runtime["protected_endpoints_count"],
+        "Public endpoints": runtime["public_endpoints_count"],
+        "Typer CLI commands": len(commands),
+        "Document/RAG smoke steps": len(smoke.DOCUMENT_RAG_SMOKE_FLOW),
+        "Assistant bridge smoke steps": len(smoke.ASSISTANT_BRIDGE_SMOKE_FLOW),
+        "Assistant bridge preflight steps": len(smoke.ASSISTANT_BRIDGE_PREFLIGHT_FLOW),
+    }
+
+    assert "## Release Contract Snapshot" in text
+    for label, value in expected_rows.items():
+        assert f"| {label} | {value} |" in text
 
 
 def test_release_checklist_requires_capability_boundary_self_check() -> None:
