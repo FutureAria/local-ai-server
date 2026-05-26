@@ -242,14 +242,26 @@ def test_project_continuation_contract_is_documented_in_public_docs() -> None:
 
 def test_runtime_api_inventory_is_documented_in_api_reference() -> None:
     api_text = DOCS["api"].read_text(encoding="utf-8")
+    inventory = build_api_inventory(app.routes)
     runtime_endpoints = {
         f"{method} {endpoint['path']}"
-        for endpoint in build_api_inventory(app.routes)["endpoints"]
+        for endpoint in inventory["endpoints"]
         for method in endpoint["methods"]
     }
+    public_read_only_section = api_text.split("현재 API key 없이 읽을 수 있는 public read-only endpoint는", 1)[1].split(
+        "이다.",
+        1,
+    )[0]
 
     missing = sorted(endpoint for endpoint in runtime_endpoints if f"`{endpoint}`" not in api_text)
     assert not missing
+    public_endpoints = {
+        f"{method} {endpoint['path']}"
+        for endpoint in inventory["endpoints"]
+        if endpoint["requires_api_key"] is False
+        for method in endpoint["methods"]
+    }
+    assert all(f"`{endpoint}`" in public_read_only_section for endpoint in public_endpoints)
 
 
 def test_runtime_cli_commands_are_documented_in_readme_and_api_reference() -> None:

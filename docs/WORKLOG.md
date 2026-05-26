@@ -1364,3 +1364,11 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_cli.py` 결과는 `46 passed, 1 warning`이다.
 - targeted docs-count self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py tests/test_readme_quick_start.py tests/test_cli.py` 결과는 `65 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `313 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### API reference public endpoint inventory guard
+
+- 2026-05-26 21:22 KST 기준으로 `docs/API.md`의 public read-only endpoint 설명을 실제 `/project/api-inventory` 기준 public endpoint 16개와 맞췄다.
+- `tests/test_public_docs_contract.py`가 API reference의 public read-only 문장이 runtime inventory에서 `requires_api_key=false`인 endpoint 전체를 포함하는지 검증하도록 보강했다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_security.py tests/test_api_contracts.py` 결과는 `70 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `313 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.

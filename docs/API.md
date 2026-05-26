@@ -60,7 +60,7 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
 
-조회 전용 endpoint 중 `GET /documents`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /documents/vector-rebuild-preview`, `GET /chat-logs`, `GET /feedback`, `GET /project/status`, `GET /project/next`, `GET /project/api-inventory`는 현재 API key 없이 읽을 수 있다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
+현재 API key 없이 읽을 수 있는 public read-only endpoint는 `GET /health`, `GET /health/ollama`, `GET /documents`, `GET /documents/{document_id}`, `GET /documents/{document_id}/chunks`, `GET /documents/supported-types`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /documents/vector-rebuild-preview`, `GET /chat-logs`, `GET /chat-logs/{chat_log_id}`, `GET /feedback`, `GET /project/status`, `GET /project/next`, `GET /project/api-inventory`이다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
 
 ## Rate Limit
 
