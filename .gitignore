@@ -25,6 +25,9 @@ data/*.db-*
 data/*.jsonl
 data/logs/*
 !data/logs/.gitkeep
+logs/*
+!logs/.gitkeep
+*.log
 dist/
 build/
 *.egg-info/

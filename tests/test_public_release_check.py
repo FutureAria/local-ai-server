@@ -28,6 +28,8 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
         ("data/chroma/index.bin", "vector"),
         ("data/uploads/private.md", "notes"),
         ("data/logs/app.log", "log"),
+        ("logs/app.log", "log"),
+        ("app.log", "log"),
         ("data/sft_dataset.jsonl", "{}\n"),
     ],
 )
@@ -153,6 +155,8 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
         "data/chroma/": ["data/chroma/*", "!data/chroma/.gitkeep"],
         "data/uploads/": ["data/uploads/*", "!data/uploads/.gitkeep"],
         "data/logs/": ["data/logs/*", "!data/logs/.gitkeep"],
+        "logs/": ["logs/*", "!logs/.gitkeep"],
+        "*.log": ["*.log"],
         "data/*.jsonl": ["data/*.jsonl"],
     }
 

@@ -36,6 +36,8 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
     "data/chroma/",
     "data/uploads/",
     "data/logs/",
+    "logs/",
+    "*.log",
     "data/*.jsonl",
 )
 
@@ -51,6 +53,8 @@ SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)data/chroma/"),
     re.compile(r"(^|/)data/uploads/"),
     re.compile(r"(^|/)data/logs/.*(?<!\.gitkeep)$"),
+    re.compile(r"(^|/)logs/.*(?<!\.gitkeep)$"),
+    re.compile(r"(^|/)[^/]+\.log$", re.IGNORECASE),
     re.compile(r"(^|/)data/.*\.jsonl$"),
 ]
 

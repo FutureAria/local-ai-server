@@ -18,6 +18,7 @@
 - [ ] `data/chroma/` 파일이 staging에 없다.
 - [ ] `data/uploads/` 파일이 staging에 없다.
 - [ ] `data/logs/` 로그 파일이 staging에 없다.
+- [ ] `logs/`, `*.log` 같은 추가 로그 파일이 staging에 없다.
 - [ ] `data/*.jsonl` export 파일이 staging에 없다.
 
 ## 2. 자동 검증
