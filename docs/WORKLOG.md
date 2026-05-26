@@ -1081,3 +1081,11 @@
 - `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `DocumentStatsResponse`, `DocumentIntegrityResponse` schema로 직접 검증한다.
 - 실제 repair/delete/rebuild, DB 수정, Chroma write/delete, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_document_stats.py tests/test_operations_runbook.py tests/test_public_docs_contract.py` 결과는 `29 passed, 1 warning`이다.
+
+### Supported document types response schema example
+
+- 2026-05-26 18:52 KST 기준으로 `GET /documents/supported-types` response example을 API reference에 추가했다.
+- 예시는 기본 `.txt`, `.md`, optional `.html`, `.pdf`, `.docx`와 `pdf_ocr=false`, `pdf_ocr_install_hint`를 포함한다.
+- `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `SupportedDocumentTypesResponse` schema로 직접 검증한다.
+- 실제 OCR 실행, 시스템 패키지 설치, 외부 OCR/cloud OCR, pdf2image/poppler 추가는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_cli.py tests/test_document_service.py tests/test_document_loader.py` 결과는 `61 passed, 1 warning`이다.

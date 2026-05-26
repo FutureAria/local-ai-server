@@ -22,6 +22,7 @@ from app.schemas.documents import (
     DocumentVectorRebuildPreviewResponse,
     IndexFolderJobPreviewResponse,
     IndexFolderRequest,
+    SupportedDocumentTypesResponse,
 )
 from app.schemas.feedback import FeedbackRequest
 from app.schemas.project import ShellDryRunRequest
@@ -155,6 +156,20 @@ def test_api_docs_index_job_preview_response_example_matches_schema() -> None:
     assert validated.progress.embedding_batches_completed == 0
     assert validated.progress.percent == 0
     assert "queue 생성" in validated.note
+
+
+def test_api_docs_supported_types_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/supported-types")
+    validated = SupportedDocumentTypesResponse.model_validate(example)
+
+    extensions = {item.extension for item in validated.types}
+    assert {".txt", ".md", ".html", ".pdf", ".docx"} <= extensions
+    assert any(item.extension == ".pdf" and "OCR fallback" in item.description for item in validated.types)
+    assert any(item.optional_dependency == "python-docx" and not item.available for item in validated.types)
+    assert validated.pdf_ocr is False
+    assert validated.pdf_ocr_install_hint is not None
+    assert "tesseract" in validated.pdf_ocr_install_hint
 
 
 def test_api_docs_document_stats_response_example_matches_schema() -> None:

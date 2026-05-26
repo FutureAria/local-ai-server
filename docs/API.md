@@ -639,6 +639,58 @@ curl -X DELETE http://127.0.0.1:8000/documents/1
 curl http://127.0.0.1:8000/documents/supported-types
 ```
 
+응답 예시:
+
+```json
+{
+  "types": [
+    {
+      "extension": ".txt",
+      "file_type": "txt",
+      "available": true,
+      "optional_dependency": null,
+      "install_hint": null,
+      "description": "Plain UTF-8 text."
+    },
+    {
+      "extension": ".md",
+      "file_type": "md",
+      "available": true,
+      "optional_dependency": null,
+      "install_hint": null,
+      "description": "Markdown text."
+    },
+    {
+      "extension": ".html",
+      "file_type": "html",
+      "available": true,
+      "optional_dependency": "beautifulsoup4",
+      "install_hint": "pip install -e '.[documents]'",
+      "description": "HTML body text without script/style/head content."
+    },
+    {
+      "extension": ".pdf",
+      "file_type": "pdf",
+      "available": true,
+      "optional_dependency": "pypdf",
+      "install_hint": null,
+      "description": "Text-based PDF with optional OCR fallback for PyPDF image XObjects."
+    },
+    {
+      "extension": ".docx",
+      "file_type": "docx",
+      "available": false,
+      "optional_dependency": "python-docx",
+      "install_hint": "pip install -e '.[documents]'",
+      "description": "Word document paragraphs and tables."
+    }
+  ],
+  "install_hint": "PDF OCR은 pip install -e '.[ocr]'와 로컬 tesseract 설치가 필요합니다.",
+  "pdf_ocr": false,
+  "pdf_ocr_install_hint": "PDF OCR을 사용하려면 Python dependency와 로컬 tesseract binary가 필요합니다: pip install -e '.[ocr]' 후 brew install tesseract 또는 apt install tesseract-ocr를 실행하세요. 한국어 OCR은 tesseract language pack(kor)을 별도로 설치해야 합니다."
+}
+```
+
 응답 핵심 필드:
 
 - `types[]`
