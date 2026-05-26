@@ -533,6 +533,31 @@ curl -X POST http://127.0.0.1:8000/documents/index-folder-job-preview \
   -d '{"folder_path":"./notes","recursive":true}'
 ```
 
+응답 예시:
+
+```json
+{
+  "job_id": "preview-only",
+  "status": "planned",
+  "folder_path": "/Users/example/notes",
+  "recursive": true,
+  "dry_run": true,
+  "would_enqueue": false,
+  "progress": {
+    "total_files": 3,
+    "processed_files": 0,
+    "indexed_documents": 0,
+    "skipped_files": 1,
+    "chunks_created": 0,
+    "embedding_batches_total": 2,
+    "embedding_batches_completed": 0,
+    "percent": 0.0
+  },
+  "status_endpoint": "/documents/index-jobs/{job_id}",
+  "note": "대용량 색인 job/status API의 preview-only 응답입니다. 현재 요청은 queue 생성, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않습니다."
+}
+```
+
 응답 핵심 필드:
 
 - `job_id`

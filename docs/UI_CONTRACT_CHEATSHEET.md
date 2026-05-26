@@ -26,7 +26,7 @@
 | `GET /assistant/sessions` | 세션 목록 | `sessions`, `limit`, `offset`, `sessions[].messages_count`, `sessions[].last_message_preview` |
 | `GET /assistant/sessions/{session_id}/messages` | 메시지 기록 | `messages`, `limit`, `offset`, `total_messages` |
 | `GET /project/api-inventory` | 개발/디버그 API 목록 | `endpoints[].path`, `endpoints[].methods`, `endpoints[].tags`, `endpoints[].requires_api_key` |
-| `POST /documents/index-folder-job-preview` | 대용량 색인 progress preview | `dry_run`, `would_enqueue`, `progress.percent`, `status_endpoint` |
+| `POST /documents/index-folder-job-preview` | 대용량 색인 progress preview | `job_id`, `status`, `dry_run`, `would_enqueue`, `progress.total_files`, `progress.embedding_batches_total`, `progress.percent`, `status_endpoint` |
 | `GET /documents/vector-rebuild-preview` | 누락 vector 재생성 preview | `dry_run`, `chunks_missing_vectors_count`, `embedding_batches_estimated`, `actions` |
 
 ## Message response type 매핑

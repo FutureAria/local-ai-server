@@ -15,7 +15,7 @@ from app.schemas.assistant import (
     AssistantSessionCreateRequest,
     ProjectRootValidateRequest,
 )
-from app.schemas.documents import IndexFolderRequest
+from app.schemas.documents import IndexFolderJobPreviewResponse, IndexFolderRequest
 from app.schemas.feedback import FeedbackRequest
 from app.schemas.project import ShellDryRunRequest
 from app.schemas.search import SearchRequest
@@ -111,6 +111,13 @@ def _extract_post_payload_examples(text: str) -> list[tuple[str, dict[str, Any]]
     return examples
 
 
+def _json_block_after_endpoint_heading(text: str, endpoint: str) -> dict[str, Any]:
+    pattern = rf"### `{re.escape(endpoint)}`.*?```json\n(.*?)\n```"
+    match = re.search(pattern, text, flags=re.S)
+    assert match, f"JSON block for {endpoint} not found"
+    return json.loads(match.group(1))
+
+
 def test_api_docs_post_payload_examples_match_request_schemas() -> None:
     text = Path("docs/API.md").read_text(encoding="utf-8")
     examples = _extract_post_payload_examples(text)
@@ -126,6 +133,21 @@ def test_api_docs_post_payload_examples_match_request_schemas() -> None:
 
     documented_schema_paths = set(REQUEST_SCHEMAS)
     assert documented_schema_paths <= seen_paths
+
+
+def test_api_docs_index_job_preview_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "POST /documents/index-folder-job-preview")
+    validated = IndexFolderJobPreviewResponse.model_validate(example)
+
+    assert validated.job_id == "preview-only"
+    assert validated.status == "planned"
+    assert validated.dry_run is True
+    assert validated.would_enqueue is False
+    assert validated.progress.processed_files == 0
+    assert validated.progress.embedding_batches_completed == 0
+    assert validated.progress.percent == 0
+    assert "queue 생성" in validated.note
 
 
 def test_api_docs_response_core_fields_match_response_models() -> None:

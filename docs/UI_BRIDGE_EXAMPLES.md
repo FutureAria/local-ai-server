@@ -206,6 +206,33 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
 }
 ```
 
+## `POST /documents/index-folder-job-preview`
+
+대용량 폴더 색인을 실제 queue로 넣기 전, UI가 progress panel을 어떻게 표시할지 확인하는 preview-only 응답이다. UI는 `dry_run=true`, `would_enqueue=false`, `job_id=preview-only`, `status=planned`이면 실행 버튼을 제공하지 않는다.
+
+```json
+{
+  "job_id": "preview-only",
+  "status": "planned",
+  "folder_path": "/Users/example/notes",
+  "recursive": true,
+  "dry_run": true,
+  "would_enqueue": false,
+  "progress": {
+    "total_files": 3,
+    "processed_files": 0,
+    "indexed_documents": 0,
+    "skipped_files": 1,
+    "chunks_created": 0,
+    "embedding_batches_total": 2,
+    "embedding_batches_completed": 0,
+    "percent": 0.0
+  },
+  "status_endpoint": "/documents/index-jobs/{job_id}",
+  "note": "대용량 색인 job/status API의 preview-only 응답입니다. 현재 요청은 queue 생성, SQLite 저장, embedding 생성, Chroma 저장을 수행하지 않습니다."
+}
+```
+
 ## `GET /assistant/startup`
 
 첫 화면을 그리기 위한 snapshot이다. UI는 이 응답만으로 연결 상태, 설정, dashboard 카드, UI 계약을 초기 렌더링할 수 있다.

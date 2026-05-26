@@ -9,6 +9,7 @@ from app.schemas.assistant import (
     AssistantStartupResponse,
     AssistantUiContractResponse,
 )
+from app.schemas.documents import IndexFolderJobPreviewResponse
 from app.services.assistant_service import AssistantService
 from app.services.project_status_service import build_api_inventory
 
@@ -42,6 +43,9 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert '"display": "startup_snapshot"' in text
     assert '"external_llm_api": "not-used"' in text
     assert '"mode": "read-only"' in text
+    assert '"job_id": "preview-only"' in text
+    assert '"would_enqueue": false' in text
+    assert '"embedding_batches_total": 2' in text
 
 
 def test_ui_bridge_examples_document_message_response_types() -> None:
@@ -112,6 +116,20 @@ def test_ui_bridge_api_inventory_example_matches_runtime_field_names() -> None:
     assert "total_routes" not in example
     assert "protected_routes" not in example
     assert "protected" not in endpoint
+
+
+def test_ui_bridge_index_job_preview_example_matches_schema() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+    example = _json_block_after_heading(text, "POST /documents/index-folder-job-preview")
+    validated = IndexFolderJobPreviewResponse.model_validate(example)
+
+    assert validated.job_id == "preview-only"
+    assert validated.status == "planned"
+    assert validated.dry_run is True
+    assert validated.would_enqueue is False
+    assert validated.progress.total_files == 3
+    assert validated.progress.embedding_batches_total == 2
+    assert validated.progress.percent == 0
 
 
 def test_ui_bridge_ui_contract_example_matches_runtime_contract_keys() -> None:

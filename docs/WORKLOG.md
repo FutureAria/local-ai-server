@@ -1044,3 +1044,12 @@
 - `tests/test_cli.py`와 `tests/test_public_docs_contract.py`가 새 CLI 명령의 endpoint mapping과 공개 문서 노출을 검증한다.
 - 실제 queue 생성, SQLite 저장, embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_cli.py tests/test_public_docs_contract.py tests/test_readme_quick_start.py` 결과는 `42 passed, 1 warning`이다.
+
+### Index job preview response schema examples
+
+- 2026-05-26 18:38 KST 기준으로 `POST /documents/index-folder-job-preview`의 preview-only response example을 API reference와 UI bridge examples에 추가했다.
+- 예시는 `job_id=preview-only`, `status=planned`, `dry_run=true`, `would_enqueue=false`, `progress.total_files`, `progress.embedding_batches_total`, `progress.percent=0`을 명시한다.
+- UI_CONNECT_GUIDE와 UI_CONTRACT_CHEATSHEET도 같은 progress 표시 필드를 강조하도록 갱신했다.
+- `tests/test_api_docs_payloads.py`와 `tests/test_ui_bridge_examples.py`가 문서 JSON 예시를 `IndexFolderJobPreviewResponse` schema로 직접 검증한다.
+- 실제 queue 생성, SQLite 저장, embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_ui_bridge_examples.py tests/test_ui_connect_guide.py tests/test_ui_contract_cheatsheet.py tests/test_api_contracts.py` 결과는 `32 passed, 1 warning`이다.

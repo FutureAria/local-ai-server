@@ -35,6 +35,11 @@ def test_ui_connect_guide_documents_startup_flow() -> None:
         "GET /project/api-inventory",
         "/documents/index-folder-job-preview",
         "/documents/vector-rebuild-preview",
+        "job_id=preview-only",
+        "status=planned",
+        "progress.total_files",
+        "progress.embedding_batches_total",
+        "progress.percent=0",
         "--assistant-bridge-preflight",
         "http://127.0.0.1:8010",
     ]:
