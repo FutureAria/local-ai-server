@@ -1128,3 +1128,10 @@
 - `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `SearchResponse`, `ChatLogListResponse`, `ChatLogDetail`, `FeedbackResponse`, `FeedbackListResponse` schema로 직접 검증한다.
 - 실제 Ollama embedding, Chroma search, DB 조회/쓰기, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_chat_logs.py tests/test_feedback_list.py tests/test_search_service.py tests/test_public_docs_contract.py` 결과는 `53 passed, 1 warning`이다.
+
+### CLI documented command drift guard
+
+- 2026-05-26 19:14 KST 기준으로 README/API/PROJECT_SUMMARY/NEXT_CHAT_HANDOFF에 적힌 `local-ai <command>` 예시가 실제 Typer command에 존재하는지 검증하는 public docs contract를 추가했다.
+- 기존 검사는 runtime command가 문서에 누락되지 않는 방향이었다. 이번 검사는 반대로 문서에 stale CLI command 예시가 남는 경우를 잡는다.
+- 실제 backend 호출, shell/browser/file-write 실행 활성화, 외부 API 호출은 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_cli.py tests/test_readme_quick_start.py` 결과는 `43 passed, 1 warning`이다.

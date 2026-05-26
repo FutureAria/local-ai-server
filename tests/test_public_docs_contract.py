@@ -13,6 +13,10 @@ DOCS = {
     "api": Path("docs/API.md"),
     "summary": Path("docs/PROJECT_SUMMARY.md"),
 }
+CLI_EXAMPLE_DOCS = {
+    **DOCS,
+    "handoff": Path("docs/NEXT_CHAT_HANDOFF.md"),
+}
 
 CORE_ENDPOINTS = [
     "GET /assistant/startup",
@@ -141,6 +145,7 @@ PUBLIC_MARKDOWN_FILES = [
 
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 INTERNAL_FASTAPI_PATHS = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
+LOCAL_AI_COMMAND_RE = re.compile(r"(?<![\w-])local-ai\s+([a-z][a-z0-9-]*)")
 
 
 def _link_target_exists(source: Path, raw_target: str) -> bool:
@@ -340,3 +345,18 @@ def test_all_typer_commands_are_documented_in_public_docs() -> None:
         assert command in texts["readme"], f"{command} missing from README"
         assert command in texts["api"], f"{command} missing from API docs"
         assert command in texts["summary"], f"{command} missing from project summary"
+
+
+def test_documented_local_ai_commands_exist_in_typer_app() -> None:
+    known_commands = set(get_command(cli_main.app).commands)
+    invalid_examples = []
+
+    for name, path in CLI_EXAMPLE_DOCS.items():
+        text = path.read_text(encoding="utf-8")
+        for match in LOCAL_AI_COMMAND_RE.finditer(text):
+            command_name = match.group(1)
+            if command_name not in known_commands:
+                line_no = text[: match.start()].count("\n") + 1
+                invalid_examples.append(f"{name}:{line_no} local-ai {command_name}")
+
+    assert not invalid_examples
