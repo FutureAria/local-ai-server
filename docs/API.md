@@ -614,6 +614,15 @@ curl -X DELETE http://127.0.0.1:8000/documents/1
 curl http://127.0.0.1:8000/documents/supported-types
 ```
 
+응답 핵심 필드:
+
+- `types[]`
+- `install_hint`
+- `pdf_ocr`
+- `pdf_ocr_install_hint`
+
+`pdf_ocr=false`이면 이미지 기반 PDF OCR fallback을 사용할 수 없는 상태다. `pytesseract`, `Pillow`, 로컬 `tesseract` binary 중 하나라도 없으면 false가 된다. 일반 PDF 텍스트 추출은 `pdf_ocr`와 별개로 `[documents]` extra의 `pypdf` 준비 상태를 따른다.
+
 ### `GET /documents/stats`
 
 SQLite/Chroma 저장 상태를 read-only로 확인한다.

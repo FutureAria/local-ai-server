@@ -203,9 +203,15 @@ class DocumentService:
         return document, len(chunk_rows)
 
     def get_supported_types(self) -> dict:
+        pdf_ocr_status = self.loader.pdf_ocr_status()
         return {
             "types": self.loader.supported_types(),
-            "install_hint": "PDF/DOCX 지원이 unavailable이면 pip install -e '.[documents]'를 실행하세요.",
+            "install_hint": (
+                "PDF/DOCX 지원이 unavailable이면 pip install -e '.[documents]'를 실행하세요. "
+                "PDF OCR은 pip install -e '.[ocr]'와 로컬 tesseract 설치가 필요합니다."
+            ),
+            "pdf_ocr": pdf_ocr_status["available"],
+            "pdf_ocr_install_hint": pdf_ocr_status["install_hint"],
         }
 
     def list_documents(

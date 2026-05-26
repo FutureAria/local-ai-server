@@ -209,7 +209,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `266 passed`
+- `.venv/bin/pytest`: `271 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능
@@ -241,10 +241,11 @@ optional dependency 설치 시 지원:
 
 - `.pdf`
 - `.docx`
+- PDF OCR fallback: `[ocr]` extra와 로컬 `tesseract`가 준비된 경우, 일반 텍스트 추출이 비어 있거나 매우 짧은 PDF 페이지에서 PyPDF image XObject에 한해 적용
 
 지원하지 않는 것:
 
-- 스캔 이미지 기반 PDF OCR
+- PyPDF가 image XObject를 추출하지 못하는 flat scan PDF OCR
 - JavaScript 렌더링 결과
 - 외부 URL 크롤링
 - 브라우저 interaction
@@ -289,7 +290,7 @@ optional dependency 설치 시 지원:
 - Agent file action은 `AGENT_ALLOWED_ROOTS` 안에서만 read-only로 동작한다.
 - Agent file preview는 민감 파일, binary 파일, 대용량 파일, 허용되지 않은 확장자를 차단한다.
 - Agent URL fetch는 `AGENT_WEB_FETCH_ENABLED=true`일 때만 동작하고 `AGENT_WEB_FETCH_MAX_BYTES` 이후 응답을 자른다.
-- OCR은 지원하지 않는다.
+- OCR은 PDF fallback 범위에서만 지원한다. PyPDF image XObject 추출이 불가능한 스캔 PDF, page rendering 기반 OCR, poppler/pdf2image fallback은 아직 지원하지 않는다.
 - HTML은 정적 UTF-8 텍스트 추출만 지원한다.
 - 인증은 단일 `LOCAL_API_KEY` 수준이다.
 - 다중 사용자 권한 관리와 HTTPS termination은 없다.
@@ -304,11 +305,12 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 3. 대용량 색인 job/status API progress response schema preview-only 계약을 기준으로 실제 queue 활성화 조건 문서 유지
 4. Chroma 누락 vector 재생성 preview-only endpoint를 기준으로 실제 rebuild 활성화 조건 문서 유지
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지
+6. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:
 
 1. 실제 repair/delete/rebuild 실행 명령
 2. 실제 브라우저 click/fill/submit 자동화
 3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
-4. OCR loader, JavaScript 렌더링, 외부 URL 크롤링
+4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
 5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit

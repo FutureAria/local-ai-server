@@ -186,7 +186,8 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 2. `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 assistant endpoint와 CLI 목록 교차 검증
 3. `tests/test_public_docs_contract.py`, `tests/test_user_document_e2e_plan.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
 4. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
-5. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
+5. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
+6. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
 
 사용자 수동 확인 또는 별도 승인 후에만 진행할 작업:
 
@@ -200,7 +201,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 8. 추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md` 또는 `.txt` 경로를 받은 뒤 실행
 9. `/search` 실제 embedding + Chroma 검색 재확인
 10. `/ask-with-docs` 실제 RAG 답변 품질 확인
-11. 필요하면 OCR loader 또는 HTML JavaScript 렌더링/크롤링 범위 결정
+11. 필요하면 HTML JavaScript 렌더링/크롤링 또는 pdf2image/poppler 기반 page rendering OCR 확장 범위 결정
 12. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 실제 rebuild 활성화 조건 문서화
 13. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
 14. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
@@ -210,8 +211,9 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - README/docs 링크와 기능 설명 정합성을 Codex가 직접 점검했다.
 - `docs/API.md` CLI 대응 목록의 `local-ai document-types` 누락을 반영했다.
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
+- PDF OCR fallback은 PyPDF image XObject 기반 optional loader로 구현했고, 외부 OCR/cloud OCR/pdf2image/poppler는 추가하지 않았다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `266 passed`
+  - `.venv/bin/pytest`: `271 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공

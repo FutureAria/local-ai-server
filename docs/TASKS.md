@@ -27,6 +27,7 @@
 - [x] assistant bridge API와 CLI
 - [x] project continuation API, API inventory, shell dry-run policy
 - [x] agent plan/approval/read-only execution v1
+- [x] PDF OCR fallback 설계와 PyPDF image XObject 기반 optional OCR loader
 - [x] public release check와 local CI script
 - [x] README, API, 운영, 보안, 최종 보고 문서
 
@@ -42,6 +43,7 @@
 - [x] 대용량 색인 job/status API progress response schema를 preview-only 계약 기준으로 문서화 유지
 - [x] Chroma 누락 vector 재생성 preview-only endpoint 기준 실제 rebuild 활성화 조건 문서 유지
 - [x] `docs/NEXT_CHAT_HANDOFF.md`와 이 문서의 safe/manual/review 경계 정합성 유지
+- [x] PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
 
 ## 사용자 수동 확인 작업
 
@@ -58,7 +60,8 @@
 - [ ] 실제 shell 실행
 - [ ] 파일 생성, 수정, 삭제 자동화
 - [ ] 브라우저 click/fill/submit/login 자동화
-- [ ] OCR loader 또는 JavaScript 렌더링/외부 URL 크롤링
+- [ ] JavaScript 렌더링/외부 URL 크롤링
+- [ ] pdf2image/poppler 기반 page rendering OCR 확장
 - [ ] Docker sandbox, cloud/local runner bridge, 서비스화 구조 변경
 - [ ] 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
 - [ ] Oracle Cloud, Oracle DB, Oracle Object Storage, Oracle VM/Compute 리소스 생성/변경

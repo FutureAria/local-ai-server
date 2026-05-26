@@ -31,6 +31,8 @@ class SupportedDocumentType(BaseModel):
 class SupportedDocumentTypesResponse(BaseModel):
     types: list[SupportedDocumentType]
     install_hint: str
+    pdf_ocr: bool = False
+    pdf_ocr_install_hint: str | None = None
 
 
 class DocumentDetail(DocumentSummary):

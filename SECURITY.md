@@ -88,13 +88,15 @@
 
 - 기본: `.txt`, `.md`, `.html`, `.htm`
 - optional dependency 설치 시: `.pdf`, `.docx`
+- OCR optional dependency와 로컬 `tesseract` 설치 시: PDF image XObject fallback OCR
 
 보안 기준:
 
 - 지원하지 않는 확장자는 거부한다.
 - `.txt`, `.md`, `.html`, `.htm`은 UTF-8 텍스트만 처리한다.
 - HTML은 `head`, `script`, `style`, `noscript` 내용을 제외하고 텍스트만 추출한다.
-- PDF OCR, JavaScript 렌더링, 외부 URL 크롤링, 브라우저 interaction은 지원하지 않는다.
+- PDF OCR은 로컬 `tesseract` binary만 사용하며 이미지 bytes는 저장하지 않고 OCR 결과 텍스트만 chunk로 저장한다.
+- JavaScript 렌더링, 외부 URL 크롤링, 브라우저 interaction은 지원하지 않는다.
 - 폴더 색인은 `.git`, `node_modules`, `venv`, `.venv`, `__pycache__`, `dist`, `build`, `target` 등을 무시한다.
 
 ## RAG 안전 기준

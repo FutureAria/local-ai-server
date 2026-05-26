@@ -110,7 +110,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `266 passed`
+- `.venv/bin/pytest`: `271 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
@@ -137,11 +137,12 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 2. 승인된 실제 사용자 `.md`/`.txt` 문서 E2E smoke summary가 민감 정보 없이 유지되는지 검증
 3. preview-only queue/rebuild 계약을 실제 queue/rebuild 활성화 조건 문서로 계속 정리
 4. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
+5. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:
 
 1. 실제 repair/delete/rebuild 실행 명령
 2. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
 3. 실제 브라우저 click/fill/submit 자동화
-4. OCR loader, JavaScript 렌더링, 외부 URL 크롤링
+4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
 5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit

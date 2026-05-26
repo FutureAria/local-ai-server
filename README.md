@@ -109,7 +109,7 @@ local-ai assistant
 
 | 구분 | 현재 상태 | 설명 |
 |---|---|---|
-| 문서 업로드/검색/RAG | 가능 | `.txt`, `.md`, `.html`, `.htm`, optional `.pdf`, `.docx`를 로컬에서 색인하고 Ollama로 답변합니다. |
+| 문서 업로드/검색/RAG | 가능 | `.txt`, `.md`, `.html`, `.htm`, optional `.pdf`, `.docx`를 로컬에서 색인하고 Ollama로 답변합니다. PDF OCR fallback은 `[ocr]` extra와 로컬 tesseract가 있을 때 PyPDF image XObject 범위에서만 동작합니다. |
 | 폴더 색인 preview | 가능 | 실제 저장 전 대상 파일, 예상 chunk, 예상 embedding batch를 read-only로 확인합니다. |
 | Agent plan/approval | 가능 | 요청을 action 후보와 위험도로 기록하고 승인/거절 상태를 저장합니다. |
 | Agent execution v1 | 조건부 read-only | `AGENT_EXECUTION_ENABLED=true`에서도 허용 root 안의 폴더 목록 조회, 텍스트 파일 preview, 명시 URL 단건 read-only fetch만 지원합니다. Agent web fetch host allowlist는 아직 없으며 private/loopback/link-local host는 차단합니다. |
@@ -248,11 +248,20 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-PDF/DOCX 문서까지 색인하려면 optional dependency를 추가로 설치합니다. 시스템 패키지는 필요하지 않고 Python 패키지만 사용합니다.
+PDF/DOCX 문서까지 색인하려면 optional dependency를 추가로 설치합니다. 일반 PDF/DOCX 텍스트 추출은 Python 패키지만 사용합니다.
 
 ```bash
 pip install -e ".[dev,documents]"
 ```
+
+이미지 기반 PDF 페이지 OCR fallback까지 쓰려면 Python OCR extra와 로컬 `tesseract` binary가 필요합니다. 시스템 패키지는 자동 설치하지 않습니다.
+
+```bash
+pip install -e ".[dev,documents,ocr]"
+brew install tesseract
+```
+
+Ubuntu/Debian에서는 `sudo apt install tesseract-ocr`를 사용하세요. 한국어 OCR이 필요하면 `tesseract --list-langs`에서 `kor` 지원 여부를 확인하고 language pack을 별도로 설치하세요.
 
 ## Ollama 실행
 
@@ -362,7 +371,7 @@ Assistant UI bridge:
 
 ## 문서 업로드
 
-기본 텍스트 문서는 `.txt`, `.md`, `.html`, `.htm`을 지원합니다. HTML은 UTF-8 파일에서 본문 텍스트를 추출하고 `script`, `style`, `head` 내용은 제외합니다. PDF/DOCX는 `pip install -e ".[dev,documents]"`로 optional dependency를 설치한 경우 사용할 수 있습니다.
+기본 텍스트 문서는 `.txt`, `.md`, `.html`, `.htm`을 지원합니다. HTML은 UTF-8 파일에서 본문 텍스트를 추출하고 `script`, `style`, `head` 내용은 제외합니다. PDF/DOCX는 `pip install -e ".[dev,documents]"`로 optional dependency를 설치한 경우 사용할 수 있습니다. 이미지 기반 PDF 페이지는 `pip install -e ".[dev,documents,ocr]"`와 로컬 `tesseract`가 준비된 경우에만 OCR fallback을 시도합니다.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/documents/upload \
@@ -577,7 +586,7 @@ local-ai repair-preview
 local-ai vector-rebuild-preview
 ```
 
-현재 환경에서 사용할 수 있는 문서 타입과 optional dependency 준비 상태는 다음 명령으로 확인합니다.
+현재 환경에서 사용할 수 있는 문서 타입, optional dependency, PDF OCR fallback 준비 상태는 다음 명령으로 확인합니다.
 
 ```bash
 local-ai document-types
@@ -1038,6 +1047,7 @@ ollama pull nomic-embed-text
 - 기본 지원은 `.txt`, `.md`, `.html`, `.htm`입니다.
 - HTML은 UTF-8 파일만 처리하며, JavaScript 렌더링 결과는 추출하지 않습니다.
 - `.pdf`, `.docx`에서 optional dependency 오류가 나오면 `pip install -e ".[dev,documents]"`를 실행합니다.
+- 이미지 기반 PDF OCR이 필요하면 `pip install -e ".[dev,documents,ocr]"`와 로컬 `tesseract` 설치 상태를 확인합니다.
 - UTF-8 텍스트 파일만 지원합니다.
 
 ### 401 응답이 나옵니다
@@ -1046,7 +1056,7 @@ ollama pull nomic-embed-text
 
 ## 현재 한계
 
-- PDF/DOCX는 optional dependency 설치 시 텍스트 추출을 지원합니다. 스캔 이미지 기반 PDF OCR은 아직 지원하지 않습니다.
+- PDF/DOCX는 optional dependency 설치 시 텍스트 추출을 지원합니다. PDF OCR fallback은 PyPDF로 추출 가능한 image XObject가 있는 페이지에 한정되며, flat scan PDF나 page rendering이 필요한 PDF는 아직 지원하지 않습니다.
 - HTML/HTM은 표준 라이브러리 기반 텍스트 추출을 지원하지만, JavaScript 렌더링 결과나 동적 페이지 크롤링은 지원하지 않습니다.
 - Chroma와 SQLite 동기화 복구는 read-only 점검과 repair preview까지만 지원합니다. 실제 repair/rebuild는 아직 수행하지 않습니다.
 - 실행형 Agent는 계획, 승인, read-only 실행 엔진 v1 단계입니다. 실제 웹 이동, 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 아직 수행하지 않습니다.
@@ -1067,13 +1077,14 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 3. 대용량 색인 job/status API progress response schema preview-only 계약을 기준으로 실제 queue 활성화 조건 문서 유지
 4. Chroma 누락 vector 재생성 preview-only endpoint를 기준으로 실제 rebuild 활성화 조건 문서 유지
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지
+6. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:
 
 1. 실제 repair/delete/rebuild 실행 명령
 2. 실제 브라우저 click/fill/submit 자동화
 3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
-4. OCR loader, JavaScript 렌더링, 외부 URL 크롤링
+4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
 5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
 
 ## 배포 상태

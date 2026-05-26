@@ -123,6 +123,8 @@ class FakeDocumentService:
                 },
             ],
             "install_hint": "PDF/DOCX 지원이 unavailable이면 pip install -e '.[documents]'를 실행하세요.",
+            "pdf_ocr": False,
+            "pdf_ocr_install_hint": "pip install -e '.[ocr]' 후 로컬 tesseract를 설치하세요.",
         }
 
     def get_document_chunks(self, db, document_id: int, limit: int, offset: int):
@@ -260,6 +262,8 @@ def test_supported_document_types_endpoint_with_mock() -> None:
     body = response.json()
     assert body["types"][0]["extension"] == ".txt"
     assert body["types"][1]["optional_dependency"] == "pypdf"
+    assert body["pdf_ocr"] is False
+    assert "tesseract" in body["pdf_ocr_install_hint"]
 
 
 def test_document_chunks_endpoint_contract_with_mock() -> None:

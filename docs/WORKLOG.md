@@ -971,3 +971,18 @@
 - replay self-check에서 `.venv/bin/pytest` 결과는 `266 passed, 1 warning`이다.
 - replay local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `266 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
 - replay whitespace check에서 `git diff --check` 결과는 통과했다.
+
+### PDF OCR fallback implementation
+
+- 2026-05-26 15:19 KST 기준으로 Claude Opus가 P1(go)로 분류한 OCR 범위 중 Stage 3 구현을 완료했다.
+- `pyproject.toml`에 `[ocr]` optional extra를 추가했고, `pytesseract`, `Pillow`는 optional dependency로만 둔다.
+- `app/services/document_loader.py`에 PDF OCR fallback을 추가했다. 기본 PDF 텍스트 추출이 충분하면 OCR을 호출하지 않고, 텍스트가 비어 있거나 매우 짧은 페이지에서만 PyPDF image XObject OCR을 시도한다.
+- `tesseract` binary 또는 OCR Python dependency가 없으면 서버 import와 일반 문서 업로드는 유지하고, OCR 필요한 페이지는 명확한 설치 안내 reason으로 skip한다.
+- OCR 이미지는 저장하지 않는다. PIL image 객체는 메모리에서만 사용하고, OCR 결과 텍스트만 기존 chunking, SQLite, Chroma pipeline으로 들어간다.
+- `GET /documents/supported-types` 응답에 `pdf_ocr`, `pdf_ocr_install_hint`를 추가했다. `local-ai document-types`는 백엔드 응답을 그대로 출력하므로 별도 로직 중복 없이 OCR 상태를 표시한다.
+- README, API, PROJECT_SUMMARY, SECURITY, release docs, TASKS, NEXT_CHAT_HANDOFF를 PDF OCR fallback의 현재 범위와 남은 page rendering 확장 경계에 맞춰 갱신했다.
+- 금지 범위는 지켰다. 외부 LLM API, cloud OCR, LangChain, pdf2image/poppler, 시스템 패키지 자동 설치, shell/browser/file-write 실행 활성화, agent 기본값 변경, 운영 배포, cloud/Oracle 변경, secret 출력은 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_document_loader.py tests/test_api_contracts.py tests/test_api_docs_payloads.py tests/test_readme_quick_start.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_security_docs_contract.py` 결과는 `62 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `271 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `271 passed, 1 warning`, public release check는 `scanned_files=120`, finding 없음이다.
+- whitespace check에서 `git diff --check` 결과는 통과했다.
