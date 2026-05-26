@@ -151,7 +151,7 @@
 - [ ] `data/uploads/`가 포함되지 않았는가?
 - [ ] `data/logs/` 로그 파일이 포함되지 않았는가?
 - [ ] `data/*.jsonl` SFT export 파일이 포함되지 않았는가?
-- [ ] API key, token, DB password, credential이 포함되지 않았는가?
+- [ ] API key, provider token, DB password, credential, key/certificate 파일이 포함되지 않았는가?
 - [ ] 개인 문서 원문 또는 민감 정보가 README, docs, tests에 들어가지 않았는가?
 - [ ] 실제 배포되지 않은 기능을 배포 완료처럼 설명하지 않았는가?
 - [ ] 외부 LLM API를 사용하는 것처럼 오해될 문구가 없는가?
