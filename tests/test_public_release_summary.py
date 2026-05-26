@@ -44,6 +44,8 @@ def test_public_release_summary_separates_done_preview_and_out_of_scope() -> Non
         "로컬 API 서버",
         "구현됨",
         "문서 기반 RAG",
+        "PDF OCR fallback",
+        "PyPDF image XObject",
         "CLI 로컬 비서",
         "Agent 실행 엔진",
         "preview-only",

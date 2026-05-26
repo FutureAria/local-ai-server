@@ -1025,3 +1025,13 @@
 - public docs link contract와 README key docs test에 OCR plan 문서 링크를 포함해 누락 드리프트를 방지했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_readme_quick_start.py tests/test_portfolio_docs_contract.py` 결과는 `28 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `276 passed, 1 warning`이다.
+
+### OCR status snapshot wording sync
+
+- 2026-05-26 18:27 KST 기준으로 README와 public release summary의 첫 상태표가 PDF OCR fallback 범위를 같은 문구로 설명하도록 정리했다.
+- `README.md`의 `Current Status Snapshot`과 `docs/PUBLIC_RELEASE_SUMMARY.md`의 공개용 상태 스냅샷에 `[ocr]` extra, 로컬 `tesseract`, PyPDF image XObject 범위를 명시했다.
+- `tests/test_readme_quick_start.py`와 `tests/test_public_release_summary.py`에 `PDF OCR fallback`, `PyPDF image XObject` 계약 문구를 추가해 첫 화면 문서 드리프트를 막았다.
+- 기능 활성화나 시스템 패키지 설치는 하지 않았다. 외부 LLM API, cloud OCR, pdf2image/poppler, shell/browser/file-write 실행, 운영 배포, secret 출력은 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_release_summary.py` 결과는 `15 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `276 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `276 passed, 1 warning`, public release check는 `scanned_files=120`, finding 없음이다.

@@ -15,7 +15,7 @@
 | 구분 | 상태 | 공개용 설명 |
 |---|---|---|
 | 로컬 API 서버 | 구현됨 | FastAPI, SQLite, Chroma, Ollama local API 기반으로 실행됩니다. |
-| 문서 기반 RAG | 구현됨 | `.txt`, `.md`, `.html`, `.htm`, optional `.pdf`, `.docx` 문서 색인과 검색/답변을 지원합니다. |
+| 문서 기반 RAG | 구현됨 | `.txt`, `.md`, `.html`, `.htm`, optional `.pdf`, `.docx` 문서 색인과 검색/답변을 지원합니다. PDF OCR fallback은 `[ocr]` extra와 로컬 `tesseract`가 있을 때 PyPDF image XObject 범위에서 동작합니다. |
 | CLI 로컬 비서 | 구현됨 | Typer CLI가 FastAPI 백엔드를 호출하며 `local-ai assistant` REPL을 제공합니다. |
 | Agent 실행 엔진 | preview-only | 승인 상태와 read-only preview 중심이며 실제 shell/file/browser 실행은 하지 않습니다. |
 | 배포/외부 자동화 | 하지 않음 | 운영 배포, 브라우저 조작, 파일 자동 수정/삭제, 외부 LLM API 연결은 현재 범위 밖입니다. |
