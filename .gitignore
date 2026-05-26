@@ -36,6 +36,9 @@ google-credentials*.json
 *.cer
 *.p12
 *.pfx
+*.jks
+*.keystore
+*.truststore
 id_rsa
 id_dsa
 id_ecdsa

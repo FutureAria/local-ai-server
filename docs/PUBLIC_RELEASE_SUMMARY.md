@@ -75,7 +75,7 @@
 - `.ssh/`, `.docker/`
 - `.aws/`, `.gcloud/`, `.azure/`, `.kube/`
 - `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json`
-- `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.p12`, `*.pfx`
+- `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.truststore`
 - `id_rsa`, `id_dsa`, `id_ecdsa`, `id_ecdsa_sk`, `id_ed25519`, `id_ed25519_sk`
 - `data/local_ai.sqlite3`
 - `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*`
@@ -101,7 +101,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `399 passed`
+- `.venv/bin/pytest`: `402 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
