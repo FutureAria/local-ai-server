@@ -961,3 +961,13 @@
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.
 - 최종 보고는 `Recommended Next Model` 섹션 중심으로 다음 작업을 이어갈 수 있게 작성함.
+
+### Opus safety polish replay verification
+
+- 2026-05-26 14:58 KST 기준으로 Claude Opus safety polish prompt를 재확인했다.
+- 요청 항목은 기존 `371290c Apply Opus safety polish`와 `43f856c Sync public release next steps` 상태에 이미 반영되어 있었다.
+- 재확인 범위는 Agent file dry-run `would_execute=false`, `execute_phase_would_run`, `LOCAL_API_KEY_WARN`, private/loopback/link-local web fetch 차단, redirect 자동 follow 비활성화, `LOCAL_CORS_ALLOW_CREDENTIALS`, README/API/OPERATIONS/USER_DOCUMENT_E2E_PLAN 문서 반영이다.
+- 추가 위험 기능 활성화는 하지 않았다. 외부 LLM API, shell/browser/file-write 실행 활성화, agent 기본값 변경, 운영 배포, cloud/Oracle 변경, secret 출력, 시스템 패키지 설치는 수행하지 않았다.
+- replay self-check에서 `.venv/bin/pytest` 결과는 `266 passed, 1 warning`이다.
+- replay local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `266 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
+- replay whitespace check에서 `git diff --check` 결과는 통과했다.
