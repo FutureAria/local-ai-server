@@ -35,6 +35,7 @@
 
 - [x] README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 유지
 - [x] runtime endpoint count drift check 유지
+- [x] README와 `docs/PROJECT_SUMMARY.md`의 Runtime Contract Snapshot 값을 실제 API/CLI/smoke flow inventory와 비교하는 테스트 유지
 - [x] assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 기준으로 유지
 - [x] `scripts/smoke_test_api.py --sanitized-summary` 결과 예시가 원문/secret/local path를 제외하는지 계속 검증
 - [x] 실제 사용자 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서 기준 upload/search/ask-with-docs end-to-end 재검증 결과를 paste-safe summary로 기록

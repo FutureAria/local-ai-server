@@ -1262,3 +1262,13 @@
 - full self-check에서 `.venv/bin/pytest` 결과는 `311 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `311 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
 - `git diff --check` 결과는 성공이다.
+
+### TASKS runtime snapshot guard tracking
+
+- 2026-05-26 20:19 KST 기준으로 `docs/TASKS.md`의 안전 작업 완료 목록에 README와 `docs/PROJECT_SUMMARY.md`의 `Runtime Contract Snapshot` 검증 유지 항목을 추가했다.
+- `tests/test_tasks_doc.py`가 해당 항목을 확인하도록 보강해 task board가 최신 문서 drift guard를 놓치지 않게 했다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_tasks_doc.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `24 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `311 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `311 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+- `git diff --check` 결과는 성공이다.
