@@ -71,6 +71,7 @@
 - `.envrc`
 - `.npmrc`, `.pypirc`, `.netrc`
 - `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`
+- `secrets/`, `.secrets/`
 - `.ssh/`, `.docker/`
 - `.aws/`, `.gcloud/`, `.azure/`, `.kube/`
 - `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json`
@@ -100,7 +101,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `393 passed`
+- `.venv/bin/pytest`: `395 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

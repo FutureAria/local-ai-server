@@ -16,6 +16,8 @@ venv/
 .boto
 .s3cfg
 .pgpass
+secrets/
+.secrets/
 .ssh/
 .docker/
 .aws/
