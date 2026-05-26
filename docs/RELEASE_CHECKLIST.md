@@ -14,7 +14,7 @@
 - [ ] `.env`가 staging에 없다.
 - [ ] `*.key`, `*.pem`, `*.p12`, `*.pfx`, `id_rsa`, `id_ed25519` 같은 key/certificate 파일이 staging에 없다.
 - [ ] `data/local_ai.sqlite3`가 staging에 없다.
-- [ ] `data/*.sqlite`, `data/*.db` 같은 SQLite/DB 파일 변형이 staging에 없다.
+- [ ] `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*` 같은 SQLite/DB 파일 변형이 staging에 없다.
 - [ ] `data/chroma/` 파일이 staging에 없다.
 - [ ] `data/uploads/` 파일이 staging에 없다.
 - [ ] `data/logs/` 로그 파일이 staging에 없다.

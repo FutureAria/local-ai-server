@@ -70,7 +70,7 @@
 - `*.key`, `*.pem`, `*.p12`, `*.pfx`
 - `id_rsa`, `id_ed25519`
 - `data/local_ai.sqlite3`
-- `data/*.sqlite`, `data/*.db`
+- `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*`
 - `data/chroma/`
 - `data/uploads/`
 - `data/logs/`
@@ -92,7 +92,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `337 passed`
+- `.venv/bin/pytest`: `340 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
