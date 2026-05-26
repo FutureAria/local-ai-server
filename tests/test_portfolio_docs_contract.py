@@ -5,6 +5,7 @@ README = Path("README.md")
 PROJECT_SUMMARY = Path("docs/PROJECT_SUMMARY.md")
 FINAL_REPORT = Path("docs/FINAL_REPORT.md")
 SECURITY = Path("SECURITY.md")
+CLAUDE_REVIEW_HANDOFF = Path("docs/CLAUDE_REVIEW_HANDOFF.md")
 
 
 def test_readme_includes_portfolio_story_without_overclaiming() -> None:
@@ -52,7 +53,7 @@ def test_project_summary_includes_portfolio_points_and_limits() -> None:
 
 
 def test_project_summary_and_final_report_show_current_pytest_count() -> None:
-    for path in [PROJECT_SUMMARY, FINAL_REPORT]:
+    for path in [PROJECT_SUMMARY, FINAL_REPORT, CLAUDE_REVIEW_HANDOFF]:
         text = path.read_text(encoding="utf-8")
         assert "312 passed" in text
         assert "276 passed" not in text
