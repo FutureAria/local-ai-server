@@ -110,6 +110,8 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
         "settings.xml",
         "build.gradle",
         "build.gradle.kts",
+        "poetry.lock",
+        "schema.sql",
     ],
 )
 def test_public_release_check_scans_common_config_and_script_files(
