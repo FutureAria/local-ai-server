@@ -197,6 +197,11 @@ curl http://127.0.0.1:8000/assistant/capabilities
 
 응답 핵심 필드:
 
+- `service`
+- `local_only`
+- `llm_provider`
+- `storage`
+- `vector_store`
 - `modes`
 - `protected`
 - `safe_defaults`
@@ -220,6 +225,7 @@ curl -X POST http://127.0.0.1:8000/assistant/action-preview \
 - `requires_approval`
 - `risk_level`
 - `needs`
+- `safety`
 - `ui`
 
 ### `GET /assistant/ping`
@@ -232,6 +238,7 @@ curl http://127.0.0.1:8000/assistant/ping
 
 응답 핵심 필드:
 
+- `service`
 - `status=ok`
 - `protected`
 - `local_only`
@@ -247,6 +254,8 @@ curl http://127.0.0.1:8000/assistant/config
 
 응답 핵심 필드:
 
+- `service`
+- `local_only`
 - `protected`
 - `cors_origins`
 - `allowed_roots`
@@ -265,12 +274,17 @@ curl http://127.0.0.1:8000/assistant/ui-contract
 
 응답 핵심 필드:
 
+- `service`
+- `version`
+- `protected`
 - `startup_sequence`
 - `refresh_endpoints`
 - `message_flow`
 - `response_types`
 - `blocked_actions`
+- `safety`
 - `auth.secret_returned=false`
+- `notes`
 
 ### `GET /assistant/startup`
 
@@ -282,11 +296,15 @@ curl http://127.0.0.1:8000/assistant/startup
 
 응답 핵심 필드:
 
+- `service`
+- `local_only`
+- `protected`
 - `ping`
 - `config`
 - `dashboard`
 - `ui_contract`
 - `recommended_calls`
+- `safety`
 - `ui`
 
 ### `GET /assistant/status`
@@ -299,6 +317,7 @@ curl http://127.0.0.1:8000/assistant/status
 
 응답 핵심 필드:
 
+- `service`
 - `current_phase`
 - `documents`
 - `integrity`
@@ -315,12 +334,14 @@ curl http://127.0.0.1:8000/assistant/dashboard
 
 응답 핵심 필드:
 
+- `service`
 - `current_phase`
 - `cards.documents`
 - `cards.integrity`
 - `cards.sessions`
 - `cards.connection`
 - `recent_sessions`
+- `safety`
 - `ui`
 
 ### `POST /assistant/bootstrap`
@@ -339,6 +360,7 @@ curl -X POST http://127.0.0.1:8000/assistant/bootstrap \
 
 응답 핵심 필드:
 
+- `service`
 - `capabilities`
 - `status`
 - `project_root`
@@ -571,6 +593,7 @@ curl -X POST http://127.0.0.1:8000/documents/index-folder-preview \
 - `files`
 - `skipped_files`
 - `dry_run=true`
+- `note`
 
 ### `POST /documents/index-folder-job-preview`
 
@@ -1311,6 +1334,7 @@ curl -X POST http://127.0.0.1:8000/agent/plan \
 - `actions[].tool`
 - `actions[].risk_level`
 - `actions[].requires_approval`
+- `note`
 
 ### `GET /agent/runs`
 

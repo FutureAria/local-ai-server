@@ -1186,3 +1186,15 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `43 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `302 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `302 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### API response field coverage drift guard
+
+- 2026-05-26 19:46 KST 기준으로 `docs/API.md`의 응답 핵심 필드 표가 실제 Pydantic response model top-level field를 누락하지 않도록 테스트를 보강했다.
+- `tests/test_api_docs_payloads.py`가 문서에 적힌 응답 필드가 schema에 존재하는지뿐 아니라, schema의 top-level field가 문서 응답 핵심 필드에 모두 포함되는지도 확인한다.
+- `docs/API.md`의 assistant, agent plan, index-folder-preview 응답 핵심 필드에 누락된 `service`, `local_only`, `safety`, `note` 등 top-level field를 보강했다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `303 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py` 결과는 `21 passed, 1 warning`이다.
+- targeted contract self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `39 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `303 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `303 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.

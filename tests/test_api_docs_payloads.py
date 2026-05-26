@@ -385,6 +385,22 @@ def test_api_docs_response_core_fields_match_response_models() -> None:
     assert checked_endpoints >= 10
 
 
+def test_api_docs_response_core_fields_cover_response_models() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    runtime_fields = _runtime_response_fields_by_endpoint()
+    documented_fields = _extract_documented_response_fields(text)
+
+    missing_by_endpoint: dict[str, list[str]] = {}
+    for endpoint, fields in documented_fields.items():
+        if endpoint not in runtime_fields:
+            continue
+        missing_fields = runtime_fields[endpoint] - fields
+        if missing_fields:
+            missing_by_endpoint[endpoint] = sorted(missing_fields)
+
+    assert not missing_by_endpoint
+
+
 def test_api_docs_top_level_sections_have_expected_order() -> None:
     text = Path("docs/API.md").read_text(encoding="utf-8")
     headings = [match.group(1) for match in re.finditer(r"^## (.+)$", text, flags=re.M)]
