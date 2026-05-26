@@ -110,7 +110,7 @@ local-ai vector-rebuild-preview
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
 - [ ] endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
-- [ ] upload/search/ask-with-docs end-to-end 재검증 결과를 sanitized smoke summary로 기록
+- [ ] 승인된 실제 사용자 `.md`/`.txt` 문서 E2E smoke summary가 민감 정보 없이 유지되는지 검증
 - [ ] 대용량 색인 job/status API progress response schema preview-only 계약 기준 실제 queue 활성화 조건 문서 유지
 - [ ] Chroma 누락 vector 재생성 preview-only endpoint 기준 실제 rebuild 활성화 조건 문서 유지
 - [ ] assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지

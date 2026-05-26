@@ -133,8 +133,8 @@ git diff --check
 
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
-1. 실제 사용자 `.md`/`.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증 결과를 sanitized smoke summary로 기록
-2. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
+1. README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
+2. 승인된 실제 사용자 `.md`/`.txt` 문서 E2E smoke summary가 민감 정보 없이 유지되는지 검증
 3. preview-only queue/rebuild 계약을 실제 queue/rebuild 활성화 조건 문서로 계속 정리
 4. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
 

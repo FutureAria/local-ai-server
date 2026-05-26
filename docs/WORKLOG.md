@@ -949,6 +949,14 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_agent_service.py tests/test_security.py tests/test_config.py tests/test_operations_runbook.py tests/test_readme_quick_start.py tests/test_api_docs_payloads.py tests/test_user_document_e2e_plan.py tests/test_portfolio_docs_contract.py` 결과는 `83 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `266 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
 
+### Public release next-step wording sync
+
+- `docs/PUBLIC_RELEASE_SUMMARY.md`, `docs/FINAL_REPORT.md`, `docs/RELEASE_CHECKLIST.md`에서 이미 완료된 실제 사용자 문서 E2E를 "남은 재검증"처럼 표현하던 문구를 정리했다.
+- 다음 개선 문구는 README/PROJECT_SUMMARY와 맞춰 "승인된 실제 사용자 `.md`/`.txt` 문서 E2E smoke summary가 민감 정보 없이 유지되는지 검증"으로 통일했다.
+- `tests/test_public_release_summary.py`도 같은 계약을 검증하도록 갱신했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_readme_quick_start.py tests/test_public_docs_contract.py` 결과는 `33 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `266 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
+
 ### 응답 형식 업데이트
 
 - 실제 배포/클라우드/DB migration 작업이 없으면 배포 여부 섹션을 반복하지 않기로 정리함.
