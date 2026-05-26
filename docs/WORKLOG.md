@@ -1,5 +1,20 @@
 # WORKLOG
 
+## 2026-05-26 21:52 KST
+
+### README/API verification command guard
+
+- `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 local CI/public release check 예시를 `.venv/bin/python` 기준으로 정리했다.
+- `tests/test_readme_quick_start.py`와 `tests/test_public_docs_contract.py`가 README/release checklist에 `.venv/bin/python` 기반 검증 명령을 유지하도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py` | `46 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `314 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 21:48 KST
 
 ### Release verification command guard

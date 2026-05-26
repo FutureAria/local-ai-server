@@ -347,6 +347,7 @@ def test_release_checklist_covers_publication_gates() -> None:
         ".venv/bin/pytest",
         ".venv/bin/python -m compileall app cli scripts",
         ".venv/bin/python scripts/public_release_check.py --root . --json",
+        ".venv/bin/python scripts/local_ci_check.py --root .",
         "git diff --check",
     ]
     sensitive_paths = [

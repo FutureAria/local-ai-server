@@ -82,7 +82,10 @@ def test_readme_verification_documents_safe_check_commands() -> None:
     text = README.read_text(encoding="utf-8")
 
     for command in [
-        "python scripts/local_ci_check.py --root .",
+        ".venv/bin/python scripts/local_ci_check.py --root .",
+        ".venv/bin/python -m pytest",
+        ".venv/bin/python -m compileall app cli scripts",
+        ".venv/bin/python scripts/public_release_check.py --root . --json",
         (
             "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 "
             "--assistant-bridge-only --project-root /Users/juyoung/local-ai-server"

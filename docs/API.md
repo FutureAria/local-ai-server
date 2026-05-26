@@ -1514,15 +1514,15 @@ Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`
 로컬에서 공개 전 최소 검증을 한 번에 실행한다.
 
 ```bash
-python scripts/local_ci_check.py --root .
-python scripts/local_ci_check.py --root . --json
+.venv/bin/python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root . --json
 ```
 
 실행 순서:
 
-1. `pytest`
-2. `python -m compileall app cli scripts`
-3. `python scripts/public_release_check.py --root . --json`
+1. `.venv/bin/python -m pytest`
+2. `.venv/bin/python -m compileall app cli scripts`
+3. `.venv/bin/python scripts/public_release_check.py --root . --json`
 4. `git diff --check`
 
 실패가 발생하면 그 단계에서 멈춘다. 시스템 패키지 설치, 운영 배포, 외부 API 활성화는 수행하지 않는다.

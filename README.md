@@ -41,14 +41,14 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 서버 없이 안전한 로컬 검증을 한 번에 실행하려면:
 
 ```bash
-python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root .
 ```
 
 이 명령은 아래 순서로 멈춤 없는 정적 검증을 실행하고, 실패하면 해당 단계에서 중단합니다.
 
-1. `python -m pytest`
-2. `python -m compileall app cli scripts`
-3. `python scripts/public_release_check.py --root . --json`
+1. `.venv/bin/python -m pytest`
+2. `.venv/bin/python -m compileall app cli scripts`
+3. `.venv/bin/python scripts/public_release_check.py --root . --json`
 4. `git diff --check`
 
 서버 실행 후 assistant bridge API만 smoke test하려면:
@@ -85,7 +85,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /pa
 
 | 명령 | 서버 필요 | Ollama 필요 | 저장 영향 |
 |---|---:|---:|---|
-| `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary` | 예 | 예 | 문서/RAG smoke와 저장 영향은 같지만 출력에서 질문/답변 원문, request id, header, local path를 제외 |
@@ -963,17 +963,17 @@ pytest
 전체 로컬 검증을 한 번에 실행하려면 아래 명령을 사용합니다.
 
 ```bash
-python scripts/local_ci_check.py --root .
-python scripts/local_ci_check.py --root . --json
+.venv/bin/python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root . --json
 ```
 
 이 스크립트는 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행합니다. 실패가 발생하면 그 단계에서 멈추며, 시스템 의존성 설치나 배포는 수행하지 않습니다.
 
 내부 실행 단계는 아래와 같습니다.
 
-- `python -m pytest`
-- `python -m compileall app cli scripts`
-- `python scripts/public_release_check.py --root . --json`
+- `.venv/bin/python -m pytest`
+- `.venv/bin/python -m compileall app cli scripts`
+- `.venv/bin/python scripts/public_release_check.py --root . --json`
 - `git diff --check`
 
 ## E2E Smoke Test
@@ -999,8 +999,8 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 로컬 데이터와 secret 후보가 공개 대상에 섞여 있는지 read-only로 점검할 수 있습니다.
 
 ```bash
-python scripts/public_release_check.py --root .
-python scripts/public_release_check.py --root . --json
+.venv/bin/python scripts/public_release_check.py --root .
+.venv/bin/python scripts/public_release_check.py --root . --json
 ```
 
 현재 로컬 DB, Chroma index, 업로드 파일이 있으면 이 스크립트는 실패 코드와 함께 항목을 출력합니다. 삭제는 수행하지 않으며, 공개 전 `.gitignore`와 실제 포함 파일을 확인하기 위한 안전장치입니다.
