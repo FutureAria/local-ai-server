@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from cli.main import ASSISTANT_REPL_HELP_LINES
@@ -170,15 +171,22 @@ def test_readme_keeps_safe_boundaries_visible_near_top() -> None:
 
 def test_readme_key_docs_links_public_project_docs() -> None:
     text = README.read_text(encoding="utf-8")
+    key_docs_section = text.split("## Key Docs", 1)[1].split("## 개발 배경", 1)[0]
 
     for link in [
         "docs/API.md",
         "docs/FINAL_REPORT.md",
         "docs/PROJECT_SUMMARY.md",
+        "docs/TASKS.md",
         "docs/OCR_INTEGRATION_PLAN.md",
+        "docs/USER_DOCUMENT_E2E_PLAN.md",
         "docs/OPERATIONS.md",
+        "docs/SMOKE_SUMMARY_EXAMPLES.md",
+        "docs/PREVIEW_ACTIVATION_POLICY.md",
         "docs/RELEASE_CHECKLIST.md",
         "docs/PUBLIC_RELEASE_SUMMARY.md",
+        "docs/UI_CONNECT_GUIDE.md",
+        "docs/UI_CONTRACT_CHEATSHEET.md",
         "docs/UI_BRIDGE_EXAMPLES.md",
         "docs/UI_QA_CHECKLIST.md",
         "docs/CLAUDE_REVIEW_HANDOFF.md",
@@ -186,4 +194,14 @@ def test_readme_key_docs_links_public_project_docs() -> None:
         "docs/NEXT_CHAT_HANDOFF.md",
         "SECURITY.md",
     ]:
-        assert link in text
+        assert link in key_docs_section
+
+
+def test_readme_key_docs_markdown_targets_exist() -> None:
+    text = README.read_text(encoding="utf-8")
+    key_docs_section = text.split("## Key Docs", 1)[1].split("## 개발 배경", 1)[0]
+    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", key_docs_section)
+
+    assert links
+    for link in links:
+        assert Path(link).exists(), f"README Key Docs link target missing: {link}"

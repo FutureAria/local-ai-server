@@ -1175,3 +1175,14 @@
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `18 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `301 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `301 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### README Key Docs link contract
+
+- 2026-05-26 19:41 KST 기준으로 README `Key Docs` 목록이 공개 핵심 문서 전체를 포함하는지 직접 검증하는 테스트를 보강했다.
+- `tests/test_readme_quick_start.py`가 `docs/TASKS.md`, `docs/USER_DOCUMENT_E2E_PLAN.md`, `docs/SMOKE_SUMMARY_EXAMPLES.md`, `docs/PREVIEW_ACTIVATION_POLICY.md`, `docs/UI_CONNECT_GUIDE.md`, `docs/UI_CONTRACT_CHEATSHEET.md`까지 README `Key Docs` 섹션에 남아 있는지 확인한다.
+- README `Key Docs` 섹션의 markdown link target이 실제 파일로 존재하는지도 확인한다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `302 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `43 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `302 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `302 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
