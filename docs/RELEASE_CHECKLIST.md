@@ -37,6 +37,7 @@ python scripts/local_ci_check.py --root .
 - [ ] `python scripts/local_ci_check.py --root .`가 통과한다.
 - [ ] `tests/test_smoke_script.py`가 sanitized smoke summary 계약을 검증한다.
 - [ ] `tests/test_ui_bridge_examples.py`가 runtime endpoint count drift check를 검증한다.
+- [ ] `tests/test_public_docs_contract.py`가 README/Project Summary Runtime Contract Snapshot 값을 실제 API/CLI/smoke flow inventory와 비교한다.
 - [ ] `tests/test_public_docs_contract.py`와 `tests/test_security_docs_contract.py`가 공개 문서 endpoint/보안 경계를 검증한다.
 
 ## 3. 문서 정합성
@@ -110,6 +111,7 @@ local-ai vector-rebuild-preview
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
 - [ ] endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
+- [ ] README/Project Summary Runtime Contract Snapshot 값을 실제 API/CLI/smoke flow inventory와 비교하는 계약 유지
 - [ ] 승인된 실제 사용자 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서 E2E smoke summary가 민감 정보 없이 유지되는지 검증
 - [ ] 대용량 색인 job/status API progress response schema preview-only 계약 기준 실제 queue 활성화 조건 문서 유지
 - [ ] Chroma 누락 vector 재생성 preview-only endpoint 기준 실제 rebuild 활성화 조건 문서 유지
