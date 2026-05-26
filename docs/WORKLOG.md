@@ -1164,3 +1164,14 @@
 - `tests/test_public_release_summary.py`가 release snapshot의 count를 runtime `build_api_inventory(app.routes)`, Typer command registry, smoke flow 상수와 직접 비교한다.
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_public_docs_contract.py tests/test_ui_bridge_examples.py tests/test_smoke_summary_examples.py` 결과는 `33 passed, 1 warning`이다.
+
+### Public verification count wording sync
+
+- 2026-05-26 19:36 KST 기준으로 공개 전 최종 pass 문서의 pytest 검증 수치를 현재 `301 passed` 상태로 맞췄다.
+- `docs/PUBLIC_RELEASE_SUMMARY.md`, `docs/PROJECT_SUMMARY.md`, `docs/FINAL_REPORT.md`, `docs/NEXT_CHAT_HANDOFF.md`, `docs/CLAUDE_REVIEW_HANDOFF.md`의 최신 검증 수치 문구를 동기화했다.
+- `tests/test_public_release_summary.py`, `tests/test_portfolio_docs_contract.py`, `tests/test_next_chat_handoff.py`가 `301 passed` 문구를 직접 확인하도록 보강했다.
+- 과거 WORKLOG의 `276 passed` 항목은 당시 실행 기록이라 수정하지 않았다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `18 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `301 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `301 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.

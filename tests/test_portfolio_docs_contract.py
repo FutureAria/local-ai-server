@@ -51,6 +51,14 @@ def test_project_summary_includes_portfolio_points_and_limits() -> None:
         assert phrase in text
 
 
+def test_project_summary_and_final_report_show_current_pytest_count() -> None:
+    for path in [PROJECT_SUMMARY, FINAL_REPORT]:
+        text = path.read_text(encoding="utf-8")
+        assert "301 passed" in text
+        assert "276 passed" not in text
+        assert "298 passed" not in text
+
+
 def test_final_report_matches_required_completion_report_shape() -> None:
     text = FINAL_REPORT.read_text(encoding="utf-8")
 
@@ -77,7 +85,7 @@ def test_final_report_matches_required_completion_report_shape() -> None:
         "local-ai assistant",
         "uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
         ".venv/bin/pytest",
-        "276 passed",
+        "301 passed",
         "프론트엔드는 포함하지 않는다",
         "실제 shell 실행은 지원하지 않는다",
         "운영 배포",
