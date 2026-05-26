@@ -220,7 +220,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - PDF OCR fallback은 PyPDF image XObject 기반 optional loader로 구현했고, 외부 OCR/cloud OCR/pdf2image/poppler는 추가하지 않았다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `397 passed`
+  - `.venv/bin/pytest`: `399 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
