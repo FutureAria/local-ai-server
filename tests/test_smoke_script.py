@@ -212,7 +212,9 @@ def test_sanitized_smoke_summary_omits_sensitive_or_noisy_fields(monkeypatch) ->
 
     summary = smoke.run_smoke_test("http://server.test/")
     safe = smoke.build_sanitized_smoke_summary(summary)
-    encoded = str(safe)
+    safe_without_excluded = dict(safe)
+    safe_without_excluded.pop("excluded_fields", None)
+    encoded = str(safe_without_excluded)
 
     assert safe["safe_to_paste"] is True
     assert safe["mode"] == "document-rag"

@@ -4,9 +4,29 @@ from pathlib import Path
 
 from app.main import app
 from app.services.project_status_service import build_api_inventory
+from scripts import smoke_test_api as smoke
 
 
 DOC = Path("docs/SMOKE_SUMMARY_EXAMPLES.md")
+TOP_LEVEL_KEYS_BY_MODE = {
+    "document-rag": {"ok", "mode", "base_url", "safe_to_paste", "sample_documents", "steps", "excluded_fields"},
+    "assistant-bridge": {"ok", "mode", "base_url", "safe_to_paste", "steps", "excluded_fields"},
+}
+STEP_KEYS = {
+    "health": {"step", "status"},
+    "upload": {"step", "status", "documents_count", "chunks_count", "documents"},
+    "search": {"step", "status", "results_count"},
+    "ask-with-docs": {"step", "status", "sources_count"},
+    "feedback": {"step", "status", "feedback_id"},
+    "stats": {"step", "status", "documents_count", "chunks_count"},
+    "assistant-startup": {"step", "status", "ui_ready", "protected"},
+    "api-inventory": {"step", "status", "endpoints_count", "protected_endpoints_count"},
+    "assistant-bootstrap": {"step", "status", "has_project_root"},
+    "assistant-action-preview": {"step", "status", "intent", "would_execute"},
+    "assistant-message": {"step", "status", "response_type"},
+    "assistant-sessions": {"step", "status", "sessions_count"},
+    "assistant-messages": {"step", "status", "total_messages"},
+}
 
 
 def _json_blocks() -> list[dict]:
@@ -54,26 +74,22 @@ def test_smoke_summary_examples_cover_document_and_assistant_modes() -> None:
         "smoke-backend-notes.md",
         "smoke-architecture-notes.txt",
     ]
-    assert {step["step"] for step in document["steps"]} >= {
-        "health",
-        "upload",
-        "search",
-        "ask-with-docs",
-        "feedback",
-        "stats",
-    }
+    assert [step["step"] for step in document["steps"]] == smoke.DOCUMENT_RAG_SMOKE_FLOW
 
     assert assistant["mode"] == "assistant-bridge"
-    assert {step["step"] for step in assistant["steps"]} >= {
-        "assistant-startup",
-        "api-inventory",
-        "assistant-bootstrap",
-        "action-preview",
-        "assistant-message",
-        "assistant-sessions",
-        "assistant-messages",
-    }
+    assert [step["step"] for step in assistant["steps"]] == smoke.ASSISTANT_BRIDGE_SMOKE_FLOW
     assert any(step.get("response_type") == "status" for step in assistant["steps"])
+
+
+def test_smoke_summary_examples_match_sanitized_summary_shape() -> None:
+    for example in _json_blocks():
+        mode = example["mode"]
+        assert set(example) == TOP_LEVEL_KEYS_BY_MODE[mode]
+        assert example["excluded_fields"] == smoke.SANITIZED_SUMMARY_EXCLUDED_FIELDS
+        for step in example["steps"]:
+            step_name = step["step"]
+            assert step_name in STEP_KEYS
+            assert set(step) == STEP_KEYS[step_name]
 
 
 def test_assistant_smoke_summary_api_inventory_counts_match_runtime() -> None:

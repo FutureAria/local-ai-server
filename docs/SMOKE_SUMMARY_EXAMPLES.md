@@ -60,14 +60,15 @@
   "excluded_fields": [
     "question",
     "answer",
-    "request_id",
+    "content",
     "headers",
+    "note",
     "api_key",
     "project_root",
+    "request_id",
     "stored_path",
     "document_id",
-    "chunk_id",
-    "content"
+    "chunk_id"
   ]
 }
 ```
@@ -99,7 +100,7 @@
       "has_project_root": true
     },
     {
-      "step": "action-preview",
+      "step": "assistant-action-preview",
       "status": 200,
       "intent": "status",
       "would_execute": false
@@ -123,14 +124,15 @@
   "excluded_fields": [
     "question",
     "answer",
-    "request_id",
+    "content",
     "headers",
+    "note",
     "api_key",
     "project_root",
+    "request_id",
     "stored_path",
     "document_id",
-    "chunk_id",
-    "content"
+    "chunk_id"
   ]
 }
 ```

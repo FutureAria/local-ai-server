@@ -61,14 +61,17 @@ ASSISTANT_BRIDGE_SMOKE_FLOW = [
 ]
 
 SANITIZED_SUMMARY_EXCLUDED_FIELDS = [
+    "question",
     "answer",
     "content",
     "headers",
     "note",
+    "api_key",
     "project_root",
-    "question",
     "request_id",
     "stored_path",
+    "document_id",
+    "chunk_id",
 ]
 
 

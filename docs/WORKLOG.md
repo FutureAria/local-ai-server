@@ -1135,3 +1135,11 @@
 - 기존 검사는 runtime command가 문서에 누락되지 않는 방향이었다. 이번 검사는 반대로 문서에 stale CLI command 예시가 남는 경우를 잡는다.
 - 실제 backend 호출, shell/browser/file-write 실행 활성화, 외부 API 호출은 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_cli.py tests/test_readme_quick_start.py` 결과는 `43 passed, 1 warning`이다.
+
+### Smoke summary example shape guard
+
+- 2026-05-26 19:18 KST 기준으로 `docs/SMOKE_SUMMARY_EXAMPLES.md`의 assistant bridge step 이름을 실제 script 출력인 `assistant-action-preview`와 맞췄다.
+- `tests/test_smoke_summary_examples.py`가 document/RAG와 assistant bridge 예시의 step 순서를 script 상수와 직접 비교하고, sanitized summary top-level/step field shape를 고정하도록 보강했다.
+- `SANITIZED_SUMMARY_EXCLUDED_FIELDS`에는 `api_key`, `document_id`, `chunk_id`도 명시해 예시 문서와 script 출력 계약을 일치시켰다.
+- 실제 smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_smoke_script.py tests/test_tasks_doc.py tests/test_public_docs_contract.py` 결과는 `33 passed, 1 warning`이다.
