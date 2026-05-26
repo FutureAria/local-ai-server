@@ -9,7 +9,7 @@ from app.schemas.assistant import (
     AssistantStartupResponse,
     AssistantUiContractResponse,
 )
-from app.schemas.documents import IndexFolderJobPreviewResponse
+from app.schemas.documents import DocumentVectorRebuildPreviewResponse, IndexFolderJobPreviewResponse
 from app.services.assistant_service import AssistantService
 from app.services.project_status_service import build_api_inventory
 
@@ -46,6 +46,9 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert '"job_id": "preview-only"' in text
     assert '"would_enqueue": false' in text
     assert '"embedding_batches_total": 2' in text
+    assert '"status": "needs_rebuild"' in text
+    assert '"chunks_missing_vectors_count": 2' in text
+    assert '"action": "rebuild_vector"' in text
 
 
 def test_ui_bridge_examples_document_message_response_types() -> None:
@@ -130,6 +133,20 @@ def test_ui_bridge_index_job_preview_example_matches_schema() -> None:
     assert validated.progress.total_files == 3
     assert validated.progress.embedding_batches_total == 2
     assert validated.progress.percent == 0
+
+
+def test_ui_bridge_vector_rebuild_preview_example_matches_schema() -> None:
+    text = Path("docs/UI_BRIDGE_EXAMPLES.md").read_text(encoding="utf-8")
+    example = _json_block_after_heading(text, "GET /documents/vector-rebuild-preview")
+    validated = DocumentVectorRebuildPreviewResponse.model_validate(example)
+
+    assert validated.status == "needs_rebuild"
+    assert validated.dry_run is True
+    assert validated.chunks_missing_vectors_count == 2
+    assert validated.embedding_batches_estimated == 1
+    assert validated.actions_count == 2
+    assert {action.action for action in validated.actions} == {"rebuild_vector"}
+    assert all(action.requires_user_approval for action in validated.actions)
 
 
 def test_ui_bridge_ui_contract_example_matches_runtime_contract_keys() -> None:

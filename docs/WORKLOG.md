@@ -1053,3 +1053,12 @@
 - `tests/test_api_docs_payloads.py`와 `tests/test_ui_bridge_examples.py`가 문서 JSON 예시를 `IndexFolderJobPreviewResponse` schema로 직접 검증한다.
 - 실제 queue 생성, SQLite 저장, embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_ui_bridge_examples.py tests/test_ui_connect_guide.py tests/test_ui_contract_cheatsheet.py tests/test_api_contracts.py` 결과는 `32 passed, 1 warning`이다.
+
+### Vector rebuild preview response schema examples
+
+- 2026-05-26 18:42 KST 기준으로 `GET /documents/vector-rebuild-preview`의 read-only response example을 API reference와 UI bridge examples에 추가했다.
+- 예시는 `status=needs_rebuild`, `dry_run=true`, `chunks_missing_vectors_count`, `embedding_batches_estimated`, `actions[].action=rebuild_vector`, `actions[].requires_user_approval=true`를 명시한다.
+- UI_CONNECT_GUIDE와 UI_CONTRACT_CHEATSHEET도 같은 read-only rebuild preview 표시 필드를 강조하도록 갱신했다.
+- `tests/test_api_docs_payloads.py`와 `tests/test_ui_bridge_examples.py`가 문서 JSON 예시를 `DocumentVectorRebuildPreviewResponse` schema로 직접 검증한다.
+- 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정, repair/delete/rebuild 실행, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_ui_bridge_examples.py tests/test_ui_connect_guide.py tests/test_ui_contract_cheatsheet.py tests/test_repair_preview.py tests/test_document_stats.py` 결과는 `28 passed, 1 warning`이다.

@@ -15,7 +15,11 @@ from app.schemas.assistant import (
     AssistantSessionCreateRequest,
     ProjectRootValidateRequest,
 )
-from app.schemas.documents import IndexFolderJobPreviewResponse, IndexFolderRequest
+from app.schemas.documents import (
+    DocumentVectorRebuildPreviewResponse,
+    IndexFolderJobPreviewResponse,
+    IndexFolderRequest,
+)
 from app.schemas.feedback import FeedbackRequest
 from app.schemas.project import ShellDryRunRequest
 from app.schemas.search import SearchRequest
@@ -148,6 +152,21 @@ def test_api_docs_index_job_preview_response_example_matches_schema() -> None:
     assert validated.progress.embedding_batches_completed == 0
     assert validated.progress.percent == 0
     assert "queue 생성" in validated.note
+
+
+def test_api_docs_vector_rebuild_preview_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/vector-rebuild-preview")
+    validated = DocumentVectorRebuildPreviewResponse.model_validate(example)
+
+    assert validated.status == "needs_rebuild"
+    assert validated.dry_run is True
+    assert validated.chunks_missing_vectors_count == 2
+    assert validated.embedding_batches_estimated == 1
+    assert validated.actions_count == 2
+    assert all(action.action == "rebuild_vector" for action in validated.actions)
+    assert all(action.requires_user_approval for action in validated.actions)
+    assert "실제 Ollama embedding 생성" in validated.note
 
 
 def test_api_docs_response_core_fields_match_response_models() -> None:

@@ -29,6 +29,8 @@ def test_ui_contract_cheatsheet_lists_core_endpoints_and_fields() -> None:
         "progress.total_files",
         "progress.embedding_batches_total",
         "progress.percent",
+        "chunks_missing_vectors_count",
+        "actions[].requires_user_approval",
         "embedding_batches_estimated",
         "sessions[].messages_count",
         "sessions[].last_message_preview",

@@ -40,6 +40,9 @@ def test_ui_connect_guide_documents_startup_flow() -> None:
         "progress.total_files",
         "progress.embedding_batches_total",
         "progress.percent=0",
+        "status=needs_rebuild 또는 ok",
+        "chunks_missing_vectors_count",
+        "actions[].requires_user_approval=true",
         "--assistant-bridge-preflight",
         "http://127.0.0.1:8010",
     ]:

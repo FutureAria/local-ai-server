@@ -233,6 +233,38 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
 }
 ```
 
+## `GET /documents/vector-rebuild-preview`
+
+SQLite chunk는 있지만 Chroma vector가 누락된 항목만 대상으로 재생성 후보를 보여주는 read-only preview 응답이다. UI는 `dry_run=true`, `actions[].requires_user_approval=true`이면 실제 embedding 생성이나 Chroma write 버튼을 제공하지 않는다.
+
+```json
+{
+  "status": "needs_rebuild",
+  "dry_run": true,
+  "chunks_missing_vectors_count": 2,
+  "embedding_batch_size": 8,
+  "embedding_batches_estimated": 1,
+  "actions_count": 2,
+  "actions": [
+    {
+      "action": "rebuild_vector",
+      "target_type": "chunk",
+      "target_id": 10,
+      "reason": "SQLite chunk는 있지만 Chroma vector가 없습니다.",
+      "requires_user_approval": true
+    },
+    {
+      "action": "rebuild_vector",
+      "target_type": "chunk",
+      "target_id": 11,
+      "reason": "SQLite chunk는 있지만 Chroma vector가 없습니다.",
+      "requires_user_approval": true
+    }
+  ],
+  "note": "미리보기 전용입니다. 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정은 수행하지 않습니다."
+}
+```
+
 ## `GET /assistant/startup`
 
 첫 화면을 그리기 위한 snapshot이다. UI는 이 응답만으로 연결 상태, 설정, dashboard 카드, UI 계약을 초기 렌더링할 수 있다.

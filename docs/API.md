@@ -680,6 +680,36 @@ Chroma vector가 누락된 SQLite chunk만 대상으로 재생성 후보를 반�
 curl http://127.0.0.1:8000/documents/vector-rebuild-preview
 ```
 
+응답 예시:
+
+```json
+{
+  "status": "needs_rebuild",
+  "dry_run": true,
+  "chunks_missing_vectors_count": 2,
+  "embedding_batch_size": 8,
+  "embedding_batches_estimated": 1,
+  "actions_count": 2,
+  "actions": [
+    {
+      "action": "rebuild_vector",
+      "target_type": "chunk",
+      "target_id": 10,
+      "reason": "SQLite chunk는 있지만 Chroma vector가 없습니다.",
+      "requires_user_approval": true
+    },
+    {
+      "action": "rebuild_vector",
+      "target_type": "chunk",
+      "target_id": 11,
+      "reason": "SQLite chunk는 있지만 Chroma vector가 없습니다.",
+      "requires_user_approval": true
+    }
+  ],
+  "note": "미리보기 전용입니다. 실제 Ollama embedding 생성, Chroma vector 재생성, DB 수정은 수행하지 않습니다."
+}
+```
+
 응답 핵심 필드:
 
 - `status`
