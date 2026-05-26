@@ -184,3 +184,4 @@ def test_ui_bridge_ui_contract_example_matches_runtime_contract_keys() -> None:
     assert example_refresh_paths == runtime_refresh_paths
     assert "/project/api-inventory" in runtime_refresh_paths
     assert example["blocked_actions"] == runtime["blocked_actions"]
+    assert example["safety"] == runtime["safety"]

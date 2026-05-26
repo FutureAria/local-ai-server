@@ -127,8 +127,10 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
   ],
   "safety": {
     "shell_execution": "disabled",
+    "shell_dry_run": "blocked",
     "browser_interaction": "blocked",
     "file_write_delete": "blocked",
+    "folder_index": "preview-only via assistant",
     "external_llm_api": "not-used"
   },
   "notes": [
