@@ -158,7 +158,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - LangChain을 추가하지 말 것.
 - 프론트엔드를 만들지 말 것.
 - 원본 색인 대상 파일을 삭제하거나 수정하지 말 것.
-- 사용자 승인과 실제 `.md`/`.txt` 경로 없이 실제 사용자 문서 E2E smoke를 실행하지 말 것.
+- 사용자 승인과 실제 지원 문서 경로 없이 실제 사용자 문서 E2E smoke를 실행하지 말 것.
 - secret, API key, DB password를 출력하지 말 것.
 - 운영 배포, 클라우드 리소스 변경, DB migration을 사용자 승인 없이 하지 말 것.
 
@@ -198,7 +198,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 5. UI에서 `POST /assistant/action-preview` 위험도/필요 입력값 표시 확인
 6. UI에서 `POST /assistant/message` 실제 메시지 전송과 `ui` 힌트 렌더링 확인
 7. UI에서 `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 대화 목록과 paging 확인
-8. 추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md` 또는 `.txt` 경로를 받은 뒤 실행
+8. 추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 경로를 받은 뒤 실행
 9. `/search` 실제 embedding + Chroma 검색 재확인
 10. `/ask-with-docs` 실제 RAG 답변 품질 확인
 11. 필요하면 HTML JavaScript 렌더링/크롤링 또는 pdf2image/poppler 기반 page rendering OCR 확장 범위 결정

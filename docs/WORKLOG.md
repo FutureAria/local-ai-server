@@ -1143,3 +1143,10 @@
 - `SANITIZED_SUMMARY_EXCLUDED_FIELDS`에는 `api_key`, `document_id`, `chunk_id`도 명시해 예시 문서와 script 출력 계약을 일치시켰다.
 - 실제 smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_smoke_script.py tests/test_tasks_doc.py tests/test_public_docs_contract.py` 결과는 `33 passed, 1 warning`이다.
+
+### Supported document E2E next-improvement wording
+
+- 2026-05-26 19:22 KST 기준으로 README, PROJECT_SUMMARY, PUBLIC_RELEASE_SUMMARY, FINAL_REPORT, RELEASE_CHECKLIST, NEXT_CHAT_HANDOFF의 실제 사용자 문서 E2E smoke next-improvement 문구를 현재 지원 타입인 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 기준으로 맞췄다.
+- 관련 contract test도 같은 지원 타입 문구를 확인하도록 갱신했다.
+- 실제 smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_user_document_e2e_plan.py` 결과는 `21 passed, 1 warning`이다.

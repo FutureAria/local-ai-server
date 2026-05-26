@@ -53,4 +53,4 @@ def test_next_chat_handoff_tracks_completed_real_user_document_e2e() -> None:
 
     assert "실제 사용자 문서 E2E는 완료됨" in text
     assert "완료된 실제 사용자 문서 E2E summary 정합성 유지" in text
-    assert "추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md` 또는 `.txt` 경로를 받은 뒤 실행" in text
+    assert "추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 경로를 받은 뒤 실행" in text
