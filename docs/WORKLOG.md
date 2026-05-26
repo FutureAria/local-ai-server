@@ -1,5 +1,20 @@
 # WORKLOG
 
+## 2026-05-26 22:38 KST
+
+### Final report verification command guard
+
+- `tests/test_portfolio_docs_contract.py`가 `docs/PROJECT_SUMMARY.md`와 `docs/FINAL_REPORT.md`의 테스트 실행 방법 코드블록에 같은 baseline 검증 명령 세트가 남아 있는지 함께 검증하도록 보강했다.
+- `docs/FINAL_REPORT.md`의 번호 포함 heading과 `docs/PROJECT_SUMMARY.md`의 일반 heading을 각각 인식하도록 테스트를 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_portfolio_docs_contract.py` | `8 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `317 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:25 KST
 
 ### Project summary verification block guard

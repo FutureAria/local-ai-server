@@ -60,18 +60,21 @@ def test_project_summary_and_final_report_show_current_pytest_count() -> None:
         assert "298 passed" not in text
 
 
-def test_project_summary_test_commands_match_final_report_baseline() -> None:
-    text = PROJECT_SUMMARY.read_text(encoding="utf-8")
-    test_section = text.split("## 테스트 실행 방법", 1)[1].split("현재 검증 상태:", 1)[0]
-
-    for command in [
+def test_summary_and_final_report_test_commands_match_baseline() -> None:
+    required_commands = [
         ".venv/bin/pytest",
         ".venv/bin/python -m compileall app cli scripts",
         ".venv/bin/python scripts/public_release_check.py --root . --json",
         "git diff --check",
         ".venv/bin/python scripts/local_ci_check.py --root .",
-    ]:
-        assert command in test_section
+    ]
+
+    for path in [PROJECT_SUMMARY, FINAL_REPORT]:
+        text = path.read_text(encoding="utf-8")
+        marker = "## 테스트 실행 방법" if path == PROJECT_SUMMARY else "## 5. 테스트 실행 방법"
+        test_section = text.split(marker, 1)[1].split("현재 검증 상태:", 1)[0]
+        for command in required_commands:
+            assert command in test_section, f"{path} missing verification command: {command}"
 
 
 def test_public_docs_use_json_public_release_check_command() -> None:
