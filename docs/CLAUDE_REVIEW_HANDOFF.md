@@ -78,7 +78,7 @@ git status
 
 ## 현재 검증 상태
 
-- `.venv/bin/pytest`: `343 passed`
+- `.venv/bin/pytest`: `345 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `.venv/bin/python scripts/local_ci_check.py --root .`: 성공
@@ -107,7 +107,7 @@ git status
    - `README.md` "배포 상태" 섹션
    - `SECURITY.md` 전체
    - `docs/PROJECT_SUMMARY.md` "보안과 운영 기준" 섹션
-5. 검증 수치 (`pytest 343 passed` 등)
+5. 검증 수치 (`pytest 345 passed` 등)
    - `README.md`, `docs/PROJECT_SUMMARY.md`, `docs/WORKLOG.md`, `docs/CLAUDE_REVIEW_HANDOFF.md`
 
 ## 리뷰할 세부 항목
