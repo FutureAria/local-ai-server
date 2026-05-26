@@ -100,7 +100,7 @@ local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/loca
 공개 전 로컬 데이터와 secret 후보를 점검한다.
 
 ```bash
-python scripts/public_release_check.py --root .
+.venv/bin/python scripts/public_release_check.py --root .
 ```
 
 점검 기준:
@@ -118,7 +118,7 @@ python scripts/public_release_check.py --root .
 
 | 명령 | 서버 필요 | Ollama 필요 | 저장 영향 |
 |---|---:|---:|---|
-| `python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 아니오 | 아니오 | read-only 검증. 파일/DB 수정 없음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server` | 예 | 아니오 | assistant 세션/메시지 기록만 SQLite에 추가될 수 있음 |
 | `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000` | 예 | 예 | 임시 Markdown/Text 문서를 업로드하므로 SQLite, Chroma, `data/uploads/`에 테스트 데이터 추가 |
 
@@ -127,16 +127,16 @@ python scripts/public_release_check.py --root .
 코드와 문서가 공개 가능한 상태인지 먼저 확인한다.
 
 ```bash
-python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root .
 ```
 
 이 명령은 `pytest`, `compileall`, public release check, `git diff --check`를 순서대로 실행한다. 실패하면 그 단계에서 멈춘다.
 
 내부 실행 단계:
 
-- `python -m pytest`
-- `python -m compileall app cli scripts`
-- `python scripts/public_release_check.py --root . --json`
+- `.venv/bin/python -m pytest`
+- `.venv/bin/python -m compileall app cli scripts`
+- `.venv/bin/python scripts/public_release_check.py --root . --json`
 - `git diff --check`
 
 ### 2. 서버 시작

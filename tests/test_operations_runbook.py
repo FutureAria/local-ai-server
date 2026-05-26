@@ -11,12 +11,9 @@ LOCAL_CI_DOCUMENTS = [
 ]
 
 LOCAL_CI_DOC_SNIPPETS = {
-    "pytest": ["python -m pytest", ".venv/bin/pytest"],
-    "compileall": ["python -m compileall app cli scripts", ".venv/bin/python -m compileall app cli scripts"],
-    "public-release-check": [
-        "python scripts/public_release_check.py --root . --json",
-        ".venv/bin/python scripts/public_release_check.py --root . --json",
-    ],
+    "pytest": [".venv/bin/python -m pytest", ".venv/bin/pytest"],
+    "compileall": [".venv/bin/python -m compileall app cli scripts"],
+    "public-release-check": [".venv/bin/python scripts/public_release_check.py --root . --json"],
     "git-diff-check": ["git diff --check"],
 }
 
@@ -51,7 +48,7 @@ def test_operations_runbook_documents_safe_local_check_order() -> None:
 
     required = [
         "## 로컬 운영 Runbook",
-        "python scripts/local_ci_check.py --root .",
+        ".venv/bin/python scripts/local_ci_check.py --root .",
         "uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
         "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server",
         "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000",
@@ -100,7 +97,7 @@ def test_local_ci_docs_match_script_step_contract() -> None:
     assert step_names == list(LOCAL_CI_DOC_SNIPPETS)
     for path in LOCAL_CI_DOCUMENTS:
         text = path.read_text(encoding="utf-8")
-        assert "python scripts/local_ci_check.py --root ." in text
+        assert ".venv/bin/python scripts/local_ci_check.py --root ." in text
         for step_name, accepted_snippets in LOCAL_CI_DOC_SNIPPETS.items():
             assert any(snippet in text for snippet in accepted_snippets), f"{path} missing {step_name} command"
 
