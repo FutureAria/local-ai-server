@@ -64,6 +64,7 @@ SECRET_TEXT_PATTERNS = [
     re.compile(r"(?im)^\s*(api[_-]?key|secret|token|password)\s*:\s*[A-Za-z0-9_\-]{16,}\s*$"),
     re.compile(r"sk-[A-Za-z0-9_\-]{20,}"),
     re.compile(r"ghp_[A-Za-z0-9]{36,}"),
+    re.compile(r"hf_[A-Za-z0-9]{30,}"),
     re.compile(r"AKIA[0-9A-Z]{16}"),
     re.compile(r"(?i)BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY"),
 ]

@@ -72,6 +72,7 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
         '"api_key": "' + "a" * 24 + '"',
         "token: " + "a" * 24,
         "github token " + "ghp_" + "a" * 36,
+        "huggingface token " + "hf_" + "a" * 30,
         "aws key " + "AKIA" + "A" * 16,
         "-----BEGIN " + "PRIVATE KEY-----\nabc\n-----END " + "PRIVATE KEY-----",
     ],
