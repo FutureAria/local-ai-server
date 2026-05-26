@@ -44,6 +44,13 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 python scripts/local_ci_check.py --root .
 ```
 
+이 명령은 아래 순서로 멈춤 없는 정적 검증을 실행하고, 실패하면 해당 단계에서 중단합니다.
+
+1. `python -m pytest`
+2. `python -m compileall app cli scripts`
+3. `python scripts/public_release_check.py --root . --json`
+4. `git diff --check`
+
 서버 실행 후 assistant bridge API만 smoke test하려면:
 
 ```bash

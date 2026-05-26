@@ -21,6 +21,31 @@ LOCAL_CI_DOC_SNIPPETS = {
 }
 
 
+def _documented_command_positions(text: str) -> list[int]:
+    snippets_by_step = [
+        LOCAL_CI_DOC_SNIPPETS[item["name"]]
+        for item in local_ci.build_check_commands(Path("."))
+    ]
+    positions = []
+    for snippets in snippets_by_step:
+        matches = [text.find(snippet) for snippet in snippets if snippet in text]
+        assert matches, f"missing command snippet from {snippets}"
+        positions.append(min(matches))
+    return positions
+
+
+def _local_ci_order_section(path: Path, text: str) -> str:
+    if path == Path("README.md"):
+        return text.split("이 명령은 아래 순서", maxsplit=1)[1].split("서버 실행 후", maxsplit=1)[0]
+    if path == Path("docs/OPERATIONS.md"):
+        return text.split("내부 실행 단계:", maxsplit=1)[1].split("### 2. 서버 시작", maxsplit=1)[0]
+    if path == Path("docs/RELEASE_CHECKLIST.md"):
+        return text.split("## 2. 자동 검증", maxsplit=1)[1].split("통과 기준:", maxsplit=1)[0]
+    if path == Path("docs/PUBLIC_RELEASE_SUMMARY.md"):
+        return text.split("공개 전 아래 명령이 통과해야 한다.", maxsplit=1)[1].split("현재 검증 상태:", maxsplit=1)[0]
+    return text
+
+
 def test_operations_runbook_documents_safe_local_check_order() -> None:
     text = Path("docs/OPERATIONS.md").read_text(encoding="utf-8")
 
@@ -78,3 +103,10 @@ def test_local_ci_docs_match_script_step_contract() -> None:
         assert "python scripts/local_ci_check.py --root ." in text
         for step_name, accepted_snippets in LOCAL_CI_DOC_SNIPPETS.items():
             assert any(snippet in text for snippet in accepted_snippets), f"{path} missing {step_name} command"
+
+
+def test_local_ci_docs_keep_script_step_order() -> None:
+    for path in LOCAL_CI_DOCUMENTS:
+        text = path.read_text(encoding="utf-8")
+        positions = _documented_command_positions(_local_ci_order_section(path, text))
+        assert positions == sorted(positions), f"{path} local CI command order drifted"

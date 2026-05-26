@@ -1237,3 +1237,15 @@
 - targeted contract self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_ui_qa_checklist.py tests/test_ui_contract_cheatsheet.py tests/test_ui_bridge_examples.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `41 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `309 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `309 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### Local CI command order contract guard
+
+- 2026-05-26 20:08 KST 기준으로 README와 운영/release 문서의 `local_ci_check.py` 내부 실행 순서가 실제 `scripts/local_ci_check.py`의 `build_check_commands()` 순서와 맞는지 테스트를 보강했다.
+- `README.md`의 Verification 섹션에 `python scripts/local_ci_check.py --root .`가 실행하는 내부 단계 `pytest`, `compileall`, public release check, `git diff --check` 순서를 명시했다.
+- `tests/test_operations_runbook.py`가 README, OPERATIONS, RELEASE_CHECKLIST, PUBLIC_RELEASE_SUMMARY의 local CI 명령 순서를 script contract와 비교한다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `310 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_operations_runbook.py tests/test_local_ci_check.py tests/test_readme_quick_start.py` 결과는 `19 passed, 1 warning`이다.
+- targeted contract self-check에서 `.venv/bin/pytest tests/test_operations_runbook.py tests/test_local_ci_check.py tests/test_readme_quick_start.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `37 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `310 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `310 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
