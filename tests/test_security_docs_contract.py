@@ -8,6 +8,8 @@ README = Path("README.md")
 SECURITY = Path("SECURITY.md")
 API_DOCS = Path("docs/API.md")
 RELEASE_CHECKLIST = Path("docs/RELEASE_CHECKLIST.md")
+PUBLIC_RELEASE_SUMMARY = Path("docs/PUBLIC_RELEASE_SUMMARY.md")
+PROJECT_SUMMARY = Path("docs/PROJECT_SUMMARY.md")
 HTTP_METHODS = ("GET ", "POST ", "PUT ", "PATCH ", "DELETE ")
 
 
@@ -59,6 +61,43 @@ def test_security_docs_share_high_risk_stop_conditions() -> None:
         "클라우드 또는 Oracle 리소스",
     ]:
         assert phrase in combined
+
+
+def test_public_release_docs_each_keep_high_risk_boundaries() -> None:
+    docs = {
+        "README.md": README.read_text(encoding="utf-8"),
+        "SECURITY.md": SECURITY.read_text(encoding="utf-8"),
+        "docs/RELEASE_CHECKLIST.md": RELEASE_CHECKLIST.read_text(encoding="utf-8"),
+        "docs/PUBLIC_RELEASE_SUMMARY.md": PUBLIC_RELEASE_SUMMARY.read_text(encoding="utf-8"),
+        "docs/PROJECT_SUMMARY.md": PROJECT_SUMMARY.read_text(encoding="utf-8"),
+    }
+    required_phrases = [
+        "외부 LLM API",
+        "실제 shell 실행",
+        "브라우저",
+        "파일 생성/수정/삭제",
+        "운영 배포",
+        "Oracle",
+        "DB migration",
+        "비용",
+    ]
+
+    for path, text in docs.items():
+        for phrase in required_phrases:
+            assert phrase in text, f"{path} missing high-risk boundary: {phrase}"
+
+
+def test_api_reference_keeps_execution_stop_boundaries_visible() -> None:
+    text = API_DOCS.read_text(encoding="utf-8")
+
+    for phrase in [
+        "외부 LLM API",
+        "실제 shell",
+        "브라우저 클릭",
+        "파일 수정",
+        "운영 배포",
+    ]:
+        assert phrase in text
 
 
 def test_security_docs_do_not_expose_secret_shapes() -> None:

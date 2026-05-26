@@ -1093,9 +1093,11 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
 4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
 5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
+6. DB migration, 운영 데이터 변경, 비용이 발생할 수 있는 cloud/Oracle 리소스 사용
 
 ## 배포 상태
 
 - 현재 구현은 로컬 실행 기준입니다.
 - 외부 클라우드 배포는 구현하지 않았습니다.
 - 외부 클라우드 credential, API key, DB password는 사용하지 않습니다.
+- DB migration, 운영 데이터 변경, 비용이 발생할 수 있는 리소스 사용은 수행하지 않았습니다.

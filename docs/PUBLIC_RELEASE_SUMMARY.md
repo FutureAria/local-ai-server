@@ -89,7 +89,7 @@ python scripts/local_ci_check.py --root .
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `303 passed`
+- `.venv/bin/pytest`: `305 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
@@ -102,6 +102,7 @@ python scripts/local_ci_check.py --root .
 - 파일 생성/수정/삭제 자동화는 지원하지 않는다.
 - Chroma/SQLite repair는 `repair-preview`만 제공하며 실제 repair/delete/rebuild는 수행하지 않는다.
 - 운영 배포, 클라우드 리소스 생성, Oracle 리소스 연결은 수행하지 않았다.
+- DB migration, 운영 데이터 변경, 비용이 발생할 수 있는 리소스 사용은 수행하지 않았다.
 - 다중 사용자 auth/RBAC, HTTPS termination은 제공하지 않는다.
 
 ## 공개 후 다음 개선 경계
@@ -122,6 +123,7 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
 4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
 5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
+6. DB migration, 운영 데이터 변경, 비용이 발생할 수 있는 cloud/Oracle 리소스 사용
 
 ## 공개 전 마지막 확인
 

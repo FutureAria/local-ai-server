@@ -162,6 +162,8 @@ python scripts/public_release_check.py --root .
 
 - 실제 repair/delete/rebuild 실행
 - 브라우저 interaction, 파일 수정, shell agent 실행
+- 실제 shell 실행
+- 파일 생성/수정/삭제 자동화
 - 외부 LLM API 활성화
 - 외부 URL 크롤링
 - 브라우저 click/fill/submit interaction 추가

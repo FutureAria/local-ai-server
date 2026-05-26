@@ -1198,3 +1198,15 @@
 - targeted contract self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `39 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `303 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `303 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### Release stop condition contract guard
+
+- 2026-05-26 19:51 KST 기준으로 release checklist, README, SECURITY, PUBLIC_RELEASE_SUMMARY, PROJECT_SUMMARY의 고위험 stop condition 문구가 서로 빠지지 않도록 테스트를 보강했다.
+- `tests/test_security_docs_contract.py`가 각 공개 문서에 외부 LLM API, 실제 shell 실행, 브라우저 자동화, 파일 생성/수정/삭제, 운영 배포, Oracle, DB migration, 비용 경계가 남아 있는지 확인한다.
+- `docs/PUBLIC_RELEASE_SUMMARY.md`, `README.md`, `docs/PROJECT_SUMMARY.md`에 DB migration, 운영 데이터 변경, 비용 발생 가능 리소스 사용이 별도 승인/보안 리뷰 대상임을 명시했다.
+- `SECURITY.md` 고위험 작업 목록에 `실제 shell 실행`, `파일 생성/수정/삭제 자동화` 표현을 명확히 추가했다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `305 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `24 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `305 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `305 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.

@@ -210,7 +210,7 @@ python -m compileall app cli scripts
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `303 passed`
+- `.venv/bin/pytest`: `305 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능
@@ -316,3 +316,4 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 3. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
 4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
 5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
+6. DB migration, 운영 데이터 변경, 비용이 발생할 수 있는 cloud/Oracle 리소스 사용
