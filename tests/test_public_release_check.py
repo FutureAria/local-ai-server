@@ -65,6 +65,24 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
     assert "secret" in result["findings"][0]["message"]
 
 
+def test_public_release_check_allows_documentation_placeholders(tmp_path: Path) -> None:
+    (tmp_path / "README.md").write_text(
+        "\n".join(
+            [
+                "X-API-Key: <LOCAL_API_KEY>",
+                "Authorization: Bearer <LOCAL_API_KEY>",
+                "LOCAL_AI_SERVER_URL=http://127.0.0.1:8000",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is True
+    assert result["findings"] == []
+
+
 def test_public_release_check_allows_gitkeep_files(tmp_path: Path) -> None:
     uploads = tmp_path / "data" / "uploads"
     uploads.mkdir(parents=True)
