@@ -995,3 +995,12 @@
 - sanitized summary는 기존과 같이 사용자 제공 문서의 filename, local path, request id, 질문/답변 원문, header 값을 제외한다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_user_document_e2e_plan.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py` 결과는 `33 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `272 passed, 1 warning`이다.
+
+### OCR supported-types polish
+
+- PDF supported type 설명을 현재 구현에 맞춰 `Text-based PDF with optional OCR fallback for PyPDF image XObjects.`로 정리했다.
+- optional dependency availability 체크에서 `importlib.util.find_spec` 예외를 `DocumentLoader._module_available`로 흡수하도록 정리했다.
+- `pdf_ocr_status()`의 missing dependency와 available 상태를 직접 검증하는 unit test를 추가했다.
+- `docs/NEXT_CHAT_HANDOFF.md`에서 `/documents/supported-types`와 `local-ai document-types`가 `pdf_ocr` 준비 상태까지 보여준다고 명시했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_document_loader.py tests/test_api_contracts.py tests/test_next_chat_handoff.py` 결과는 `34 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `274 passed, 1 warning`이다.

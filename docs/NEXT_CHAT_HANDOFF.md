@@ -118,7 +118,7 @@ local-ai ask-docs "내 문서 기준으로 JWT 인증 흐름 설명해줘"
 - `/documents/repair-preview`와 `local-ai repair-preview`로 실제 수정 없이 repair action 후보 확인 가능.
 - `/documents/index-folder-preview`와 `local-ai index-preview`로 실제 저장 없이 폴더 색인 대상, 예상 chunk 수, 예상 embedding batch 수 확인 가능.
 - `/documents/index-folder`는 `indexed_files`, `skipped_file_details`로 파일별 색인 결과 확인 가능.
-- `/documents/supported-types`와 `local-ai document-types`로 문서 타입별 optional dependency 준비 상태 확인 가능.
+- `/documents/supported-types`와 `local-ai document-types`로 문서 타입별 optional dependency와 `pdf_ocr` 준비 상태 확인 가능.
 - `/project/api-inventory`와 `local-ai api-inventory`로 endpoint 목록, tag, method, API key 보호 여부를 read-only로 확인 가능.
 - `/documents/{document_id}/chunks`와 `local-ai chunks`로 chunk 페이지 조회 가능.
 - `/documents?source_type=&file_type=&query=`와 `local-ai docs --source-type --file-type --query`로 문서 목록 필터 조회 가능.
@@ -213,7 +213,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - PDF OCR fallback은 PyPDF image XObject 기반 optional loader로 구현했고, 외부 OCR/cloud OCR/pdf2image/poppler는 추가하지 않았다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `272 passed`
+  - `.venv/bin/pytest`: `274 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공

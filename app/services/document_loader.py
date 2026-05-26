@@ -28,7 +28,7 @@ DOCUMENT_TYPE_REQUIREMENTS = {
     ".pdf": {
         "file_type": "pdf",
         "optional_dependency": "pypdf",
-        "description": "Text-based PDF. Scanned image OCR is not supported.",
+        "description": "Text-based PDF with optional OCR fallback for PyPDF image XObjects.",
     },
     ".docx": {
         "file_type": "docx",
@@ -123,7 +123,7 @@ class DocumentLoader:
             requirement = DOCUMENT_TYPE_REQUIREMENTS[extension]
             module_name = requirement.get("module_name") or requirement["optional_dependency"]
             optional_dependency = requirement["optional_dependency"]
-            available = optional_dependency is None or importlib.util.find_spec(module_name) is not None
+            available = optional_dependency is None or self._module_available(module_name)
             types.append(
                 {
                     "extension": extension,

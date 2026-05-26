@@ -266,7 +266,30 @@ def test_supported_types_report_optional_dependency_availability() -> None:
     assert types[".html"]["available"] is True
     assert types[".htm"]["file_type"] == "html"
     assert types[".pdf"]["optional_dependency"] == "pypdf"
+    assert "OCR fallback" in types[".pdf"]["description"]
     assert types[".docx"]["optional_dependency"] == "python-docx"
+
+
+def test_pdf_ocr_status_reports_missing_binary_and_dependency(monkeypatch: pytest.MonkeyPatch) -> None:
+    loader = DocumentLoader()
+    monkeypatch.setattr(loader, "_module_available", lambda module_name: module_name == "PIL")
+    monkeypatch.setattr("app.services.document_loader.shutil.which", lambda binary: None)
+
+    status = loader.pdf_ocr_status()
+
+    assert status["available"] is False
+    assert status["missing"] == ["pytesseract", "tesseract binary"]
+    assert "pip install -e '.[ocr]'" in status["install_hint"]
+
+
+def test_pdf_ocr_status_reports_available_when_dependencies_exist(monkeypatch: pytest.MonkeyPatch) -> None:
+    loader = DocumentLoader()
+    monkeypatch.setattr(loader, "_module_available", lambda module_name: True)
+    monkeypatch.setattr("app.services.document_loader.shutil.which", lambda binary: "/usr/local/bin/tesseract")
+
+    status = loader.pdf_ocr_status()
+
+    assert status == {"available": True, "missing": [], "install_hint": None}
 
 
 def test_iter_supported_files_includes_pdf_docx_and_html(tmp_path: Path) -> None:
