@@ -67,6 +67,8 @@ def test_next_chat_handoff_boundaries_match_task_board_and_public_docs() -> None
     shared_safe_terms = [
         "endpoint/response field 계약 테스트",
         "runtime endpoint count drift check",
+        "README/Project Summary Runtime Contract Snapshot",
+        "API/CLI/smoke flow inventory",
         "assistant bridge smoke expected output",
         "UI 수동 QA 체크리스트",
         "PDF OCR fallback",

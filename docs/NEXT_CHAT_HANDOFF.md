@@ -185,11 +185,12 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 1. `docs/USER_DOCUMENT_E2E_PLAN.md`, `docs/TASKS.md`, `docs/WORKLOG.md`의 완료된 실제 사용자 문서 E2E summary 정합성 유지
 2. `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 assistant endpoint와 CLI 목록 교차 검증
    - endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
-3. `tests/test_public_docs_contract.py`, `tests/test_user_document_e2e_plan.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
-4. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
-5. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
-6. assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지
-7. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
+3. README/Project Summary Runtime Contract Snapshot 값을 실제 API/CLI/smoke flow inventory와 비교하는 계약 유지
+4. `tests/test_public_docs_contract.py`, `tests/test_user_document_e2e_plan.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
+5. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
+6. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
+7. assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지
+8. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
 
 사용자 수동 확인 또는 별도 승인 후에만 진행할 작업:
 

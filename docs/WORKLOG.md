@@ -1283,3 +1283,14 @@
 - full self-check에서 `.venv/bin/pytest` 결과는 `311 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `311 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
 - `git diff --check` 결과는 성공이다.
+
+### Handoff runtime snapshot guard alignment
+
+- 2026-05-26 20:28 KST 기준으로 README, `docs/PROJECT_SUMMARY.md`, `docs/FINAL_REPORT.md`, `docs/NEXT_CHAT_HANDOFF.md`의 다음 추천 개선에 README/Project Summary `Runtime Contract Snapshot`과 실제 API/CLI/smoke flow inventory 비교 계약을 추가했다.
+- `docs/TASKS.md`의 같은 항목도 동일한 표기인 `README/Project Summary Runtime Contract Snapshot`으로 맞췄다.
+- `tests/test_next_chat_handoff.py`, `tests/test_portfolio_docs_contract.py`, `tests/test_tasks_doc.py`가 해당 문구를 확인하도록 보강했다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_tasks_doc.py` 결과는 `21 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `311 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `311 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+- `git diff --check` 결과는 성공이다.

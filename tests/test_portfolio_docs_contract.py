@@ -138,6 +138,8 @@ def test_readme_and_project_summary_share_next_improvement_boundaries() -> None:
         "별도 승인 또는 보안 리뷰가 필요한 개선",
         "endpoint/response field 계약 테스트",
         "runtime endpoint count drift check",
+        "README/Project Summary Runtime Contract Snapshot",
+        "API/CLI/smoke flow inventory",
         "승인된 실제 사용자 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서 E2E smoke summary",
         "민감 정보 없이 유지",
         "대용량 색인 job/status API",
