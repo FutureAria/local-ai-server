@@ -4,6 +4,7 @@ import pytest
 from app.api.dependencies import get_search_service, reset_rate_limiter
 from app.config import get_settings
 from app.main import app, create_app
+from app.services.project_status_service import build_api_inventory
 
 
 class FakeSearchService:
@@ -11,50 +12,60 @@ class FakeSearchService:
         return []
 
 
-@pytest.mark.parametrize(
-    ("method", "path", "kwargs"),
-    [
-        ("post", "/ask", {"json": {"question": "hello"}}),
-        ("post", "/ask-with-docs", {"json": {"question": "hello"}}),
-        ("post", "/search", {"json": {"query": "hello"}}),
-        (
-            "post",
-            "/documents/upload",
-            {"files": {"file": ("note.md", b"# Note", "text/markdown")}},
-        ),
-        ("post", "/documents/index-folder-preview", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
-        ("post", "/documents/index-folder-job-preview", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
-        ("post", "/documents/index-folder", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
-        ("delete", "/documents/1", {}),
-        ("post", "/feedback", {"json": {"request_id": "1", "rating": "good"}}),
-        ("post", "/agent/plan", {"json": {"instruction": "웹 열어줘"}}),
-        ("get", "/agent/runs", {}),
-        ("get", "/agent/runs/1", {}),
-        ("get", "/agent/runs/1/results", {}),
-        ("get", "/agent/runs/1/actions", {}),
-        ("post", "/agent/runs/1/dry-run", {}),
-        ("post", "/agent/runs/1/approve", {}),
-        ("post", "/agent/runs/1/reject", {}),
-        ("post", "/agent/runs/1/execute", {}),
-        ("get", "/project/shell-policy", {}),
-        ("post", "/project/shell-dry-run", {"json": {"command": "pwd"}}),
-        ("get", "/assistant/capabilities", {}),
-        ("post", "/assistant/action-preview", {"json": {"message": "hello"}}),
-        ("get", "/assistant/ping", {}),
-        ("get", "/assistant/config", {}),
-        ("get", "/assistant/status", {}),
-        ("get", "/assistant/dashboard", {}),
-        ("get", "/assistant/startup", {}),
-        ("get", "/assistant/ui-contract", {}),
-        ("post", "/assistant/bootstrap", {"json": {}}),
-        ("post", "/assistant/sessions", {"json": {"title": "Demo"}}),
-        ("get", "/assistant/sessions", {}),
-        ("get", "/assistant/sessions/session-1", {}),
-        ("get", "/assistant/sessions/session-1/messages", {}),
-        ("post", "/assistant/message", {"json": {"message": "hello"}}),
-        ("post", "/assistant/project-root/validate", {"json": {"project_root": "/tmp/project"}}),
-    ],
-)
+PROTECTED_ENDPOINT_CASES = [
+    ("post", "/ask", {"json": {"question": "hello"}}),
+    ("post", "/ask-with-docs", {"json": {"question": "hello"}}),
+    ("post", "/search", {"json": {"query": "hello"}}),
+    (
+        "post",
+        "/documents/upload",
+        {"files": {"file": ("note.md", b"# Note", "text/markdown")}},
+    ),
+    ("post", "/documents/index-folder-preview", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
+    ("post", "/documents/index-folder-job-preview", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
+    ("post", "/documents/index-folder", {"json": {"folder_path": "/tmp/notes", "recursive": True}}),
+    ("delete", "/documents/1", {}),
+    ("post", "/feedback", {"json": {"request_id": "1", "rating": "good"}}),
+    ("post", "/agent/plan", {"json": {"instruction": "웹 열어줘"}}),
+    ("get", "/agent/runs", {}),
+    ("get", "/agent/runs/1", {}),
+    ("get", "/agent/runs/1/results", {}),
+    ("get", "/agent/runs/1/actions", {}),
+    ("post", "/agent/runs/1/dry-run", {}),
+    ("post", "/agent/runs/1/approve", {}),
+    ("post", "/agent/runs/1/reject", {}),
+    ("post", "/agent/runs/1/execute", {}),
+    ("get", "/project/shell-policy", {}),
+    ("post", "/project/shell-dry-run", {"json": {"command": "pwd"}}),
+    ("get", "/assistant/capabilities", {}),
+    ("post", "/assistant/action-preview", {"json": {"message": "hello"}}),
+    ("get", "/assistant/ping", {}),
+    ("get", "/assistant/config", {}),
+    ("get", "/assistant/status", {}),
+    ("get", "/assistant/dashboard", {}),
+    ("get", "/assistant/startup", {}),
+    ("get", "/assistant/ui-contract", {}),
+    ("post", "/assistant/bootstrap", {"json": {}}),
+    ("post", "/assistant/sessions", {"json": {"title": "Demo"}}),
+    ("get", "/assistant/sessions", {}),
+    ("get", "/assistant/sessions/session-1", {}),
+    ("get", "/assistant/sessions/session-1/messages", {}),
+    ("post", "/assistant/message", {"json": {"message": "hello"}}),
+    ("post", "/assistant/project-root/validate", {"json": {"project_root": "/tmp/project"}}),
+]
+
+
+def _case_path_to_template(path: str) -> str:
+    if path == "/documents/1":
+        return "/documents/{document_id}"
+    if path.startswith("/agent/runs/1"):
+        return path.replace("/agent/runs/1", "/agent/runs/{run_id}", 1)
+    if path.startswith("/assistant/sessions/session-1"):
+        return path.replace("/assistant/sessions/session-1", "/assistant/sessions/{session_id}", 1)
+    return path
+
+
+@pytest.mark.parametrize(("method", "path", "kwargs"), PROTECTED_ENDPOINT_CASES)
 def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str, path: str, kwargs: dict) -> None:
     get_settings.cache_clear()
     reset_rate_limiter()
@@ -68,6 +79,23 @@ def test_local_api_key_protects_all_mutating_endpoints(monkeypatch, method: str,
     get_settings.cache_clear()
     reset_rate_limiter()
     monkeypatch.delenv("LOCAL_API_KEY", raising=False)
+
+
+def test_protected_endpoint_cases_match_api_inventory() -> None:
+    inventory = build_api_inventory(app.routes)
+    inventory_protected = {
+        (method.lower(), endpoint["path"])
+        for endpoint in inventory["endpoints"]
+        if endpoint["requires_api_key"] is True
+        for method in endpoint["methods"]
+    }
+    tested_protected = {
+        (method, _case_path_to_template(path))
+        for method, path, _kwargs in PROTECTED_ENDPOINT_CASES
+    }
+
+    assert tested_protected == inventory_protected
+    assert len(tested_protected) == inventory["protected_endpoints_count"]
 
 
 def test_local_rate_limit_blocks_protected_endpoint_after_limit(monkeypatch) -> None:

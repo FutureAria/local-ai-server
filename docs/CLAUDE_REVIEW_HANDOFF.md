@@ -78,7 +78,7 @@ git status
 
 ## 현재 검증 상태
 
-- `.venv/bin/pytest`: `313 passed`
+- `.venv/bin/pytest`: `314 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `git status`: 현재 프로젝트 루트 기준 실행 가능
 - 실제 로컬 Ollama 검증 이력은 `docs/WORKLOG.md`에 기록됨
@@ -105,7 +105,7 @@ git status
    - `README.md` "배포 상태" 섹션
    - `SECURITY.md` 전체
    - `docs/PROJECT_SUMMARY.md` "보안과 운영 기준" 섹션
-5. 검증 수치 (`pytest 313 passed` 등)
+5. 검증 수치 (`pytest 314 passed` 등)
    - `README.md`, `docs/PROJECT_SUMMARY.md`, `docs/WORKLOG.md`, `docs/CLAUDE_REVIEW_HANDOFF.md`
 
 ## 리뷰할 세부 항목

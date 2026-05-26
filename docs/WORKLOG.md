@@ -1380,3 +1380,13 @@
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_security.py tests/test_api_contracts.py` 결과는 `70 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `313 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### Protected endpoint inventory security guard
+
+- 2026-05-26 21:31 KST 기준으로 `tests/test_security.py`의 보호 endpoint 호출 사례를 `PROTECTED_ENDPOINT_CASES` 상수로 분리했다.
+- `tests/test_security.py`가 `PROTECTED_ENDPOINT_CASES`의 method/path set과 `/project/api-inventory`의 `requires_api_key=true` endpoint set 및 `protected_endpoints_count`가 정확히 같은지 검증하도록 보강했다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `314 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_security.py tests/test_public_docs_contract.py tests/test_api_contracts.py` 결과는 `71 passed, 1 warning`이다.
+- targeted docs-count self-check에서 `.venv/bin/pytest tests/test_security.py tests/test_public_docs_contract.py tests/test_api_contracts.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py` 결과는 `90 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `314 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
