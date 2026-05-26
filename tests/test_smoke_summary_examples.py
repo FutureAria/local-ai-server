@@ -21,7 +21,7 @@ STEP_KEYS = {
     "stats": {"step", "status", "documents_count", "chunks_count"},
     "assistant-startup": {"step", "status", "ui_ready", "protected"},
     "api-inventory": {"step", "status", "endpoints_count", "protected_endpoints_count"},
-    "assistant-bootstrap": {"step", "status", "has_project_root"},
+    "assistant-bootstrap": {"step", "status", "ui_ready", "has_project_root"},
     "assistant-action-preview": {"step", "status", "intent", "would_execute"},
     "assistant-message": {"step", "status", "response_type"},
     "assistant-sessions": {"step", "status", "sessions_count"},
@@ -90,6 +90,61 @@ def test_smoke_summary_examples_match_sanitized_summary_shape() -> None:
             step_name = step["step"]
             assert step_name in STEP_KEYS
             assert set(step) == STEP_KEYS[step_name]
+
+    generated_document = smoke.build_sanitized_smoke_summary(
+        {
+            "ok": True,
+            "base_url": "http://127.0.0.1:8000",
+            "sample_documents": ["smoke-backend-notes.md", "smoke-architecture-notes.txt"],
+            "steps": [
+                {"step": "health", "status": 200},
+                {
+                    "step": "upload",
+                    "status": 200,
+                    "documents_count": 2,
+                    "chunks_count": 2,
+                    "documents": [
+                        {"filename": "smoke-backend-notes.md", "document_id": 1, "chunks_created": 1},
+                        {"filename": "smoke-architecture-notes.txt", "document_id": 2, "chunks_created": 1},
+                    ],
+                },
+                {"step": "search", "status": 200, "results_count": 2},
+                {"step": "ask-with-docs", "status": 200, "request_id": "1", "sources_count": 2},
+                {"step": "feedback", "status": 200, "feedback_id": 1},
+                {"step": "stats", "status": 200, "documents_count": 2, "chunks_count": 2},
+            ],
+        }
+    )
+    generated_assistant = smoke.build_sanitized_smoke_summary(
+        {
+            "ok": True,
+            "base_url": "http://127.0.0.1:8000",
+            "project_root": "/Users/juyoung/local-ai-server",
+            "steps": [
+                {"step": "assistant-startup", "status": 200, "ui_ready": True, "protected": True},
+                {
+                    "step": "api-inventory",
+                    "status": 200,
+                    "endpoints_count": build_api_inventory(app.routes)["endpoints_count"],
+                    "protected_endpoints_count": build_api_inventory(app.routes)["protected_endpoints_count"],
+                },
+                {"step": "assistant-bootstrap", "status": 200, "ui_ready": True, "has_project_root": True},
+                {"step": "assistant-action-preview", "status": 200, "intent": "status", "would_execute": False},
+                {
+                    "step": "assistant-message",
+                    "status": 200,
+                    "session_id": "session-1",
+                    "response_type": "status",
+                },
+                {"step": "assistant-sessions", "status": 200, "sessions_count": 1},
+                {"step": "assistant-messages", "status": 200, "total_messages": 2},
+            ],
+        }
+    )
+
+    examples = {example["mode"]: example for example in _json_blocks()}
+    assert generated_document == examples["document-rag"]
+    assert generated_assistant == examples["assistant-bridge"]
 
 
 def test_smoke_summary_usage_rules_document_all_excluded_fields() -> None:

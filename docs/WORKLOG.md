@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-26 21:55 KST
+
+### Smoke summary example guard
+
+- `scripts/smoke_test_api.py`의 document/RAG upload summary에 `chunks_count`를 추가해 paste-safe summary 예시와 실제 출력 필드가 맞도록 정리했다.
+- `docs/SMOKE_SUMMARY_EXAMPLES.md`의 assistant bootstrap 예시에 실제 sanitizer 출력 필드인 `ui_ready`를 반영했다.
+- `tests/test_smoke_summary_examples.py`가 문서 예시 JSON과 `build_sanitized_smoke_summary()`로 만든 대표 출력이 정확히 일치하는지 검증하도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_smoke_summary_examples.py tests/test_smoke_script.py` | `18 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `314 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 21:52 KST
 
 ### README/API verification command guard

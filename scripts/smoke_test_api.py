@@ -175,6 +175,7 @@ def _upload_and_run_rag_flow(
             "step": "upload",
             "status": 200,
             "documents_count": len(uploaded_documents),
+            "chunks_count": sum(item["chunks_created"] for item in uploaded_documents),
             "documents": uploaded_documents,
         }
     )

@@ -92,6 +92,7 @@ def test_smoke_script_calls_expected_api_flow(monkeypatch) -> None:
     assert [step["step"] for step in summary["steps"]] == smoke.DOCUMENT_RAG_SMOKE_FLOW
     assert summary["sample_documents"] == ["smoke-backend-notes.md", "smoke-architecture-notes.txt"]
     assert summary["steps"][1]["documents_count"] == 2
+    assert summary["steps"][1]["chunks_count"] == 2
     assert [item["filename"] for item in summary["steps"][1]["documents"]] == [
         "smoke-backend-notes.md",
         "smoke-architecture-notes.txt",

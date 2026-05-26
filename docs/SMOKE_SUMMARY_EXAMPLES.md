@@ -97,6 +97,7 @@
     {
       "step": "assistant-bootstrap",
       "status": 200,
+      "ui_ready": true,
       "has_project_root": true
     },
     {
