@@ -1112,3 +1112,11 @@
 - 기존 upload response example을 `DocumentUploadResponse` schema로 직접 검증하는 테스트를 추가했다.
 - 실제 파일 업로드, SQLite 저장, Ollama embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `56 passed, 1 warning`이다.
+
+### Document list detail chunks response schema examples
+
+- 2026-05-26 19:05 KST 기준으로 `GET /documents`, `GET /documents/{document_id}`, `GET /documents/{document_id}/chunks` response example을 API reference에 추가했다.
+- 예시는 문서 목록의 summary field, 상세 조회의 chunk 목록, chunk paging 응답의 `limit`/`offset`/`total_chunks`를 포함한다.
+- `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `DocumentSummary`, `DocumentDetail`, `DocumentChunksResponse` schema로 직접 검증한다.
+- 실제 DB 조회, 파일 읽기, embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `59 passed, 1 warning`이다.

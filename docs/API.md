@@ -685,11 +685,46 @@ curl -X POST http://127.0.0.1:8000/documents/index-folder \
 curl "http://127.0.0.1:8000/documents?source_type=upload&file_type=md&query=backend"
 ```
 
+응답 예시:
+
+```json
+[
+  {
+    "id": 1,
+    "original_filename": "backend.md",
+    "stored_path": "data/uploads/backend.md",
+    "file_type": "md",
+    "source_type": "upload",
+    "created_at": "2026-05-26T18:00:00",
+    "chunks_count": 3
+  },
+  {
+    "id": 2,
+    "original_filename": "security-notes.md",
+    "stored_path": "/Users/example/notes/security-notes.md",
+    "file_type": "md",
+    "source_type": "folder",
+    "created_at": "2026-05-26T18:05:00",
+    "chunks_count": 2
+  }
+]
+```
+
 필터:
 
 - `source_type=upload|folder`
 - `file_type=txt|md|pdf|docx|html`
 - `query=<filename 또는 path keyword>`
+
+응답 핵심 필드:
+
+- `id`
+- `original_filename`
+- `stored_path`
+- `file_type`
+- `source_type`
+- `created_at`
+- `chunks_count`
 
 ### `GET /documents/{document_id}`
 
@@ -699,6 +734,49 @@ curl "http://127.0.0.1:8000/documents?source_type=upload&file_type=md&query=back
 curl http://127.0.0.1:8000/documents/1
 ```
 
+응답 예시:
+
+```json
+{
+  "id": 1,
+  "original_filename": "backend.md",
+  "stored_path": "data/uploads/backend.md",
+  "file_type": "md",
+  "source_type": "upload",
+  "created_at": "2026-05-26T18:00:00",
+  "chunks_count": 2,
+  "chunks": [
+    {
+      "id": 10,
+      "document_id": 1,
+      "chunk_index": 0,
+      "content": "Spring Boot controller and service notes.",
+      "token_estimate": 8,
+      "created_at": "2026-05-26T18:00:01"
+    },
+    {
+      "id": 11,
+      "document_id": 1,
+      "chunk_index": 1,
+      "content": "Repository and transaction boundary notes.",
+      "token_estimate": 6,
+      "created_at": "2026-05-26T18:00:02"
+    }
+  ]
+}
+```
+
+응답 핵심 필드:
+
+- `id`
+- `original_filename`
+- `stored_path`
+- `file_type`
+- `source_type`
+- `created_at`
+- `chunks_count`
+- `chunks`
+
 ### `GET /documents/{document_id}/chunks`
 
 문서 chunk를 페이지 단위로 조회한다.
@@ -706,6 +784,43 @@ curl http://127.0.0.1:8000/documents/1
 ```bash
 curl "http://127.0.0.1:8000/documents/1/chunks?limit=20&offset=0"
 ```
+
+응답 예시:
+
+```json
+{
+  "document_id": 1,
+  "total_chunks": 2,
+  "limit": 20,
+  "offset": 0,
+  "chunks": [
+    {
+      "id": 10,
+      "document_id": 1,
+      "chunk_index": 0,
+      "content": "Spring Boot controller and service notes.",
+      "token_estimate": 8,
+      "created_at": "2026-05-26T18:00:01"
+    },
+    {
+      "id": 11,
+      "document_id": 1,
+      "chunk_index": 1,
+      "content": "Repository and transaction boundary notes.",
+      "token_estimate": 6,
+      "created_at": "2026-05-26T18:00:02"
+    }
+  ]
+}
+```
+
+응답 핵심 필드:
+
+- `document_id`
+- `total_chunks`
+- `limit`
+- `offset`
+- `chunks`
 
 ### `DELETE /documents/{document_id}`
 

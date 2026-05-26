@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from typing import Any, get_args, get_origin
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 
 from app.main import app
 from app.schemas.agent import AgentPlanRequest
@@ -16,9 +16,12 @@ from app.schemas.assistant import (
     ProjectRootValidateRequest,
 )
 from app.schemas.documents import (
+    DocumentChunksResponse,
+    DocumentDetail,
     DocumentIntegrityResponse,
     DocumentRepairPreviewResponse,
     DocumentStatsResponse,
+    DocumentSummary,
     DocumentUploadResponse,
     DocumentVectorRebuildPreviewResponse,
     IndexFolderResponse,
@@ -200,6 +203,42 @@ def test_api_docs_index_folder_response_example_matches_schema() -> None:
     assert {file.file_type for file in validated.indexed_files} == {"md", "txt"}
     assert validated.indexed_files[0].filename == "backend.md"
     assert validated.skipped_file_details[0].filename == "empty.md"
+
+
+def test_api_docs_document_list_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents")
+    validated = TypeAdapter(list[DocumentSummary]).validate_python(example)
+
+    assert len(validated) == 2
+    assert validated[0].original_filename == "backend.md"
+    assert validated[0].source_type == "upload"
+    assert validated[1].source_type == "folder"
+    assert validated[0].chunks_count == 3
+
+
+def test_api_docs_document_detail_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/{document_id}")
+    validated = DocumentDetail.model_validate(example)
+
+    assert validated.id == 1
+    assert validated.original_filename == "backend.md"
+    assert validated.chunks_count == 2
+    assert len(validated.chunks) == 2
+    assert validated.chunks[0]["chunk_index"] == 0
+
+
+def test_api_docs_document_chunks_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/{document_id}/chunks")
+    validated = DocumentChunksResponse.model_validate(example)
+
+    assert validated.document_id == 1
+    assert validated.total_chunks == 2
+    assert validated.limit == 20
+    assert validated.offset == 0
+    assert validated.chunks[1].chunk_index == 1
 
 
 def test_api_docs_supported_types_response_example_matches_schema() -> None:
