@@ -986,3 +986,12 @@
 - full self-check에서 `.venv/bin/pytest` 결과는 `271 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `271 passed, 1 warning`, public release check는 `scanned_files=120`, finding 없음이다.
 - whitespace check에서 `git diff --check` 결과는 통과했다.
+
+### OCR smoke document type contract
+
+- `scripts/smoke_test_api.py --document`가 승인된 실제 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서를 받을 수 있게 확장했다.
+- PDF OCR fallback 검증도 같은 `--document /path/to/approved-scan.pdf --sanitized-summary` 흐름으로 실행할 수 있게 README, API, OPERATIONS, USER_DOCUMENT_E2E_PLAN을 갱신했다.
+- 실제 PDF 업로드나 OCR 실행은 수행하지 않았다. SQLite, Chroma, `data/uploads/`에 새 smoke 데이터는 추가하지 않았다.
+- sanitized summary는 기존과 같이 사용자 제공 문서의 filename, local path, request id, 질문/답변 원문, header 값을 제외한다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_user_document_e2e_plan.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py` 결과는 `33 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `272 passed, 1 warning`이다.

@@ -1,6 +1,6 @@
 # User Document E2E Smoke Plan
 
-이 문서는 실제 사용자 `.md` 또는 `.txt` 문서를 기준으로 upload/search/ask-with-docs 흐름을 검증하기 위한 안전 실행 계획이다.
+이 문서는 실제 사용자 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서를 기준으로 upload/search/ask-with-docs 흐름을 검증하기 위한 안전 실행 계획이다.
 
 실제 실행은 SQLite, Chroma, `data/uploads/`에 문서와 vector 기록을 추가할 수 있으므로 사용자 승인 후에만 진행한다. 이 문서는 승인 전 준비와 paste-safe 기록 기준만 정의하며, 원본 문서를 삭제하거나 수정하지 않는다.
 
@@ -22,8 +22,9 @@
 | LLM model | `llama3.2` pull 완료 |
 | Embedding model | `nomic-embed-text` pull 완료 |
 | 인증 | `LOCAL_API_KEY` 설정 시 `X-API-Key` header 사용 |
-| 문서 타입 | `.md` 또는 `.txt` |
+| 문서 타입 | `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` |
 | 저장 영향 인지 | SQLite, Chroma, `data/uploads/`에 테스트 데이터가 추가될 수 있음을 인지 |
+| OCR 조건 | 이미지 기반 PDF OCR 검증이면 `[ocr]` extra와 로컬 `tesseract` 준비 상태를 확인 |
 
 ## 권장 실행 순서
 
@@ -42,6 +43,12 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ```bash
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-notes.md --sanitized-summary
+```
+
+PDF OCR fallback을 확인할 때도 같은 옵션을 사용한다. 이 경우 시스템 패키지는 자동 설치하지 않으며, `tesseract`가 준비되지 않았으면 서버가 명확한 설치 안내 오류를 반환해야 한다.
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-scan.pdf --sanitized-summary
 ```
 
 `LOCAL_API_KEY`가 설정된 서버라면 CLI 또는 HTTP client가 `X-API-Key`를 보내도록 환경변수를 맞춘다. key 값 자체는 문서, 로그, GitHub, 채팅에 붙이지 않는다.
@@ -73,7 +80,7 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /pa
 아래 중 하나라도 해당하면 실행하지 않고 멈춘다.
 
 - 사용자 승인이 없는 실제 사용자 문서 smoke
-- `.md`, `.txt`가 아닌 문서
+- 지원하지 않는 문서 확장자
 - 민감한 원문이 포함되어 있어 summary만으로도 식별 위험이 있는 문서
 - `ollama serve`가 실행 중이지 않거나 모델이 준비되지 않은 상태
 - 서버가 `127.0.0.1` 또는 `localhost`가 아닌 주소에 bind된 상태
@@ -99,7 +106,7 @@ local-ai integrity
 
 `docs/TASKS.md`의 실제 사용자 문서 E2E 항목은 아래 조건이 모두 충족될 때만 완료로 바꾼다.
 
-- 사용자 승인 후 실제 `.md` 또는 `.txt` 문서로 smoke 실행
+- 사용자 승인 후 실제 지원 문서로 smoke 실행
 - `--sanitized-summary` 출력 확인
 - 민감 정보가 없는 paste-safe summary를 `docs/WORKLOG.md`에 기록
 - public release check 통과

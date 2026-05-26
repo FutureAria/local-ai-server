@@ -190,10 +190,14 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --sanitized-summary
 ```
 
-승인된 실제 `.md` 또는 `.txt` 문서를 사용할 때는 `--document`를 추가한다. 이 모드는 SQLite, Chroma, `data/uploads/`에 기록을 추가할 수 있으므로 사용자 승인 후에만 실행한다.
+승인된 실제 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서를 사용할 때는 `--document`를 추가한다. PDF OCR fallback 검증도 같은 옵션을 사용한다. 이 모드는 SQLite, Chroma, `data/uploads/`에 기록을 추가할 수 있으므로 사용자 승인 후에만 실행한다.
 
 ```bash
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-notes.md --sanitized-summary
+```
+
+```bash
+python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-scan.pdf --sanitized-summary
 ```
 
 sanitized smoke summary에서 확인할 필드:

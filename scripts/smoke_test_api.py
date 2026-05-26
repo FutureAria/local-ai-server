@@ -27,7 +27,11 @@ SAMPLE_DOCUMENTS = [
 ]
 
 SUPPORTED_USER_DOCUMENT_TYPES = {
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".htm": "text/html",
+    ".html": "text/html",
     ".md": "text/markdown",
+    ".pdf": "application/pdf",
     ".txt": "text/plain",
 }
 
@@ -462,7 +466,10 @@ def main() -> None:
         "--document",
         action="append",
         default=[],
-        help="Approved real .md or .txt document path to upload for document/RAG smoke. Can be passed multiple times.",
+        help=(
+            "Approved real document path to upload for document/RAG smoke. "
+            "Supports .md, .txt, .html, .htm, .pdf, and .docx. Can be passed multiple times."
+        ),
     )
     args = parser.parse_args()
     if args.assistant_bridge_preflight:

@@ -18,6 +18,10 @@ def test_user_document_e2e_plan_documents_approval_and_storage_impact() -> None:
         "ollama serve",
         "llama3.2",
         "nomic-embed-text",
+        ".pdf",
+        ".docx",
+        "OCR 조건",
+        "tesseract",
     ]:
         assert phrase in text
 
@@ -27,6 +31,7 @@ def test_user_document_e2e_plan_keeps_paste_safe_summary_contract() -> None:
 
     for phrase in [
         "scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-notes.md --sanitized-summary",
+        "scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /path/to/approved-scan.pdf --sanitized-summary",
         "safe_to_paste=true",
         "excluded_fields",
         "질문/답변 원문",
@@ -46,5 +51,5 @@ def test_user_document_e2e_plan_is_linked_and_task_remains_manual() -> None:
 
     assert "docs/USER_DOCUMENT_E2E_PLAN.md" in readme
     assert "docs/USER_DOCUMENT_E2E_PLAN.md" in summary
-    assert "[x] 실제 사용자 `.md` 또는 `.txt` 문서 기준 upload/search/ask-with-docs end-to-end 재검증 결과를 paste-safe summary로 기록" in tasks
+    assert "[x] 실제 사용자 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 문서 기준 upload/search/ask-with-docs end-to-end 재검증 결과를 paste-safe summary로 기록" in tasks
     assert "승인 후 `docs/PROJECT_SUMMARY.md` 기준으로 실행했고, safe-to-paste summary를 `docs/WORKLOG.md`에 기록했다." in tasks

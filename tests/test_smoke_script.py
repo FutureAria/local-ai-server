@@ -113,15 +113,35 @@ def test_smoke_script_accepts_approved_user_document(monkeypatch, tmp_path) -> N
     assert "approved-notes.md" not in str(safe)
 
 
+def test_smoke_script_accepts_approved_pdf_user_document(monkeypatch, tmp_path) -> None:
+    calls: list[dict] = []
+    approved_doc = tmp_path / "approved-scan.pdf"
+    approved_doc.write_bytes(b"%PDF approved")
+
+    def client_factory(timeout: float) -> FakeClient:
+        return FakeClient(calls)
+
+    monkeypatch.setattr(smoke.httpx, "Client", client_factory)
+
+    summary = smoke.run_smoke_test("http://server.test/", document_paths=[str(approved_doc)])
+    safe = smoke.build_sanitized_smoke_summary(summary)
+
+    assert summary["document_source"] == "user-provided"
+    assert calls[1]["files"]["file"][0] == "approved-scan.pdf"
+    assert calls[1]["files"]["file"][2] == "application/pdf"
+    assert safe["steps"][1]["documents"] == [{"chunks_created": 1}]
+    assert "approved-scan.pdf" not in str(safe)
+
+
 def test_smoke_script_rejects_unsupported_user_document(tmp_path) -> None:
-    unsupported_doc = tmp_path / "notes.pdf"
-    unsupported_doc.write_bytes(b"%PDF")
+    unsupported_doc = tmp_path / "notes.png"
+    unsupported_doc.write_bytes(b"png")
 
     try:
         smoke.run_smoke_test("http://server.test/", document_paths=[str(unsupported_doc)])
     except RuntimeError as exc:
         assert "unsupported document type" in str(exc)
-        assert ".md" in str(exc)
+        assert ".pdf" in str(exc)
         assert ".txt" in str(exc)
     else:
         raise AssertionError("unsupported document should fail before any HTTP call")
