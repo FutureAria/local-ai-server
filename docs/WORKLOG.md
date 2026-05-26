@@ -1,5 +1,20 @@
 # WORKLOG
 
+## 2026-05-26 22:21 KST
+
+### Claude handoff verification sync
+
+- `docs/CLAUDE_REVIEW_HANDOFF.md`의 현재 검증 상태에 public release check와 local CI 결과를 추가해 공개 요약 문서들과 같은 검증 표면을 갖도록 정리했다.
+- `tests/test_portfolio_docs_contract.py`가 Claude review handoff에서도 `--json` public release check 명령을 유지하도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_portfolio_docs_contract.py` | `7 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `316 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:15 KST
 
 ### Public release check command guard

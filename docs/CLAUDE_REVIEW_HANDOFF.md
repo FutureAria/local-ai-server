@@ -80,6 +80,8 @@ git status
 
 - `.venv/bin/pytest`: `316 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
+- `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
+- `.venv/bin/python scripts/local_ci_check.py --root .`: 성공
 - `git status`: 현재 프로젝트 루트 기준 실행 가능
 - 실제 로컬 Ollama 검증 이력은 `docs/WORKLOG.md`에 기록됨
 

@@ -61,7 +61,7 @@ def test_project_summary_and_final_report_show_current_pytest_count() -> None:
 
 
 def test_public_docs_use_json_public_release_check_command() -> None:
-    for path in [README, PROJECT_SUMMARY, FINAL_REPORT, SECURITY]:
+    for path in [README, PROJECT_SUMMARY, FINAL_REPORT, SECURITY, CLAUDE_REVIEW_HANDOFF]:
         text = path.read_text(encoding="utf-8")
         assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
         assert ".venv/bin/python scripts/public_release_check.py --root .`" not in text
