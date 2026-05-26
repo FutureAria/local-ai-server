@@ -12,6 +12,10 @@ venv/
 .npmrc
 .pypirc
 .netrc
+.git-credentials
+.boto
+.s3cfg
+.pgpass
 .ssh/
 .docker/
 .aws/

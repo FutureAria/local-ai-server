@@ -227,7 +227,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `389 passed`
+- `.venv/bin/pytest`: `393 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능
