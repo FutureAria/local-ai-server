@@ -1011,3 +1011,10 @@
 - mock API contract뿐 아니라 service layer contract도 함께 고정해 `/documents/supported-types` 응답 드리프트를 줄였다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_document_service.py tests/test_document_loader.py tests/test_api_contracts.py` 결과는 `33 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `275 passed, 1 warning`이다.
+
+### OCR document-types CLI contract
+
+- `local-ai document-types`가 `/documents/supported-types` 백엔드 응답의 `pdf_ocr`, `pdf_ocr_install_hint`, PDF OCR fallback 설명을 그대로 출력하는지 CLI mock test를 추가했다.
+- CLI 안에 OCR readiness 판단 로직을 중복 구현하지 않고, 백엔드 응답을 JSON으로 출력하는 기존 구조를 유지했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_cli.py tests/test_document_service.py tests/test_document_loader.py` 결과는 `40 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `276 passed, 1 warning`이다.

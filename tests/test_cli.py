@@ -142,6 +142,24 @@ class FakeClient:
             return FakeResponse({"session_id": "session-1", "total_messages": 1, "messages": []})
         if url.endswith("/assistant/sessions"):
             return FakeResponse({"sessions": [], "limit": kwargs.get("params", {}).get("limit", 20), "offset": 0})
+        if url.endswith("/documents/supported-types"):
+            return FakeResponse(
+                {
+                    "types": [
+                        {
+                            "extension": ".pdf",
+                            "file_type": "pdf",
+                            "available": True,
+                            "optional_dependency": "pypdf",
+                            "install_hint": None,
+                            "description": "Text-based PDF with optional OCR fallback for PyPDF image XObjects.",
+                        }
+                    ],
+                    "install_hint": "PDF OCR은 pip install -e '.[ocr]'와 로컬 tesseract 설치가 필요합니다.",
+                    "pdf_ocr": False,
+                    "pdf_ocr_install_hint": "install local tesseract",
+                }
+            )
         return FakeResponse({"method": "GET"})
 
     def post(self, url: str, **kwargs) -> FakeResponse:
@@ -267,6 +285,20 @@ def test_cli_api_inventory_calls_project_inventory(monkeypatch) -> None:
     assert "api-inventory" in result.output
     assert calls == [
         {"method": "GET", "url": "http://127.0.0.1:8000/project/api-inventory"},
+    ]
+
+
+def test_cli_document_types_preserves_pdf_ocr_fields(monkeypatch) -> None:
+    calls = _install_fake_client(monkeypatch)
+
+    result = CliRunner().invoke(cli_main.app, ["document-types"])
+
+    assert result.exit_code == 0
+    assert '"pdf_ocr": false' in result.output
+    assert "install local tesseract" in result.output
+    assert "OCR fallback" in result.output
+    assert calls == [
+        {"method": "GET", "url": "http://127.0.0.1:8000/documents/supported-types"},
     ]
 
 
