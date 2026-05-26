@@ -1098,6 +1098,24 @@ curl -X POST http://127.0.0.1:8000/search \
   -d '{"query":"JWT authentication","top_k":5}'
 ```
 
+응답 예시:
+
+```json
+{
+  "query": "JWT authentication",
+  "results": [
+    {
+      "chunk_id": 10,
+      "document_id": 1,
+      "filename": "backend.md",
+      "chunk_index": 0,
+      "content": "JWT authentication flow notes.",
+      "score": 0.123
+    }
+  ]
+}
+```
+
 응답 핵심 필드:
 
 - `query`
@@ -1120,10 +1138,42 @@ curl "http://127.0.0.1:8000/chat-logs?limit=20&offset=0"
 curl "http://127.0.0.1:8000/chat-logs?mode=rag&query=JWT&limit=20&offset=0"
 ```
 
+응답 예시:
+
+```json
+{
+  "total": 1,
+  "limit": 20,
+  "offset": 0,
+  "mode": "rag",
+  "query": "JWT",
+  "items": [
+    {
+      "id": 1,
+      "question_preview": "JWT 인증 흐름 설명해줘",
+      "answer_preview": "문서 기준으로 JWT 인증은...",
+      "mode": "rag",
+      "model": "llama3.2",
+      "used_sources_count": 2,
+      "created_at": "2026-05-26T18:10:00"
+    }
+  ]
+}
+```
+
 필터:
 
 - `mode=direct|rag`
 - `query=<keyword>`
+
+응답 핵심 필드:
+
+- `total`
+- `limit`
+- `offset`
+- `mode`
+- `query`
+- `items`
 
 ### `GET /chat-logs/{chat_log_id}`
 
@@ -1132,6 +1182,37 @@ chat log 상세를 조회한다.
 ```bash
 curl http://127.0.0.1:8000/chat-logs/1
 ```
+
+응답 예시:
+
+```json
+{
+  "id": 1,
+  "question": "JWT 인증 흐름 설명해줘",
+  "answer": "문서 기준으로 JWT 인증은 access token 검증과 권한 확인 흐름으로 설명할 수 있습니다.",
+  "mode": "rag",
+  "model": "llama3.2",
+  "used_sources": [
+    {
+      "document_id": 1,
+      "filename": "backend.md",
+      "chunk_index": 0,
+      "chunk_id": 10
+    }
+  ],
+  "created_at": "2026-05-26T18:10:00"
+}
+```
+
+응답 핵심 필드:
+
+- `id`
+- `question`
+- `answer`
+- `mode`
+- `model`
+- `used_sources`
+- `created_at`
 
 ## Feedback
 
@@ -1145,11 +1226,27 @@ curl -X POST http://127.0.0.1:8000/feedback \
   -d '{"request_id":"1","rating":"good","corrected_answer":"수정 답변","note":"좋은 답변"}'
 ```
 
+응답 예시:
+
+```json
+{
+  "feedback_id": 1,
+  "chat_log_id": 1,
+  "rating": "good"
+}
+```
+
 `rating` 허용 값:
 
 - `good`
 - `bad`
 - `neutral`
+
+응답 핵심 필드:
+
+- `feedback_id`
+- `chat_log_id`
+- `rating`
 
 ### `GET /feedback`
 
@@ -1160,6 +1257,37 @@ curl "http://127.0.0.1:8000/feedback?limit=20&offset=0"
 curl "http://127.0.0.1:8000/feedback?rating=bad&limit=20&offset=0"
 curl "http://127.0.0.1:8000/feedback?chat_log_id=1&limit=20&offset=0"
 ```
+
+응답 예시:
+
+```json
+{
+  "total": 1,
+  "limit": 20,
+  "offset": 0,
+  "rating": "good",
+  "chat_log_id": 1,
+  "items": [
+    {
+      "id": 1,
+      "chat_log_id": 1,
+      "rating": "good",
+      "corrected_answer_preview": "수정 답변",
+      "note_preview": "좋은 답변",
+      "created_at": "2026-05-26T18:15:00"
+    }
+  ]
+}
+```
+
+응답 핵심 필드:
+
+- `total`
+- `limit`
+- `offset`
+- `rating`
+- `chat_log_id`
+- `items`
 
 ## Agent
 

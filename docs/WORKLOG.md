@@ -1120,3 +1120,11 @@
 - `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `DocumentSummary`, `DocumentDetail`, `DocumentChunksResponse` schema로 직접 검증한다.
 - 실제 DB 조회, 파일 읽기, embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `59 passed, 1 warning`이다.
+
+### Search chat logs feedback response schema examples
+
+- 2026-05-26 19:10 KST 기준으로 `POST /search`, `GET /chat-logs`, `GET /chat-logs/{chat_log_id}`, `POST /feedback`, `GET /feedback` response example을 API reference에 추가했다.
+- 예시는 search result, chat log preview/detail, feedback create/list의 paging/filter field를 포함한다.
+- `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `SearchResponse`, `ChatLogListResponse`, `ChatLogDetail`, `FeedbackResponse`, `FeedbackListResponse` schema로 직접 검증한다.
+- 실제 Ollama embedding, Chroma search, DB 조회/쓰기, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_chat_logs.py tests/test_feedback_list.py tests/test_search_service.py tests/test_public_docs_contract.py` 결과는 `53 passed, 1 warning`이다.

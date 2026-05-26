@@ -15,6 +15,7 @@ from app.schemas.assistant import (
     AssistantSessionCreateRequest,
     ProjectRootValidateRequest,
 )
+from app.schemas.chat_logs import ChatLogDetail, ChatLogListResponse
 from app.schemas.documents import (
     DocumentChunksResponse,
     DocumentDetail,
@@ -30,9 +31,9 @@ from app.schemas.documents import (
     IndexFolderRequest,
     SupportedDocumentTypesResponse,
 )
-from app.schemas.feedback import FeedbackRequest
+from app.schemas.feedback import FeedbackListResponse, FeedbackRequest, FeedbackResponse
 from app.schemas.project import ShellDryRunRequest
-from app.schemas.search import SearchRequest
+from app.schemas.search import SearchRequest, SearchResponse
 
 
 REQUEST_SCHEMAS: dict[str, type[BaseModel]] = {
@@ -295,6 +296,59 @@ def test_api_docs_vector_rebuild_preview_response_example_matches_schema() -> No
     assert all(action.action == "rebuild_vector" for action in validated.actions)
     assert all(action.requires_user_approval for action in validated.actions)
     assert "실제 Ollama embedding 생성" in validated.note
+
+
+def test_api_docs_search_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "POST /search")
+    validated = SearchResponse.model_validate(example)
+
+    assert validated.query == "JWT authentication"
+    assert len(validated.results) == 1
+    assert validated.results[0].filename == "backend.md"
+    assert validated.results[0].score == 0.123
+
+
+def test_api_docs_chat_logs_list_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /chat-logs")
+    validated = ChatLogListResponse.model_validate(example)
+
+    assert validated.total == 1
+    assert validated.mode == "rag"
+    assert validated.query == "JWT"
+    assert validated.items[0].used_sources_count == 2
+
+
+def test_api_docs_chat_log_detail_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /chat-logs/{chat_log_id}")
+    validated = ChatLogDetail.model_validate(example)
+
+    assert validated.id == 1
+    assert validated.mode == "rag"
+    assert validated.used_sources[0]["chunk_id"] == 10
+
+
+def test_api_docs_feedback_create_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "POST /feedback")
+    validated = FeedbackResponse.model_validate(example)
+
+    assert validated.feedback_id == 1
+    assert validated.chat_log_id == 1
+    assert validated.rating == "good"
+
+
+def test_api_docs_feedback_list_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /feedback")
+    validated = FeedbackListResponse.model_validate(example)
+
+    assert validated.total == 1
+    assert validated.rating == "good"
+    assert validated.chat_log_id == 1
+    assert validated.items[0].note_preview == "좋은 답변"
 
 
 def test_api_docs_repair_preview_response_example_matches_schema() -> None:
