@@ -290,6 +290,18 @@ def test_project_status_contract() -> None:
     assert status_body["project"] == "local-ai-server"
     assert status_body["current_phase"]["phase"] == 15
     assert status_body["recommended_next_model"]["recommended_ai"] == "Codex"
+    assert (
+        "shell/file-write/browser-interaction/deploy/fine-tuning"
+        in status_body["recommended_next_model"]["user_action_required"]
+    )
+    assert {
+        "Unrestricted shell execution",
+        "File write/delete/patch apply",
+        "Browser click/fill/submit/login interaction",
+        "Deployment or cloud resource changes",
+        "Automatic fine-tuning runs",
+    } <= set(status_body["blocked_until_review"])
+    assert any("blocked or review-required" in task for task in status_body["safe_next_tasks"])
     assert next_response.status_code == 200
     assert next_response.json()["recommended_next_model"]["recommended_model"] == "Codex GPT-5.5"
     assert inventory_response.status_code == 200
