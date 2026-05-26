@@ -12,6 +12,10 @@ venv/
 .npmrc
 .pypirc
 .netrc
+.aws/
+.gcloud/
+.azure/
+.kube/
 *.key
 *.pem
 *.crt

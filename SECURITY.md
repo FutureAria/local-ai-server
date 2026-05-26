@@ -73,7 +73,7 @@
 | 업로드 파일 | `data/uploads/` | 제외 |
 | 운영 로그 | `data/logs/` | 제외 |
 | SFT export | `data/*.jsonl` | 제외 |
-| 환경변수/credential 파일 | `.env`, `.env.*`, `.envrc`, `.npmrc`, `.pypirc`, `.netrc` (`.env.example` 예외) | 제외 |
+| 환경변수/credential 파일 | `.env`, `.env.*`, `.envrc`, `.npmrc`, `.pypirc`, `.netrc`, `.aws/`, `.gcloud/`, `.azure/`, `.kube/` (`.env.example` 예외) | 제외 |
 
 ## 로그 정책
 

@@ -1,5 +1,23 @@
 # WORKLOG
 
+## 2026-05-27 00:31 KST
+
+### Public release cloud credential directory guard
+
+- `.gitignore`가 project-local cloud credential 디렉터리(`.aws/`, `.gcloud/`, `.azure/`, `.kube/`)를 제외하도록 보강했다.
+- `scripts/public_release_check.py`가 같은 credential 디렉터리 경로를 공개 전 high finding으로 감지하도록 보강했다.
+- `SECURITY.md`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`의 비공개 파일/경로 목록을 `.gitignore`와 scanner 계약에 맞췄다.
+- `tests/test_public_release_check.py`가 `.aws/credentials`, `.gcloud/application_default_credentials.json`, `.azure/accessTokens.json`, `.kube/config` 경로를 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `381 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `103 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `381 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 00:27 KST
 
 ### Public release GraphQL text scan guard

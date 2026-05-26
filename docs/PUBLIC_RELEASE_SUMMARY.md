@@ -70,6 +70,7 @@
 - `.env.*`
 - `.envrc`
 - `.npmrc`, `.pypirc`, `.netrc`
+- `.aws/`, `.gcloud/`, `.azure/`, `.kube/`
 - `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.p12`, `*.pfx`
 - `id_rsa`, `id_ed25519`
 - `data/local_ai.sqlite3`
@@ -96,7 +97,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `377 passed`
+- `.venv/bin/pytest`: `381 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

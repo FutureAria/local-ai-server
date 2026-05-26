@@ -6,12 +6,12 @@
 
 - 이 문서는 공개 전 점검용이다.
 - 운영 배포, 클라우드 리소스 생성, Oracle 리소스 연결, DB migration을 실행하지 않는다.
-- 실제 API key, `.env`, `.env.*`, `.envrc`, package manager credential 파일, key/certificate 파일, SQLite DB, Chroma index, 업로드 파일, 로그, JSONL export를 공개하지 않는다.
+- 실제 API key, `.env`, `.env.*`, `.envrc`, package manager/cloud credential 파일, key/certificate 파일, SQLite DB, Chroma index, 업로드 파일, 로그, JSONL export를 공개하지 않는다.
 
 ## 1. 코드 상태
 
 - [ ] `git status --short --branch`가 의도한 변경만 보여준다.
-- [ ] `.env`, `.env.*`, `.envrc`, `.npmrc`, `.pypirc`, `.netrc`가 staging에 없다. 단, placeholder만 담은 `.env.example`은 예외다.
+- [ ] `.env`, `.env.*`, `.envrc`, `.npmrc`, `.pypirc`, `.netrc`, `.aws/`, `.gcloud/`, `.azure/`, `.kube/`가 staging에 없다. 단, placeholder만 담은 `.env.example`은 예외다.
 - [ ] `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.p12`, `*.pfx`, `id_rsa`, `id_ed25519` 같은 key/certificate 파일이 staging에 없다.
 - [ ] `data/local_ai.sqlite3`가 staging에 없다.
 - [ ] `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*` 같은 SQLite/DB 파일 변형이 staging에 없다.
