@@ -15,7 +15,7 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
 
     assert ".venv/bin/pytest" in text
-    assert "311 passed" in text
+    assert "312 passed" in text
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert "git diff --check" in text
@@ -54,6 +54,20 @@ def test_next_chat_handoff_tracks_completed_real_user_document_e2e() -> None:
     assert "실제 사용자 문서 E2E는 완료됨" in text
     assert "완료된 실제 사용자 문서 E2E summary 정합성 유지" in text
     assert "추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 경로를 받은 뒤 실행" in text
+
+
+def test_next_chat_handoff_tracks_runtime_snapshot_guard_tests() -> None:
+    text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
+
+    for phrase in [
+        "README와 Project Summary의 `Runtime Contract Snapshot` 값을 실제 API/CLI/smoke flow inventory와 비교한다",
+        "tests/test_tasks_doc.py",
+        "tests/test_public_release_summary.py",
+        "tests/test_portfolio_docs_contract.py",
+        "tests/test_next_chat_handoff.py",
+        "Runtime Contract Snapshot guard가 task board, release summary, portfolio docs, handoff에 남아 있는지 검증한다",
+    ]:
+        assert phrase in text
 
 
 def test_next_chat_handoff_boundaries_match_task_board_and_public_docs() -> None:

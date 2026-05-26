@@ -1294,3 +1294,14 @@
 - full self-check에서 `.venv/bin/pytest` 결과는 `311 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `311 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
 - `git diff --check` 결과는 성공이다.
+
+### Handoff recent-test snapshot guard note
+
+- 2026-05-26 20:31 KST 기준으로 `docs/NEXT_CHAT_HANDOFF.md`의 최근 테스트 보강 목록에 Runtime Contract Snapshot guard 관련 테스트 설명을 추가했다.
+- `tests/test_next_chat_handoff.py`가 `tests/test_public_docs_contract.py`, `tests/test_tasks_doc.py`, `tests/test_public_release_summary.py`, `tests/test_portfolio_docs_contract.py`, `tests/test_next_chat_handoff.py`의 snapshot guard 역할 설명이 handoff에 남아 있는지 검증하도록 보강했다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `312 passed` 기준으로 맞췄다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py` 결과는 `7 passed, 1 warning`이다.
+- targeted contract self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py` 결과는 `19 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+- `git diff --check` 결과는 성공이다.

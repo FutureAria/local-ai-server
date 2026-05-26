@@ -218,7 +218,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - PDF OCR fallback은 PyPDF image XObject 기반 optional loader로 구현했고, 외부 OCR/cloud OCR/pdf2image/poppler는 추가하지 않았다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `311 passed`
+  - `.venv/bin/pytest`: `312 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공
@@ -274,6 +274,8 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - `/assistant/startup`와 `local-ai assistant-startup`을 추가했다.
 - `/project/status`는 14차 Project API inventory 완료, 15차 Live browser UI QA를 다음 단계로 표시한다.
 - `tests/test_next_chat_handoff.py`를 추가해 이 handoff가 브라우저 조작 없이 가능한 Codex 작업과 사용자 수동 확인 작업을 분리하는지 검증한다.
+- `tests/test_public_docs_contract.py`가 README와 Project Summary의 `Runtime Contract Snapshot` 값을 실제 API/CLI/smoke flow inventory와 비교한다.
+- `tests/test_tasks_doc.py`, `tests/test_public_release_summary.py`, `tests/test_portfolio_docs_contract.py`, `tests/test_next_chat_handoff.py`가 Runtime Contract Snapshot guard가 task board, release summary, portfolio docs, handoff에 남아 있는지 검증한다.
 - `tests/test_public_docs_contract.py`를 확장해 assistant endpoint/CLI 전체와 project continuation endpoint/CLI가 README/API/PROJECT_SUMMARY에 모두 문서화되어 있는지 검증한다.
 - `tests/test_ui_bridge_examples.py`를 확장해 UI bridge 예시 JSON이 실제 assistant Pydantic schema와 맞는지 검증한다.
 - `tests/test_api_docs_payloads.py`를 추가해 `docs/API.md` curl JSON payload 예시가 실제 request schema와 맞는지 검증한다.
