@@ -176,6 +176,8 @@ def _should_scan_text(path: Path) -> bool:
         ".env",
         ".example",
         ".gradle",
+        ".gql",
+        ".graphql",
         ".hcl",
         ".http",
         ".ini",

@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 00:27 KST
+
+### Public release GraphQL text scan guard
+
+- `scripts/public_release_check.py`가 GraphQL request/schema 파일(`.gql`, `.graphql`)도 secret text scan 대상으로 포함하도록 보강했다.
+- `tests/test_public_release_check.py`가 `query.gql`, `query.graphql` 안의 `LOCAL_API_KEY=...` 후보를 high finding으로 감지하는지 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `377 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `71 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py tests/test_public_release_summary.py` | `92 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `377 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 00:15 KST
 
 ### Public release API client and notebook text scan guard

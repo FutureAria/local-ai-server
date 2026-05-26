@@ -110,6 +110,8 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
         "settings.xml",
         "build.gradle",
         "build.gradle.kts",
+        "query.gql",
+        "query.graphql",
         "poetry.lock",
         "schema.sql",
         "main.tf",
