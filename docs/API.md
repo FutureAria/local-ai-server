@@ -70,12 +70,13 @@ Authorization: Bearer <LOCAL_API_KEY>
 
 ## CORS
 
-브라우저 기반 로컬 UI 호출을 위해 `LOCAL_CORS_ORIGINS`에 명시된 origin만 허용한다.
+브라우저 기반 로컬 UI 호출을 위해 `LOCAL_CORS_ORIGINS`에 명시된 origin만 허용한다. `LOCAL_CORS_ALLOW_CREDENTIALS`의 기본값은 `false`이며, cookie/auth credential이 필요한 별도 UI를 붙일 때만 명시적으로 켠다.
 
 기본값:
 
 ```env
 LOCAL_CORS_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
+LOCAL_CORS_ALLOW_CREDENTIALS=false
 ```
 
 허용 header:
@@ -781,6 +782,7 @@ curl http://127.0.0.1:8000/agent/runs/1/actions
 ### `POST /agent/runs/{run_id}/dry-run`
 
 실제 파일 내용 읽기, URL fetch, shell 실행, 브라우저 조작 없이 실행 전 정책 판단만 기록한다.
+dry-run 응답의 `would_execute`는 항상 `false`이며, 실제 `execute` 단계에서 현재 설정상 read-only 실행 후보가 될 수 있는지는 `execute_phase_would_run`으로 구분한다.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/agent/runs/1/dry-run

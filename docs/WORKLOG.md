@@ -53,7 +53,7 @@
 | 명령 | 결과 |
 |---|---|
 | `.venv/bin/python scripts/local_ci_check.py --root .` | 성공 |
-| `.venv/bin/pytest` | `260 passed` |
+| `.venv/bin/pytest` | `266 passed` |
 | `.venv/bin/python -m compileall app cli scripts` | 성공 |
 | `test -f docs/API.md` | API 문서 존재 확인 |
 | `test -f docs/CLAUDE_REVIEW_HANDOFF.md` | Claude 리뷰 handoff 문서 존재 확인 |
@@ -938,6 +938,16 @@
 - `docs/TASKS.md`의 실제 사용자 문서 E2E 항목을 완료 상태로 갱신했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_user_document_e2e_plan.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_portfolio_docs_contract.py tests/test_readme_quick_start.py` 결과는 `37 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `260 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
+
+### Opus safety polish follow-up
+
+- Agent file dry-run 응답에서 `would_execute=false`를 고정하고, 실제 execute 단계에서 현재 설정상 read-only 후보가 될 수 있는지는 `execute_phase_would_run`으로 분리했다.
+- `LOCAL_API_KEY`가 없으면 startup stderr warning을 출력하고, `LOCAL_API_KEY_WARN=false`로 의도적인 local demo 경고를 끌 수 있게 했다.
+- Agent read-only web fetch 실행 전 hostname을 IP로 해석해 private, loopback, link-local 주소를 차단하고, redirect 응답은 자동으로 따라가지 않도록 명시 처리했다.
+- CORS credential 허용 여부를 `LOCAL_CORS_ALLOW_CREDENTIALS`로 분리하고 기본값을 `false`로 유지했다.
+- README, API, OPERATIONS, USER_DOCUMENT_E2E_PLAN, `.env.example`에 host allowlist 미구현, CORS credentials 기본값, SQLite `.backup`, 수동 cleanup 예시를 문서화했다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_agent_service.py tests/test_security.py tests/test_config.py tests/test_operations_runbook.py tests/test_readme_quick_start.py tests/test_api_docs_payloads.py tests/test_user_document_e2e_plan.py tests/test_portfolio_docs_contract.py` 결과는 `83 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `266 passed, 1 warning`, public release check는 `scanned_files=119`, finding 없음이다.
 
 ### 응답 형식 업데이트
 

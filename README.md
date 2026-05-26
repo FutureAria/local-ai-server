@@ -112,7 +112,7 @@ local-ai assistant
 | 문서 업로드/검색/RAG | 가능 | `.txt`, `.md`, `.html`, `.htm`, optional `.pdf`, `.docx`를 로컬에서 색인하고 Ollama로 답변합니다. |
 | 폴더 색인 preview | 가능 | 실제 저장 전 대상 파일, 예상 chunk, 예상 embedding batch를 read-only로 확인합니다. |
 | Agent plan/approval | 가능 | 요청을 action 후보와 위험도로 기록하고 승인/거절 상태를 저장합니다. |
-| Agent execution v1 | 조건부 read-only | `AGENT_EXECUTION_ENABLED=true`에서도 허용 root 안의 폴더 목록 조회, 텍스트 파일 preview, 명시 URL 단건 read-only fetch만 지원합니다. |
+| Agent execution v1 | 조건부 read-only | `AGENT_EXECUTION_ENABLED=true`에서도 허용 root 안의 폴더 목록 조회, 텍스트 파일 preview, 명시 URL 단건 read-only fetch만 지원합니다. Agent web fetch host allowlist는 아직 없으며 private/loopback/link-local host는 차단합니다. |
 | shell | dry-run only | `shell-policy`, `shell-dry-run`은 정책 판단만 반환하고 실제 명령을 실행하지 않습니다. |
 | 브라우저/파일/배포 | 금지 | 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 클라우드/Oracle 리소스 변경은 구현하지 않았습니다. |
 | 외부 API | 금지 | 외부 LLM API와 cloud vector DB는 사용하지 않습니다. 명시 URL read-only fetch는 LLM API 연동이나 크롤링/브라우저 이동이 아닙니다. |
@@ -1051,6 +1051,7 @@ ollama pull nomic-embed-text
 - Chroma와 SQLite 동기화 복구는 read-only 점검과 repair preview까지만 지원합니다. 실제 repair/rebuild는 아직 수행하지 않습니다.
 - 실행형 Agent는 계획, 승인, read-only 실행 엔진 v1 단계입니다. 실제 웹 이동, 브라우저 클릭, 폴더 UI 열기, 파일 수정, shell 실행은 아직 수행하지 않습니다.
 - 실행 엔진 v1은 승인된 run에 대해 허용 root 안의 폴더 목록 조회와 텍스트 파일 내용 preview만 지원합니다. 웹 fetch는 `AGENT_WEB_FETCH_ENABLED=true`와 명시 URL이 있을 때만 read-only로 동작하며, `AGENT_WEB_FETCH_MAX_BYTES` 이후 응답을 자릅니다.
+- Agent web fetch host allowlist는 아직 구현하지 않았고, private/loopback/link-local host는 차단합니다.
 - embedding은 batch 처리되고 preview에서 예상 batch 수를 볼 수 있지만, 매우 큰 문서의 실시간 진행률 표시는 아직 없습니다.
 - 자동 로그 rotation은 아직 구현하지 않았고, 운영 로그 정책은 문서로만 제공합니다.
 - 인증은 로컬 API key 수준이며, 다중 사용자 권한 관리는 없습니다.

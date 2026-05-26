@@ -8,6 +8,8 @@ def test_config_defaults() -> None:
     assert settings.ollama_embed_model == "nomic-embed-text"
     assert settings.database_url == "sqlite:///data/local_ai.sqlite3"
     assert "http://127.0.0.1:5173" in settings.local_cors_origins
+    assert settings.local_cors_allow_credentials is False
+    assert settings.local_api_key_warn is True
     assert settings.embedding_batch_size == 8
     assert settings.embedding_max_retries == 2
     assert settings.local_rate_limit_per_minute == 120

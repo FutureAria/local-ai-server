@@ -87,6 +87,14 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --document /pa
 
 삭제, repair, rebuild, DB 초기화는 되돌리기 어려울 수 있으므로 사용자 승인 또는 별도 보안 리뷰 후 진행한다.
 
+수동 정리가 승인된 경우에만 아래처럼 대상 document id를 먼저 확인한 뒤 삭제한다. 아래 명령은 예시이며, 실제 실행 전 삭제 대상과 저장 영향에 대한 사용자 승인이 필요하다.
+
+```bash
+local-ai docs --query approved-notes
+curl -X DELETE http://127.0.0.1:8000/documents/<document_id> -H "X-API-Key: <local-api-key>"
+local-ai integrity
+```
+
 ## TASKS 반영 기준
 
 `docs/TASKS.md`의 실제 사용자 문서 E2E 항목은 아래 조건이 모두 충족될 때만 완료로 바꾼다.

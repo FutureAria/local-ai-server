@@ -3,7 +3,7 @@ import pytest
 
 from app.api.dependencies import get_search_service, reset_rate_limiter
 from app.config import get_settings
-from app.main import app
+from app.main import app, create_app
 
 
 class FakeSearchService:
@@ -134,3 +134,53 @@ def test_local_api_key_accepts_authorization_bearer(monkeypatch) -> None:
     monkeypatch.delenv("LOCAL_API_KEY", raising=False)
 
     assert response.status_code == 200
+
+
+def test_create_app_warns_when_local_api_key_missing(monkeypatch, capsys, tmp_path) -> None:
+    get_settings.cache_clear()
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("LOCAL_API_KEY", raising=False)
+    monkeypatch.delenv("LOCAL_API_KEY_WARN", raising=False)
+
+    create_app()
+    captured = capsys.readouterr()
+
+    get_settings.cache_clear()
+    assert "LOCAL_API_KEY is not set" in captured.err
+
+
+def test_create_app_can_silence_missing_local_api_key_warning(monkeypatch, capsys, tmp_path) -> None:
+    get_settings.cache_clear()
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("LOCAL_API_KEY", raising=False)
+    monkeypatch.setenv("LOCAL_API_KEY_WARN", "false")
+
+    create_app()
+    captured = capsys.readouterr()
+
+    get_settings.cache_clear()
+    monkeypatch.delenv("LOCAL_API_KEY_WARN", raising=False)
+    assert "LOCAL_API_KEY is not set" not in captured.err
+
+
+def test_cors_allow_credentials_defaults_false(monkeypatch) -> None:
+    get_settings.cache_clear()
+    monkeypatch.delenv("LOCAL_CORS_ALLOW_CREDENTIALS", raising=False)
+
+    test_app = create_app()
+
+    get_settings.cache_clear()
+    cors_middleware = next(item for item in test_app.user_middleware if item.cls.__name__ == "CORSMiddleware")
+    assert cors_middleware.kwargs["allow_credentials"] is False
+
+
+def test_cors_allow_credentials_can_be_enabled_by_env(monkeypatch) -> None:
+    get_settings.cache_clear()
+    monkeypatch.setenv("LOCAL_CORS_ALLOW_CREDENTIALS", "true")
+
+    test_app = create_app()
+
+    get_settings.cache_clear()
+    monkeypatch.delenv("LOCAL_CORS_ALLOW_CREDENTIALS", raising=False)
+    cors_middleware = next(item for item in test_app.user_middleware if item.cls.__name__ == "CORSMiddleware")
+    assert cors_middleware.kwargs["allow_credentials"] is True

@@ -1,5 +1,7 @@
 import json
+import ipaddress
 import re
+import socket
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
@@ -324,7 +326,8 @@ class AgentService:
             "action": action["action"],
             "requires_approval": True,
             "execution_mode": "read_only_file_preview",
-            "would_execute": bool(self.settings.agent_execution_enabled),
+            "would_execute": False,
+            "execute_phase_would_run": bool(self.settings.agent_execution_enabled),
         }
         if not self.settings.agent_execution_enabled:
             return {
@@ -526,11 +529,26 @@ class AgentService:
         parsed = urlparse(url)
         if parsed.scheme not in {"http", "https"}:
             return _blocked_result(action, "http/https URL만 허용합니다.")
+        host_block_reason = _public_http_host_block_reason(url)
+        if host_block_reason:
+            return _blocked_result(action, host_block_reason)
         if not self.settings.agent_web_fetch_enabled:
             return _blocked_result(action, "AGENT_WEB_FETCH_ENABLED=false 상태라 웹 fetch를 차단했습니다.")
 
         try:
-            with httpx.stream("GET", url, timeout=10.0, follow_redirects=True) as response:
+            with httpx.stream("GET", url, timeout=10.0, follow_redirects=False) as response:
+                final_url = str(response.url)
+                final_host_block_reason = _public_http_host_block_reason(final_url)
+                if final_host_block_reason:
+                    return _blocked_result(action, final_host_block_reason)
+                if 300 <= response.status_code < 400:
+                    redirect_target = response.headers.get("location")
+                    if redirect_target:
+                        redirect_url = urljoin(final_url, redirect_target)
+                        redirect_block_reason = _public_http_host_block_reason(redirect_url)
+                        if redirect_block_reason:
+                            return _blocked_result(action, f"redirect target blocked: {redirect_block_reason}")
+                    return _blocked_result(action, "redirect 응답은 자동으로 따라가지 않습니다. redirect target 검증 후 별도 승인된 URL만 fetch하세요.")
                 content_type = response.headers.get("content-type", "")
                 chunks = []
                 bytes_read = 0
@@ -545,7 +563,6 @@ class AgentService:
                         break
                     chunks.append(chunk)
                 body = b"".join(chunks)
-                final_url = str(response.url)
                 status_code = response.status_code
         except httpx.HTTPError as exc:
             return _blocked_result(action, f"웹 fetch 실패: {exc}")
@@ -661,6 +678,37 @@ def _is_relative_to(path: Path, root: Path) -> bool:
 def _extract_url(text: str) -> str | None:
     match = re.search(r"https?://[^\s\"']+", text)
     return match.group(0) if match else None
+
+
+def _public_http_host_block_reason(url: str) -> str | None:
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"}:
+        return "http/https URL만 허용합니다."
+    if not parsed.hostname:
+        return "URL hostname을 확인할 수 없어 웹 fetch를 차단했습니다."
+
+    try:
+        addresses = _resolve_host_ips(parsed.hostname)
+    except OSError as exc:
+        return f"URL hostname을 해석할 수 없어 웹 fetch를 차단했습니다: {exc}"
+
+    for address in addresses:
+        ip = ipaddress.ip_address(address)
+        if ip.is_private or ip.is_loopback or ip.is_link_local:
+            return "private, loopback, link-local IP로 해석되는 URL은 웹 fetch에서 차단됩니다."
+    return None
+
+
+def _resolve_host_ips(hostname: str) -> set[str]:
+    try:
+        return {str(ipaddress.ip_address(hostname))}
+    except ValueError:
+        pass
+
+    addresses = set()
+    for item in socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM):
+        addresses.add(item[4][0])
+    return addresses
 
 
 def _extract_path(text: str) -> str | None:

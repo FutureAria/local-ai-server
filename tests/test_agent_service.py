@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.config import Settings
 from app.db.database import Base
 from app.db.models import AgentRun
+import app.services.agent_service as agent_service_module
 from app.services.agent_service import AgentService, _extract_html_summary
 
 
@@ -249,6 +250,8 @@ def test_agent_service_dry_run_records_policy_without_execution(tmp_path) -> Non
         assert result == []
         assert actions[0]["status"] == "dry_run_allowed"
         assert actions[0]["dry_run_result"]["operation"] == "preview_file"
+        assert actions[0]["dry_run_result"]["would_execute"] is False
+        assert actions[0]["dry_run_result"]["execute_phase_would_run"] is True
         assert "content_preview" not in actions[0]["dry_run_result"]
 
 
@@ -283,3 +286,50 @@ def test_agent_html_summary_extracts_title_text_and_links() -> None:
     assert "JWT" in summary["text_preview"]
     assert "Authentication flow" in summary["text_preview"]
     assert summary["links"] == [{"url": "https://example.com/next", "text": ""}]
+
+
+def test_agent_service_execute_blocks_private_web_fetch_host() -> None:
+    service = AgentService(settings=Settings(AGENT_EXECUTION_ENABLED=True, AGENT_WEB_FETCH_ENABLED=True))
+
+    result = service._execute_web_action(
+        {"tool": "web_search", "action": "fetch_url_preview", "target": "http://127.0.0.1:8000/private"}
+    )
+
+    assert result["status"] == "blocked"
+    assert "private, loopback, link-local IP" in result["message"]
+
+
+def test_agent_service_execute_blocks_redirect_to_private_host(monkeypatch) -> None:
+    class FakeStreamResponse:
+        status_code = 302
+        headers = {"location": "http://127.0.0.1:8000/private"}
+        url = "https://example.test/start"
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback) -> None:
+            return None
+
+        def iter_bytes(self):
+            return iter(())
+
+    def fake_stream(*args, **kwargs) -> FakeStreamResponse:
+        assert kwargs["follow_redirects"] is False
+        return FakeStreamResponse()
+
+    monkeypatch.setattr(
+        agent_service_module,
+        "_resolve_host_ips",
+        lambda hostname: {"127.0.0.1"} if hostname == "127.0.0.1" else {"93.184.216.34"},
+    )
+    monkeypatch.setattr(agent_service_module.httpx, "stream", fake_stream)
+    service = AgentService(settings=Settings(AGENT_EXECUTION_ENABLED=True, AGENT_WEB_FETCH_ENABLED=True))
+
+    result = service._execute_web_action(
+        {"tool": "web_search", "action": "fetch_url_preview", "target": "https://example.test/start"}
+    )
+
+    assert result["status"] == "blocked"
+    assert "redirect target blocked" in result["message"]
+    assert "private, loopback, link-local IP" in result["message"]

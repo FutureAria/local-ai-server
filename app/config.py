@@ -23,6 +23,8 @@ class Settings(BaseSettings):
         default="http://127.0.0.1:5173,http://localhost:5173",
         alias="LOCAL_CORS_ORIGINS",
     )
+    local_cors_allow_credentials: bool = Field(default=False, alias="LOCAL_CORS_ALLOW_CREDENTIALS")
+    local_api_key_warn: bool = Field(default=True, alias="LOCAL_API_KEY_WARN")
     agent_execution_enabled: bool = Field(default=False, alias="AGENT_EXECUTION_ENABLED")
     agent_allowed_roots: str = Field(default=".", alias="AGENT_ALLOWED_ROOTS")
     agent_web_fetch_enabled: bool = Field(default=False, alias="AGENT_WEB_FETCH_ENABLED")
