@@ -1,5 +1,20 @@
 # WORKLOG
 
+## 2026-05-26 21:45 KST
+
+### UI QA checklist contract guard
+
+- `docs/UI_QA_CHECKLIST.md`의 UI contract 항목에 refresh/message flow의 method+path 조합을 명시했다.
+- `tests/test_ui_qa_checklist.py`가 `AssistantService().ui_contract()`의 `startup_sequence`, `refresh_endpoints`, `message_flow` 항목을 method+path 기준으로 검증하도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_ui_qa_checklist.py tests/test_ui_connect_guide.py tests/test_ui_bridge_examples.py` | `18 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `314 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-20
 
 ### 완료

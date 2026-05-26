@@ -48,6 +48,10 @@ def test_ui_qa_checklist_covers_ui_contract_runtime_shape() -> None:
     text = Path("docs/UI_QA_CHECKLIST.md").read_text(encoding="utf-8")
     contract = AssistantService().ui_contract()
 
+    for group in ["startup_sequence", "refresh_endpoints", "message_flow"]:
+        for item in contract[group]:
+            assert f"{item['method']} {item['path']}" in text
+
     runtime_paths = [
         item["path"]
         for group in ["startup_sequence", "refresh_endpoints", "message_flow"]

@@ -43,8 +43,8 @@
 
 - [ ] `GET /assistant/ui-contract` 호출이 `200`을 반환한다.
 - [ ] `startup_sequence`가 `/assistant/startup`, `/assistant/bootstrap`, `/assistant/action-preview`, `/assistant/message` 순서를 표시한다.
-- [ ] `refresh_endpoints`에 `/assistant/ping`, `/assistant/config`, `/assistant/dashboard`, `/assistant/sessions`, `/project/api-inventory`가 포함된다.
-- [ ] `message_flow`가 action preview, confirmed message, paged history 순서를 표시한다.
+- [ ] `refresh_endpoints`에 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`, `GET /assistant/sessions`, `GET /project/api-inventory`가 포함된다.
+- [ ] `message_flow`가 `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions/{session_id}/messages` 순서를 표시한다.
 - [ ] `response_types`에 `answer`, `search_results`, `index_preview`, `needs_project_root`, `shell_dry_run`, `agent_plan`, `status`, `action_preview`가 모두 표시된다.
 - [ ] `blocked_actions`에 `shell_execution`, `browser_interaction`, `file_write_delete`, `external_llm_api`가 표시된다.
 - [ ] `auth.secret_returned=false`가 표시되고 API key 원문은 표시되지 않는다.
