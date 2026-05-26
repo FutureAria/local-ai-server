@@ -625,6 +625,43 @@ curl -X POST http://127.0.0.1:8000/documents/index-folder \
   -d '{"folder_path":"./notes","recursive":true}'
 ```
 
+응답 예시:
+
+```json
+{
+  "indexed_documents": 2,
+  "skipped_files": 1,
+  "chunks_created": 5,
+  "document_ids": [
+    10,
+    11
+  ],
+  "indexed_files": [
+    {
+      "path": "/Users/example/notes/backend.md",
+      "document_id": 10,
+      "filename": "backend.md",
+      "file_type": "md",
+      "chunks_created": 3
+    },
+    {
+      "path": "/Users/example/notes/security.txt",
+      "document_id": 11,
+      "filename": "security.txt",
+      "file_type": "txt",
+      "chunks_created": 2
+    }
+  ],
+  "skipped_file_details": [
+    {
+      "path": "/Users/example/notes/empty.md",
+      "filename": "empty.md",
+      "reason": "비어 있는 문서는 색인할 수 없습니다."
+    }
+  ]
+}
+```
+
 응답 핵심 필드:
 
 - `indexed_documents`

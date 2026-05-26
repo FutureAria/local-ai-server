@@ -1097,3 +1097,11 @@
 - `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `IndexFolderPreviewResponse` schema로 직접 검증한다.
 - 실제 파일 수정, SQLite 저장, Ollama embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_document_service.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `58 passed, 1 warning`이다.
+
+### Index folder response schema example
+
+- 2026-05-26 18:59 KST 기준으로 `POST /documents/index-folder` response example을 API reference에 추가했다.
+- 예시는 `indexed_documents`, `skipped_files`, `chunks_created`, `document_ids`, `indexed_files`, `skipped_file_details`를 포함한다.
+- `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `IndexFolderResponse` schema로 직접 검증한다.
+- 실제 폴더 색인, SQLite 저장, Ollama embedding 생성, Chroma write, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_api_contracts.py tests/test_document_service.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `59 passed, 1 warning`이다.
