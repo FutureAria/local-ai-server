@@ -120,6 +120,9 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
         "setup.cmd",
         "export.csv",
         "export.tsv",
+        "request.http",
+        "request.rest",
+        "analysis.ipynb",
     ],
 )
 def test_public_release_check_scans_common_config_and_script_files(
