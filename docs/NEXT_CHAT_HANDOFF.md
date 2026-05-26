@@ -184,10 +184,12 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 
 1. `docs/USER_DOCUMENT_E2E_PLAN.md`, `docs/TASKS.md`, `docs/WORKLOG.md`의 완료된 실제 사용자 문서 E2E summary 정합성 유지
 2. `README.md`, `docs/API.md`, `docs/PROJECT_SUMMARY.md`의 assistant endpoint와 CLI 목록 교차 검증
+   - endpoint/response field 계약 테스트와 runtime endpoint count drift check 유지
 3. `tests/test_public_docs_contract.py`, `tests/test_user_document_e2e_plan.py`, `tests/test_readme_ui_bridge.py`로 문서 계약 유지
 4. `docs/RELEASE_CHECKLIST.md` 기준 공개 전 stop condition 누락 여부 확인
 5. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
-6. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
+6. assistant bridge smoke expected output과 UI 수동 QA 체크리스트를 최신 preview endpoint 표시 기준과 함께 유지
+7. `.venv/bin/pytest`, compileall, public release check, `git diff --check` 재실행
 
 사용자 수동 확인 또는 별도 승인 후에만 진행할 작업:
 
@@ -205,6 +207,8 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 12. 필요하면 대용량 문서 진행률 표시 또는 Chroma 누락 vector 실제 rebuild 활성화 조건 문서화
 13. 필요하면 자동 로그 rotation 구현. 단 실제 삭제/압축 자동화 정책은 사용자 승인 필요
 14. 필요하면 Chroma/SQLite 실제 repair 명령 추가. 단 실제 repair/delete는 사용자 승인 필요
+15. 실제 repair/delete/rebuild, 브라우저 click/fill/submit, shell 실행, 파일 생성/수정/삭제 자동화는 별도 승인 또는 보안 리뷰 전 진행하지 않음
+16. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit은 별도 보안/운영 리뷰 전 진행하지 않음
 
 ## 최근 Codex self-check
 
@@ -213,7 +217,7 @@ Codex가 바로 이어서 할 수 있는 안전 작업:
 - README 현재 한계에 HTTPS termination 미지원 상태와 process-local rate limit 한계를 명시했다.
 - PDF OCR fallback은 PyPDF image XObject 기반 optional loader로 구현했고, 외부 OCR/cloud OCR/pdf2image/poppler는 추가하지 않았다.
 - 최신 검증:
-  - `.venv/bin/pytest`: `276 passed`
+  - `.venv/bin/pytest`: `298 passed`
   - `.venv/bin/python -m compileall app cli scripts`: 성공
   - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
   - `git diff --check`: 성공

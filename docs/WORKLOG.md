@@ -1150,3 +1150,10 @@
 - 관련 contract test도 같은 지원 타입 문구를 확인하도록 갱신했다.
 - 실제 smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_tasks_doc.py tests/test_next_chat_handoff.py tests/test_user_document_e2e_plan.py` 결과는 `21 passed, 1 warning`이다.
+
+### Handoff task boundary drift guard
+
+- 2026-05-26 19:26 KST 기준으로 `docs/NEXT_CHAT_HANDOFF.md`의 safe/manual/review 경계 문구를 README, PROJECT_SUMMARY, TASKS와 같은 핵심 용어로 맞췄다.
+- `tests/test_next_chat_handoff.py`가 endpoint/response field 계약, runtime endpoint count drift, assistant bridge smoke, PDF OCR, repair/browser/shell/file/deploy/auth/rate-limit 경계가 네 문서에 같이 남아 있는지 검증한다.
+- 실제 브라우저 UI 확인, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_tasks_doc.py tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py` 결과는 `19 passed, 1 warning`이다.
