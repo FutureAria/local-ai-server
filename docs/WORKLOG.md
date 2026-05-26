@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-26 23:39 KST
+
+### Public release unreadable file guard
+
+- `scripts/public_release_check.py`가 text scan 대상 파일을 권한 문제 등으로 읽을 수 없을 때 조용히 넘기지 않고 high finding으로 반환하도록 보강했다.
+- binary-ish 파일의 `UnicodeDecodeError`는 기존처럼 skip하되, `PermissionError` 같은 `OSError`는 공개 전 확인 대상이 되도록 분리했다.
+- `tests/test_public_release_check.py`가 unreadable text file을 high finding으로 감지하는지 mock 기반으로 검증한다.
+- 공개 요약 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `343 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_local_ci_check.py` | `40 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `343 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 23:37 KST
 
 ### Public release log file guard

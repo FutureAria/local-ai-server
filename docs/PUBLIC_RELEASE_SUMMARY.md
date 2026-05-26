@@ -93,7 +93,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `342 passed`
+- `.venv/bin/pytest`: `343 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

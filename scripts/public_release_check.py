@@ -174,6 +174,14 @@ def _scan_text_file(root: Path, path: Path) -> list[Finding]:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         return []
+    except OSError as exc:
+        return [
+            Finding(
+                severity="high",
+                path=relative,
+                message=f"공개 전 점검에서 파일을 읽을 수 없습니다: {exc.__class__.__name__}",
+            )
+        ]
 
     findings = []
     for pattern in SECRET_TEXT_PATTERNS:
