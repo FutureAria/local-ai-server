@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-26 22:15 KST
+
+### Public release check command guard
+
+- `README.md`의 GitHub 공개 전 보안 점검 예시에서 `--json` 없는 public release check 명령을 제거했다.
+- `docs/PROJECT_SUMMARY.md`의 공개 전 점검 명령도 `.venv/bin/python scripts/public_release_check.py --root . --json` 기준으로 정리했다.
+- `tests/test_portfolio_docs_contract.py`가 README, PROJECT_SUMMARY, FINAL_REPORT, SECURITY에서 `--json` 없는 public release check 명령 드리프트를 잡도록 보강했다.
+- 공개 요약 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `316 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py tests/test_public_docs_contract.py` | `36 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `316 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:11 KST
 
 ### Final verification command cleanup

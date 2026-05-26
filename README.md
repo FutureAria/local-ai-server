@@ -999,7 +999,6 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-br
 로컬 데이터와 secret 후보가 공개 대상에 섞여 있는지 read-only로 점검할 수 있습니다.
 
 ```bash
-.venv/bin/python scripts/public_release_check.py --root .
 .venv/bin/python scripts/public_release_check.py --root . --json
 ```
 
