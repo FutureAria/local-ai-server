@@ -76,6 +76,19 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
     assert "secret" in result["findings"][0]["message"]
 
 
+@pytest.mark.parametrize("relative_path", ["setup.sh", "settings.ini", "app.conf", "app.properties"])
+def test_public_release_check_scans_common_config_and_script_files(
+    tmp_path: Path,
+    relative_path: str,
+) -> None:
+    (tmp_path / relative_path).write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["findings"][0]["path"] == relative_path
+
+
 def test_public_release_check_allows_documentation_placeholders(tmp_path: Path) -> None:
     (tmp_path / "README.md").write_text(
         "\n".join(
