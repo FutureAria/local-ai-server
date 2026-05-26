@@ -116,6 +116,7 @@ def test_ui_bridge_api_inventory_example_matches_runtime_field_names() -> None:
     assert example["endpoints_count"] == runtime["endpoints_count"]
     assert example["protected_endpoints_count"] == runtime["protected_endpoints_count"]
     assert example["public_endpoints_count"] == runtime["public_endpoints_count"]
+    assert example["safety"] == runtime["safety"]
 
     endpoint = example["endpoints"][0]
     assert {"path", "methods", "name", "tags", "requires_api_key"} <= set(endpoint)

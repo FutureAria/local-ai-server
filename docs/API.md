@@ -151,7 +151,10 @@ curl http://127.0.0.1:8000/project/api-inventory
 - `endpoints[].path`
 - `endpoints[].methods`
 - `endpoints[].requires_api_key`
-- `safety`
+- `safety.external_llm_api=disabled`
+- `safety.shell_execution=dry-run-only`
+- `safety.browser_interaction=disabled`
+- `safety.file_write_delete=disabled`
 
 ### `GET /project/shell-policy`
 

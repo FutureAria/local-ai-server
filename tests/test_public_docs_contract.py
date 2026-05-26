@@ -327,12 +327,16 @@ def test_readme_and_project_summary_contract_snapshots_match_runtime() -> None:
 
 def test_public_docs_keep_safety_boundaries_visible() -> None:
     combined = "\n".join(path.read_text(encoding="utf-8") for path in DOCS.values())
+    api_text = DOCS["api"].read_text(encoding="utf-8")
+    inventory_safety = build_api_inventory(app.routes)["safety"]
 
     assert "외부 LLM API" in combined
     assert "Ollama local" in combined
     assert "read-only" in combined
     assert "브라우저 클릭" in combined or "browser interaction" in combined
     assert "파일 수정" in combined or "file_write_delete" in combined
+    for key, value in inventory_safety.items():
+        assert f"safety.{key}={value}" in api_text
 
 
 def test_release_checklist_covers_publication_gates() -> None:
