@@ -34,6 +34,10 @@ google-credentials*.json
 *.pem
 *.crt
 *.cer
+*.der
+*.csr
+*.p7b
+*.p7c
 *.p12
 *.pfx
 *.jks
