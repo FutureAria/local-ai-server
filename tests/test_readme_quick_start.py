@@ -138,11 +138,15 @@ def test_readme_documents_minimal_local_assistant_flow_near_top() -> None:
 def test_readme_documents_all_assistant_repl_help_commands() -> None:
     text = README.read_text(encoding="utf-8")
     repl_section = text.split("`local-ai assistant` 안에서는", 1)[1].split("## LOCAL_API_KEY", 1)[0]
+    command_block_match = re.search(r"```text\n(/ask <질문>.*?)\n```", repl_section, flags=re.S)
+    assert command_block_match is not None
+    command_block = command_block_match.group(1).splitlines()
 
     for line in ASSISTANT_REPL_HELP_LINES:
         if not line.startswith("/"):
             continue
         assert line in repl_section
+    assert command_block == [line for line in ASSISTANT_REPL_HELP_LINES if line.startswith("/")]
 
 
 def test_readme_keeps_safe_boundaries_visible_near_top() -> None:

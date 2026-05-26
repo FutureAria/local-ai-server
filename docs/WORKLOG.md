@@ -1347,3 +1347,11 @@
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_ui_connect_guide.py` 결과는 `20 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### README assistant REPL help ordering guard
+
+- 2026-05-26 21:14 KST 기준으로 `tests/test_readme_quick_start.py`가 README의 `local-ai assistant` REPL command block 순서와 `cli.main.ASSISTANT_REPL_HELP_LINES`의 실제 help 순서가 정확히 같은지 검증하도록 보강했다.
+- 이 guard는 CLI REPL help가 바뀌었을 때 README 명령 목록이 누락, 추가, 순서 drift 없이 함께 갱신되도록 한다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_cli.py tests/test_public_docs_contract.py` 결과는 `45 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
