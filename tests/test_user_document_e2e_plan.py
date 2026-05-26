@@ -22,8 +22,11 @@ def test_user_document_e2e_plan_documents_approval_and_storage_impact() -> None:
         ".docx",
         "OCR 조건",
         "tesseract",
+        ".venv/bin/python scripts/local_ci_check.py --root .",
     ]:
         assert phrase in text
+
+    assert "python scripts/local_ci_check.py --root ." not in text.splitlines()
 
 
 def test_user_document_e2e_plan_keeps_paste_safe_summary_contract() -> None:

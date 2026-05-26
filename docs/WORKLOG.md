@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-26 22:11 KST
+
+### Final verification command cleanup
+
+- `README.md`의 단독 테스트 명령을 `.venv/bin/pytest` 기준으로 정리했다.
+- `docs/USER_DOCUMENT_E2E_PLAN.md`의 승인 전 local CI 명령을 `.venv/bin/python scripts/local_ci_check.py --root .` 기준으로 정리했다.
+- `docs/OPERATIONS.md`의 공개 전 public release check 명령에 `--json`을 명시했다.
+- 관련 문서 테스트가 bare local CI 명령과 public release check 명령 drift를 잡도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_user_document_e2e_plan.py tests/test_operations_runbook.py tests/test_public_docs_contract.py` | `35 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `315 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:07 KST
 
 ### Security release checklist guard

@@ -49,6 +49,7 @@ def test_operations_runbook_documents_safe_local_check_order() -> None:
     required = [
         "## 로컬 운영 Runbook",
         ".venv/bin/python scripts/local_ci_check.py --root .",
+        ".venv/bin/python scripts/public_release_check.py --root . --json",
         "uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
         "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server",
         "python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000",

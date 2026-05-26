@@ -30,7 +30,7 @@
 
 ```bash
 git status --short --branch
-python scripts/local_ci_check.py --root .
+.venv/bin/python scripts/local_ci_check.py --root .
 
 ollama serve
 ollama pull llama3.2

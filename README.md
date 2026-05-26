@@ -957,7 +957,7 @@ curl "http://127.0.0.1:8000/documents/1/chunks?limit=20&offset=0"
 ## 테스트
 
 ```bash
-pytest
+.venv/bin/pytest
 ```
 
 전체 로컬 검증을 한 번에 실행하려면 아래 명령을 사용합니다.

@@ -82,6 +82,7 @@ def test_readme_verification_documents_safe_check_commands() -> None:
     text = README.read_text(encoding="utf-8")
 
     for command in [
+        ".venv/bin/pytest",
         ".venv/bin/python scripts/local_ci_check.py --root .",
         ".venv/bin/python -m pytest",
         ".venv/bin/python -m compileall app cli scripts",

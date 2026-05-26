@@ -100,7 +100,7 @@ local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/loca
 공개 전 로컬 데이터와 secret 후보를 점검한다.
 
 ```bash
-.venv/bin/python scripts/public_release_check.py --root .
+.venv/bin/python scripts/public_release_check.py --root . --json
 ```
 
 점검 기준:
