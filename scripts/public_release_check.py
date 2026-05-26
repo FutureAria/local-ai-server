@@ -75,6 +75,8 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
     "logs/",
     "*.log",
     "data/*.jsonl",
+    "*.tfstate",
+    "*.tfstate.*",
 )
 
 SENSITIVE_PATH_PATTERNS = [
@@ -123,6 +125,7 @@ SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)logs/.*(?<!\.gitkeep)$"),
     re.compile(r"(^|/)[^/]+\.log$", re.IGNORECASE),
     re.compile(r"(^|/)data/.*\.jsonl$"),
+    re.compile(r"(^|/)[^/]+\.tfstate($|\.)", re.IGNORECASE),
 ]
 
 SECRET_TEXT_PATTERNS = [

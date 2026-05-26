@@ -60,6 +60,8 @@ data/*.sqlite-*
 data/*.db
 data/*.db-*
 data/*.jsonl
+*.tfstate
+*.tfstate.*
 data/logs/*
 !data/logs/.gitkeep
 logs/*

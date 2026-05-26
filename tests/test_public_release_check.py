@@ -69,6 +69,8 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
         ("logs/app.log", "log"),
         ("app.log", "log"),
         ("data/sft_dataset.jsonl", "{}\n"),
+        ("terraform.tfstate", "{}"),
+        ("terraform.tfstate.backup", "{}"),
     ],
 )
 def test_public_release_check_flags_all_private_data_patterns(
@@ -277,6 +279,8 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
         "logs/": ["logs/*", "!logs/.gitkeep"],
         "*.log": ["*.log"],
         "data/*.jsonl": ["data/*.jsonl"],
+        "*.tfstate": ["*.tfstate"],
+        "*.tfstate.*": ["*.tfstate.*"],
     }
 
     assert set(PUBLIC_RELEASE_PRIVATE_DATA) == set(gitignore_coverage)
