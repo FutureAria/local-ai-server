@@ -1,5 +1,20 @@
 # WORKLOG
 
+## 2026-05-26 22:42 KST
+
+### Local CI public release JSON guard
+
+- `tests/test_local_ci_check.py`가 `scripts/local_ci_check.py` 내부 public release check 단계에 `--json`이 유지되는지 직접 검증하도록 보강했다.
+- 이는 문서 표기뿐 아니라 실제 local CI 실행 경로도 machine-readable public release check를 계속 사용하게 하는 안전 가드다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_local_ci_check.py tests/test_operations_runbook.py` | `8 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `317 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:38 KST
 
 ### Final report verification command guard

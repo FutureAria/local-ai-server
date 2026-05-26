@@ -17,6 +17,7 @@ def test_build_check_commands_are_fixed_safe_project_checks() -> None:
     assert commands[0]["command"] == [sys.executable, "-m", "pytest"]
     assert commands[1]["command"] == [sys.executable, "-m", "compileall", "app", "cli", "scripts"]
     assert commands[2]["command"][:2] == [sys.executable, "scripts/public_release_check.py"]
+    assert "--json" in commands[2]["command"]
     assert commands[3]["command"] == ["git", "diff", "--check"]
 
 
