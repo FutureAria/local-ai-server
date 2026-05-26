@@ -65,9 +65,11 @@ git status
 ## 검증 명령
 
 ```bash
-source .venv/bin/activate
-pytest
-python -m compileall app cli scripts
+.venv/bin/pytest
+.venv/bin/python -m compileall app cli scripts
+.venv/bin/python scripts/public_release_check.py --root . --json
+git diff --check
+.venv/bin/python scripts/local_ci_check.py --root .
 ```
 
 PDF/DOCX 실제 색인 검증을 위해 Python optional dependency는 현재 venv에 설치되어 있다.

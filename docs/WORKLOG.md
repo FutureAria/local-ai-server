@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-26 22:02 KST
+
+### Handoff boundary verification guard
+
+- `docs/NEXT_CHAT_HANDOFF.md`의 검증 명령을 `.venv/bin/...` 직접 실행 기준으로 정리했다.
+- `tests/test_next_chat_handoff.py`가 legacy `source .venv/bin/activate`, bare `pytest`, bare `python -m compileall` 표기가 handoff 검증 블록에 남지 않도록 보강했다.
+- `tests/test_next_chat_handoff.py`가 `docs/PUBLIC_RELEASE_SUMMARY.md`도 task board/public docs/handoff 경계 교차 검증에 포함하도록 보강했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_tasks_doc.py tests/test_public_release_summary.py tests/test_public_docs_contract.py` | `32 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `314 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 21:58 KST
 
 ### Operations verification command guard

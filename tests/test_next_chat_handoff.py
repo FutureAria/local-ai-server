@@ -20,6 +20,9 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert ".venv/bin/python scripts/local_ci_check.py --root ." in text
     assert "git diff --check" in text
+    assert "source .venv/bin/activate" not in text
+    assert "\npytest\n" not in text
+    assert "\npython -m compileall app cli scripts\n" not in text
     assert "message(auto/status intent)" in text
     assert "message(status)" not in text
 
@@ -77,6 +80,7 @@ def test_next_chat_handoff_boundaries_match_task_board_and_public_docs() -> None
         "docs/PROJECT_SUMMARY.md": Path("docs/PROJECT_SUMMARY.md").read_text(encoding="utf-8"),
         "docs/TASKS.md": Path("docs/TASKS.md").read_text(encoding="utf-8"),
         "docs/NEXT_CHAT_HANDOFF.md": Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8"),
+        "docs/PUBLIC_RELEASE_SUMMARY.md": Path("docs/PUBLIC_RELEASE_SUMMARY.md").read_text(encoding="utf-8"),
     }
 
     shared_safe_terms = [
