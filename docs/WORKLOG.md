@@ -1331,3 +1331,11 @@
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_contracts.py tests/test_tasks_doc.py tests/test_public_docs_contract.py` 결과는 `30 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### UI contract API inventory count field guard
+
+- 2026-05-26 20:44 KST 기준으로 `docs/UI_CONTRACT_CHEATSHEET.md`의 `GET /project/api-inventory` 표시 필드에 `mode`, `local_only`, `endpoints_count`, `protected_endpoints_count`, `public_endpoints_count`, `safety`를 명시했다.
+- `tests/test_ui_contract_cheatsheet.py`가 해당 top-level count/safety 필드가 cheatsheet에 남아 있는지 검증하도록 보강했다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_contract_cheatsheet.py tests/test_ui_connect_guide.py tests/test_public_docs_contract.py` 결과는 `26 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
