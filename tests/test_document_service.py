@@ -28,6 +28,44 @@ class RecordingVectorStore:
         self.records.extend(records)
 
 
+class FakeSupportedTypesLoader:
+    def supported_types(self) -> list[dict]:
+        return [
+            {
+                "extension": ".pdf",
+                "file_type": "pdf",
+                "available": True,
+                "optional_dependency": "pypdf",
+                "install_hint": None,
+                "description": "Text-based PDF with optional OCR fallback for PyPDF image XObjects.",
+            }
+        ]
+
+    def pdf_ocr_status(self) -> dict:
+        return {
+            "available": False,
+            "missing": ["tesseract binary"],
+            "install_hint": "install local tesseract",
+        }
+
+
+def test_document_service_supported_types_includes_pdf_ocr_status(tmp_path) -> None:
+    settings = Settings(UPLOAD_DIR=str(tmp_path / "uploads"), CHROMA_PATH=str(tmp_path / "chroma"))
+    service = DocumentService(
+        settings=settings,
+        loader=FakeSupportedTypesLoader(),
+        embedding_service=FakeEmbeddingService(),
+        vector_store=RecordingVectorStore(),
+    )
+
+    supported = service.get_supported_types()
+
+    assert supported["types"][0]["extension"] == ".pdf"
+    assert supported["pdf_ocr"] is False
+    assert supported["pdf_ocr_install_hint"] == "install local tesseract"
+    assert "PDF OCR" in supported["install_hint"]
+
+
 def test_document_service_rolls_back_sqlite_when_vector_store_fails(tmp_path) -> None:
     engine = create_engine(f"sqlite:///{tmp_path / 'test.sqlite3'}", connect_args={"check_same_thread": False})
     TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)

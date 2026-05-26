@@ -1004,3 +1004,10 @@
 - `docs/NEXT_CHAT_HANDOFF.md`에서 `/documents/supported-types`와 `local-ai document-types`가 `pdf_ocr` 준비 상태까지 보여준다고 명시했다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_document_loader.py tests/test_api_contracts.py tests/test_next_chat_handoff.py` 결과는 `34 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `274 passed, 1 warning`이다.
+
+### OCR supported-types service contract
+
+- `DocumentService.get_supported_types()`가 loader의 `pdf_ocr_status()` 결과를 그대로 `pdf_ocr`, `pdf_ocr_install_hint`에 반영하는지 unit test를 추가했다.
+- mock API contract뿐 아니라 service layer contract도 함께 고정해 `/documents/supported-types` 응답 드리프트를 줄였다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_document_service.py tests/test_document_loader.py tests/test_api_contracts.py` 결과는 `33 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `275 passed, 1 warning`이다.
