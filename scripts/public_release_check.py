@@ -52,6 +52,8 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
     "*.p12",
     "*.pfx",
     "id_rsa",
+    "id_dsa",
+    "id_ecdsa",
     "id_ed25519",
     "data/local_ai.sqlite3",
     "data/*.sqlite",
