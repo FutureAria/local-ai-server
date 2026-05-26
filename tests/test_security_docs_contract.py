@@ -108,3 +108,16 @@ def test_security_docs_do_not_expose_secret_shapes() -> None:
     release_text = RELEASE_CHECKLIST.read_text(encoding="utf-8")
     assert "LOCAL_API_KEY=" not in release_text
     assert "Authorization: Bearer <LOCAL_API_KEY>" in release_text
+
+
+def test_security_docs_use_venv_public_release_check_command() -> None:
+    docs = {
+        "SECURITY.md": SECURITY.read_text(encoding="utf-8"),
+        "docs/RELEASE_CHECKLIST.md": RELEASE_CHECKLIST.read_text(encoding="utf-8"),
+        "docs/PUBLIC_RELEASE_SUMMARY.md": PUBLIC_RELEASE_SUMMARY.read_text(encoding="utf-8"),
+    }
+
+    for path, text in docs.items():
+        assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text, (
+            f"{path} missing venv public release check command"
+        )

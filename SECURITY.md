@@ -140,7 +140,7 @@
 자동 점검:
 
 ```bash
-python scripts/public_release_check.py --root .
+.venv/bin/python scripts/public_release_check.py --root . --json
 ```
 
 이 명령은 read-only 점검만 수행한다. 로컬 DB, Chroma index, 업로드 파일, 로그, SFT export, secret 후보가 발견되면 실패 코드로 종료한다.
