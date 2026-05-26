@@ -48,6 +48,23 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
     assert "data/local_ai.sqlite3" in paths
 
 
+@pytest.mark.parametrize(
+    "content",
+    [
+        "OPENAI_API_KEY=" + "sk-" + "a" * 24,
+        "-----BEGIN " + "PRIVATE KEY-----\nabc\n-----END " + "PRIVATE KEY-----",
+    ],
+)
+def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content: str) -> None:
+    (tmp_path / "docs.md").write_text(content, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["findings"][0]["path"] == "docs.md"
+    assert "secret" in result["findings"][0]["message"]
+
+
 def test_public_release_check_allows_gitkeep_files(tmp_path: Path) -> None:
     uploads = tmp_path / "data" / "uploads"
     uploads.mkdir(parents=True)

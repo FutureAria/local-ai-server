@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-26 22:47 KST
+
+### Public release secret pattern guard
+
+- `tests/test_public_release_check.py`가 `sk-...` 형태의 API key 후보와 PEM private key 후보를 public release scanner가 high finding으로 감지하는지 검증하도록 보강했다.
+- 로컬 데이터 경로뿐 아니라 파일 내용 안의 secret 후보 탐지도 공개 전 안전장치로 유지한다.
+- fake secret 문자열이 public release scanner에 걸리지 않도록 테스트 소스에서는 민감 패턴을 조각내서 조립한다.
+- 공개 요약 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `319 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py` | `41 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `319 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:42 KST
 
 ### Local CI public release JSON guard
