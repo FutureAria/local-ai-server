@@ -87,7 +87,7 @@ def test_public_release_summary_keeps_private_data_and_verification_visible() ->
     for item in private_paths + verification_commands:
         assert item in text
 
-    assert "410 passed" in text
+    assert "413 passed" in text
 
 
 def test_public_release_summary_contract_snapshot_matches_runtime() -> None:

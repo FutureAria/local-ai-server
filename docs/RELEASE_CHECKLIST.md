@@ -22,6 +22,7 @@
 - [ ] `data/*.jsonl` export 파일이 staging에 없다.
 - [ ] `*.tfstate`, `*.tfstate.*` Terraform state 파일이 staging에 없다.
 - [ ] `Pulumi.*.yaml`, `Pulumi.*.json` Pulumi stack 파일이 staging에 없다.
+- [ ] `.vault_pass`, `.vault_password`, `*.vault` Ansible vault 파일이 staging에 없다.
 
 ## 2. 자동 검증
 

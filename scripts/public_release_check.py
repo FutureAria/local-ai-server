@@ -79,6 +79,9 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
     "*.tfstate.*",
     "Pulumi.*.yaml",
     "Pulumi.*.json",
+    ".vault_pass",
+    ".vault_password",
+    "*.vault",
 )
 
 SENSITIVE_PATH_PATTERNS = [
@@ -129,6 +132,9 @@ SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)data/.*\.jsonl$"),
     re.compile(r"(^|/)[^/]+\.tfstate($|\.)", re.IGNORECASE),
     re.compile(r"(^|/)Pulumi\.[^/]+\.(yaml|json)$"),
+    re.compile(r"(^|/)\.vault_pass$", re.IGNORECASE),
+    re.compile(r"(^|/)\.vault_password$", re.IGNORECASE),
+    re.compile(r"(^|/)[^/]+\.vault$", re.IGNORECASE),
 ]
 
 SECRET_TEXT_PATTERNS = [

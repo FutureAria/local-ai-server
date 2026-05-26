@@ -64,6 +64,9 @@ data/*.jsonl
 *.tfstate.*
 Pulumi.*.yaml
 Pulumi.*.json
+.vault_pass
+.vault_password
+*.vault
 data/logs/*
 !data/logs/.gitkeep
 logs/*
