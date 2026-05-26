@@ -12,6 +12,7 @@
 
 - [ ] `git status --short --branch`가 의도한 변경만 보여준다.
 - [ ] `.env`가 staging에 없다.
+- [ ] `*.key`, `*.pem`, `*.p12`, `*.pfx`, `id_rsa`, `id_ed25519` 같은 key/certificate 파일이 staging에 없다.
 - [ ] `data/local_ai.sqlite3`가 staging에 없다.
 - [ ] `data/chroma/` 파일이 staging에 없다.
 - [ ] `data/uploads/` 파일이 staging에 없다.
@@ -57,7 +58,7 @@ git diff --check
 - [ ] LangChain과 cloud vector DB를 사용하지 않는다고 문서화되어 있다.
 - [ ] `LOCAL_API_KEY`는 예시 placeholder로만 표시된다.
 - [ ] `Authorization: Bearer <LOCAL_API_KEY>`처럼 placeholder를 사용한다.
-- [ ] 실제 token, password, private key, credential은 문서와 테스트에 없다.
+- [ ] 실제 token, password, private key, certificate, credential은 문서와 테스트에 없다.
 
 ## 5. 실행 경계
 

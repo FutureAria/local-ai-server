@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-26 23:06 KST
+
+### Public release key file guard
+
+- `.gitignore`와 `scripts/public_release_check.py`가 `.key`, `.pem`, `.p12`, `.pfx`, `id_rsa`, `id_ed25519` 같은 key/certificate 파일을 GitHub 공개 전 민감 경로로 다루도록 보강했다.
+- `tests/test_public_release_check.py`가 key/certificate 파일 경로 후보를 high finding으로 감지하고, `docs/RELEASE_CHECKLIST.md`와 `docs/PUBLIC_RELEASE_SUMMARY.md`에 같은 비공개 항목이 남아 있는지 검증한다.
+- 공개 요약 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `328 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py` | `35 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `328 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 23:00 KST
 
 ### Public release JSON and YAML secret guard

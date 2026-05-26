@@ -67,13 +67,15 @@
 ## 공개하지 않는 로컬 데이터
 
 - `.env`
+- `*.key`, `*.pem`, `*.p12`, `*.pfx`
+- `id_rsa`, `id_ed25519`
 - `data/local_ai.sqlite3`
 - `data/chroma/`
 - `data/uploads/`
 - `data/logs/`
 - `data/*.jsonl`
 - 개인 문서 원문
-- API key, token, password, credential
+- API key, token, password, private key, certificate, credential
 
 ## 검증 기준
 
@@ -89,7 +91,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `322 passed`
+- `.venv/bin/pytest`: `328 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

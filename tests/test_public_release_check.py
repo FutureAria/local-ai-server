@@ -9,6 +9,12 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
     ("relative_path", "content"),
     [
         (".env", "LOCAL_API_KEY=" + "a" * 24),
+        ("secrets/local.key", "key"),
+        ("secrets/local.pem", "pem"),
+        ("secrets/local.p12", "p12"),
+        ("secrets/local.pfx", "pfx"),
+        ("secrets/id_rsa", "ssh"),
+        ("secrets/id_ed25519", "ssh"),
         ("data/local_ai.sqlite3", "sqlite"),
         ("data/local_ai.sqlite3-wal", "wal"),
         ("data/chroma/index.bin", "vector"),
@@ -112,6 +118,12 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
 
     gitignore_coverage = {
         ".env": [".env"],
+        "*.key": ["*.key"],
+        "*.pem": ["*.pem"],
+        "*.p12": ["*.p12"],
+        "*.pfx": ["*.pfx"],
+        "id_rsa": ["id_rsa"],
+        "id_ed25519": ["id_ed25519"],
         "data/local_ai.sqlite3": ["data/*.sqlite3", "data/*.sqlite3-*"],
         "data/chroma/": ["data/chroma/*", "!data/chroma/.gitkeep"],
         "data/uploads/": ["data/uploads/*", "!data/uploads/.gitkeep"],

@@ -22,6 +22,12 @@ DEFAULT_EXCLUDED_DIRS = {
 
 PUBLIC_RELEASE_PRIVATE_DATA = (
     ".env",
+    "*.key",
+    "*.pem",
+    "*.p12",
+    "*.pfx",
+    "id_rsa",
+    "id_ed25519",
     "data/local_ai.sqlite3",
     "data/chroma/",
     "data/uploads/",
@@ -31,6 +37,11 @@ PUBLIC_RELEASE_PRIVATE_DATA = (
 
 SENSITIVE_PATH_PATTERNS = [
     re.compile(r"(^|/)\.env($|\.)"),
+    re.compile(r"(^|/)[^/]+\.key$"),
+    re.compile(r"(^|/)[^/]+\.pem$"),
+    re.compile(r"(^|/)[^/]+\.p12$"),
+    re.compile(r"(^|/)[^/]+\.pfx$"),
+    re.compile(r"(^|/)id_(rsa|dsa|ecdsa|ed25519)$"),
     re.compile(r"(^|/)data/local_ai\.sqlite3($|[-\w.])"),
     re.compile(r"(^|/)data/chroma/"),
     re.compile(r"(^|/)data/uploads/"),
