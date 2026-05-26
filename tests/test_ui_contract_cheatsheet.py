@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.schemas.assistant import AssistantMessageListResponse, AssistantSessionListResponse
+from app.services.assistant_service import AssistantService
 
 
 CHEATSHEET = Path("docs/UI_CONTRACT_CHEATSHEET.md")
@@ -57,31 +58,26 @@ def test_ui_contract_cheatsheet_matches_session_schema_field_names() -> None:
 
 def test_ui_contract_cheatsheet_lists_response_type_mapping() -> None:
     text = CHEATSHEET.read_text(encoding="utf-8")
+    contract = AssistantService().ui_contract()
 
-    for response_type in [
-        "answer",
-        "search_results",
-        "index_preview",
-        "needs_project_root",
-        "shell_dry_run",
-        "agent_plan",
-        "status",
-        "action_preview",
-    ]:
+    for response_type in contract["response_types"]:
         assert f"| `{response_type}` |" in text
+
+
+def test_ui_contract_cheatsheet_lists_runtime_refresh_endpoints() -> None:
+    text = CHEATSHEET.read_text(encoding="utf-8")
+    contract = AssistantService().ui_contract()
+
+    assert "## Refresh endpoints" in text
+    for item in contract["refresh_endpoints"]:
+        assert f"| `{item['method']}` | `{item['path']}` |" in text
 
 
 def test_ui_contract_cheatsheet_keeps_safety_and_error_contracts_visible() -> None:
     text = CHEATSHEET.read_text(encoding="utf-8")
+    contract = AssistantService().ui_contract()
 
     for phrase in [
-        "safety.shell_execution",
-        "disabled",
-        "safety.browser_interaction",
-        "blocked",
-        "safety.file_write_delete",
-        "safety.external_llm_api",
-        "not-used",
         "`401`",
         "`404`",
         "`422`",
@@ -93,5 +89,12 @@ def test_ui_contract_cheatsheet_keeps_safety_and_error_contracts_visible() -> No
         "외부 LLM API 호출",
     ]:
         assert phrase in text
+
+    for key, value in contract["safety"].items():
+        assert f"safety.{key}" in text
+        assert value in text
+
+    for blocked_action in contract["blocked_actions"]:
+        assert blocked_action in text
 
     assert "LOCAL_API_KEY=" not in text

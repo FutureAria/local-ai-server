@@ -30,6 +30,18 @@
 | `GET /documents/repair-preview` | SQLite/Chroma repair preview | `status`, `dry_run`, `actions_count`, `actions[].requires_user_approval`, `note` |
 | `GET /documents/vector-rebuild-preview` | 누락 vector 재생성 preview | `status`, `dry_run`, `chunks_missing_vectors_count`, `embedding_batches_estimated`, `actions[].requires_user_approval` |
 
+## Refresh endpoints
+
+`GET /assistant/ui-contract`의 `refresh_endpoints`에 포함되는 endpoint다.
+
+| Method | Path | UI 목적 |
+|---|---|---|
+| `GET` | `/assistant/ping` | 서버/auth quick check |
+| `GET` | `/assistant/config` | safe local settings |
+| `GET` | `/assistant/dashboard` | dashboard cards |
+| `GET` | `/assistant/sessions` | session sidebar refresh |
+| `GET` | `/project/api-inventory` | read-only endpoint inventory for developer/debug UI |
+
 ## Message response type 매핑
 
 | `type` | UI 렌더링 | 주요 필드 |
@@ -50,8 +62,10 @@ UI는 아래 값이 보이면 실제 실행 버튼을 활성화하지 않는다.
 | Field | Expected value | UI 처리 |
 |---|---|---|
 | `safety.shell_execution` | `disabled` | shell 실행 버튼 비활성 |
+| `safety.shell_dry_run` | `blocked` 또는 정책 판단 결과 | dry-run 결과 panel만 표시 |
 | `safety.browser_interaction` | `blocked` | 브라우저 click/fill/submit 버튼 비활성 |
 | `safety.file_write_delete` | `blocked` | 파일 생성/수정/삭제 버튼 비활성 |
+| `safety.folder_index` | `preview-only via assistant` | assistant 경유 폴더 색인은 preview만 허용 |
 | `safety.external_llm_api` | `not-used` | 외부 LLM provider 선택/전송 비활성 |
 
 ## 에러 표시

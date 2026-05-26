@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.schemas.assistant import AssistantBootstrapResponse, AssistantStartupResponse
+from app.services.assistant_service import AssistantService
 
 
 GUIDE = Path("docs/UI_CONNECT_GUIDE.md")
@@ -125,3 +126,27 @@ def test_ui_connect_guide_keeps_safety_boundaries_visible() -> None:
         assert phrase in text
 
     assert "LOCAL_API_KEY=" not in text
+
+
+def test_ui_connect_guide_matches_runtime_ui_contract_paths_and_types() -> None:
+    text = GUIDE.read_text(encoding="utf-8")
+    contract = AssistantService().ui_contract()
+
+    for item in contract["startup_sequence"]:
+        assert f"{item['method']} {item['path']}" in text or item["path"] in text
+
+    for item in contract["refresh_endpoints"]:
+        assert item["path"] in text
+
+    for item in contract["message_flow"]:
+        assert f"{item['method']} {item['path']}" in text or item["path"] in text
+
+    for response_type in contract["response_types"]:
+        assert response_type in text
+
+    for blocked_action in contract["blocked_actions"]:
+        assert blocked_action in text
+
+    for key, value in contract["safety"].items():
+        assert key in text
+        assert value in text

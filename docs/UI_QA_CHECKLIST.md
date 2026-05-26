@@ -94,8 +94,10 @@
 - [ ] 잘못된 token이면 `401`을 반환한다.
 - [ ] 분당 요청 제한 초과 시 `429`와 `Retry-After`가 표시된다.
 - [ ] `safety.shell_execution`이 `disabled`이면 실행 버튼을 활성화하지 않는다.
+- [ ] `safety.shell_dry_run`이 `blocked` 또는 dry-run 정책 판단 결과로 표시된다.
 - [ ] `safety.browser_interaction`이 `blocked`이면 브라우저 조작 버튼을 활성화하지 않는다.
 - [ ] `safety.file_write_delete`가 `blocked`이면 파일 수정/삭제 버튼을 활성화하지 않는다.
+- [ ] `safety.folder_index`가 `preview-only via assistant`로 표시되면 실제 폴더 색인 실행 버튼을 자동 활성화하지 않는다.
 - [ ] `external_llm_api`는 `not-used`로 표시된다.
 - [ ] `vector-rebuild-preview`와 `index-folder-job-preview` 화면에서도 실제 repair/delete/rebuild, embedding 생성, Chroma write 버튼은 제공하지 않는다.
 

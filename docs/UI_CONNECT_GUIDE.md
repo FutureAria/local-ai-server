@@ -61,6 +61,14 @@ curl http://127.0.0.1:8000/project/api-inventory \
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-preflight
 ```
 
+`GET /assistant/ui-contract`의 `refresh_endpoints`는 아래 path를 UI의 개별 새로고침 버튼 또는 polling 후보로 제공한다.
+
+- `/assistant/ping`
+- `/assistant/config`
+- `/assistant/dashboard`
+- `/assistant/sessions`
+- `/project/api-inventory`
+
 `8000` 포트를 다른 서버가 쓰고 있으면 `local-ai-server`를 다른 포트로 띄운 뒤 같은 `--base-url`만 바꿔 실행한다.
 
 ```bash
@@ -161,6 +169,19 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 | `ui.ready` | UI 활성화 가능 여부 표시 |
 | `ui.blocked_actions` | 실행 금지 항목 표시 |
 
+`GET /assistant/ui-contract`의 `response_types`는 `/assistant/message` 응답 렌더링 타입이다.
+
+| response type | UI 렌더링 기준 |
+|---|---|
+| `answer` | 채팅 bubble |
+| `search_results` | 검색 결과 panel |
+| `index_preview` | 폴더 색인 미리보기 panel |
+| `needs_project_root` | project root 입력 warning |
+| `shell_dry_run` | shell 정책 판단 panel |
+| `agent_plan` | 실행 대신 계획/승인 필요 panel |
+| `status` | 프로젝트 상태 panel |
+| `action_preview` | 전송 전 intent preview panel |
+
 ## Copy-ready fetch 예시
 
 브라우저 UI에서 사용할 수 있는 최소 `fetch` 예시다. token 값은 사용자가 입력한 값을 런타임에 넣고, 코드나 문서에 하드코딩하지 않는다.
@@ -223,8 +244,10 @@ export async function sendAssistantMessage(localApiKey, message) {
 ## UI가 표시해야 할 안전 상태
 
 - `safety.shell_execution`: `disabled`
+- `safety.shell_dry_run`: `blocked` 또는 dry-run 정책 판단 결과
 - `safety.browser_interaction`: `blocked`
 - `safety.file_write_delete`: `blocked`
+- `safety.folder_index`: `preview-only via assistant`
 - `safety.external_llm_api`: `not-used`
 
 이 값이 위와 다르게 보이거나, UI가 실행 버튼을 활성화하려고 하면 연결을 멈추고 보안 리뷰를 먼저 진행한다.

@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from app.services.assistant_service import AssistantService
+
 
 def test_ui_qa_checklist_documents_required_flows() -> None:
     text = Path("docs/UI_QA_CHECKLIST.md").read_text(encoding="utf-8")
@@ -44,41 +46,28 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
 
 def test_ui_qa_checklist_covers_ui_contract_runtime_shape() -> None:
     text = Path("docs/UI_QA_CHECKLIST.md").read_text(encoding="utf-8")
+    contract = AssistantService().ui_contract()
 
-    for endpoint in [
-        "/assistant/startup",
-        "/assistant/bootstrap",
-        "/assistant/action-preview",
-        "/assistant/message",
-        "/assistant/ping",
-        "/assistant/config",
-        "/assistant/dashboard",
-        "/assistant/sessions",
-        "/project/api-inventory",
+    runtime_paths = [
+        item["path"]
+        for group in ["startup_sequence", "refresh_endpoints", "message_flow"]
+        for item in contract[group]
+    ]
+    for endpoint in runtime_paths + [
         "/documents/index-folder-job-preview",
         "/documents/vector-rebuild-preview",
     ]:
         assert endpoint in text
 
-    for response_type in [
-        "answer",
-        "search_results",
-        "index_preview",
-        "needs_project_root",
-        "shell_dry_run",
-        "agent_plan",
-        "status",
-        "action_preview",
-    ]:
+    for response_type in contract["response_types"]:
         assert response_type in text
 
-    for blocked_action in [
-        "shell_execution",
-        "browser_interaction",
-        "file_write_delete",
-        "external_llm_api",
-    ]:
+    for blocked_action in contract["blocked_actions"]:
         assert blocked_action in text
+
+    for key, value in contract["safety"].items():
+        assert key in text
+        assert value in text
 
 
 def test_ui_qa_checklist_documents_safety_stop_conditions() -> None:

@@ -1223,3 +1223,17 @@
 - targeted contract self-check에서 `.venv/bin/pytest tests/test_smoke_script.py tests/test_smoke_summary_examples.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `36 passed, 1 warning`이다.
 - full self-check에서 `.venv/bin/pytest` 결과는 `307 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `307 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### Assistant UI runtime contract drift guard
+
+- 2026-05-26 20:03 KST 기준으로 assistant UI 문서가 실제 `AssistantService().ui_contract()`의 startup sequence, refresh endpoint, message flow, response type, blocked action, safety 값을 놓치지 않도록 테스트를 보강했다.
+- `docs/UI_CONTRACT_CHEATSHEET.md`에 `GET /assistant/ui-contract`의 `refresh_endpoints` 표를 추가했다.
+- `docs/UI_CONNECT_GUIDE.md`에 refresh endpoint 목록, 전체 `response_types` 렌더링 표, `shell_dry_run`, `folder_index` safety 값을 추가했다.
+- `docs/UI_QA_CHECKLIST.md`에 `safety.shell_dry_run`과 `safety.folder_index` 확인 항목을 추가했다.
+- `tests/test_ui_connect_guide.py`, `tests/test_ui_qa_checklist.py`, `tests/test_ui_contract_cheatsheet.py`가 실제 service contract를 기준으로 문서 drift를 확인한다.
+- 공개 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `309 passed` 기준으로 맞췄다.
+- 실제 브라우저 조작, 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_ui_qa_checklist.py tests/test_ui_contract_cheatsheet.py tests/test_ui_bridge_examples.py` 결과는 `23 passed, 1 warning`이다.
+- targeted contract self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_ui_qa_checklist.py tests/test_ui_contract_cheatsheet.py tests/test_ui_bridge_examples.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `41 passed, 1 warning`이다.
+- full self-check에서 `.venv/bin/pytest` 결과는 `309 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `309 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
