@@ -19,8 +19,11 @@ venv/
 .azure/
 .kube/
 credentials.json
+application_default_credentials.json
 client_secret*.json
 service-account*.json
+firebase-adminsdk*.json
+google-credentials*.json
 *.key
 *.pem
 *.crt
