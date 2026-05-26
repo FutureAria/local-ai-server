@@ -55,9 +55,23 @@ def test_project_summary_includes_portfolio_points_and_limits() -> None:
 def test_project_summary_and_final_report_show_current_pytest_count() -> None:
     for path in [PROJECT_SUMMARY, FINAL_REPORT, CLAUDE_REVIEW_HANDOFF]:
         text = path.read_text(encoding="utf-8")
-        assert "316 passed" in text
+        assert "317 passed" in text
         assert "276 passed" not in text
         assert "298 passed" not in text
+
+
+def test_project_summary_test_commands_match_final_report_baseline() -> None:
+    text = PROJECT_SUMMARY.read_text(encoding="utf-8")
+    test_section = text.split("## 테스트 실행 방법", 1)[1].split("현재 검증 상태:", 1)[0]
+
+    for command in [
+        ".venv/bin/pytest",
+        ".venv/bin/python -m compileall app cli scripts",
+        ".venv/bin/python scripts/public_release_check.py --root . --json",
+        "git diff --check",
+        ".venv/bin/python scripts/local_ci_check.py --root .",
+    ]:
+        assert command in test_section
 
 
 def test_public_docs_use_json_public_release_check_command() -> None:
@@ -94,7 +108,7 @@ def test_final_report_matches_required_completion_report_shape() -> None:
         "local-ai assistant",
         "uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
         ".venv/bin/pytest",
-        "316 passed",
+        "317 passed",
         "프론트엔드는 포함하지 않는다",
         "실제 shell 실행은 지원하지 않는다",
         "운영 배포",

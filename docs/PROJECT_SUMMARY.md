@@ -220,11 +220,14 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```bash
 .venv/bin/pytest
 .venv/bin/python -m compileall app cli scripts
+.venv/bin/python scripts/public_release_check.py --root . --json
+git diff --check
+.venv/bin/python scripts/local_ci_check.py --root .
 ```
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `316 passed`
+- `.venv/bin/pytest`: `317 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능

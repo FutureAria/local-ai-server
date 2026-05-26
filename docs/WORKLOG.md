@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-26 22:25 KST
+
+### Project summary verification block guard
+
+- `docs/PROJECT_SUMMARY.md`의 테스트 실행 방법 코드블록을 최종 보고/공개 요약 문서와 같은 baseline 검증 명령 세트로 맞췄다.
+- `tests/test_portfolio_docs_contract.py`가 Project Summary의 테스트 실행 블록에 pytest, compileall, public release check, git diff check, local CI 명령이 모두 남아 있는지 검증하도록 보강했다.
+- 공개 요약 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `317 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py tests/test_public_docs_contract.py` | `37 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `317 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 22:21 KST
 
 ### Claude handoff verification sync
