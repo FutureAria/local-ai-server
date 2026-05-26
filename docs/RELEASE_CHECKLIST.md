@@ -11,7 +11,7 @@
 ## 1. 코드 상태
 
 - [ ] `git status --short --branch`가 의도한 변경만 보여준다.
-- [ ] `.env`, `.env.*`, `.envrc`, `.npmrc`, `.pypirc`, `.netrc`, `.aws/`, `.gcloud/`, `.azure/`, `.kube/`가 staging에 없다. 단, placeholder만 담은 `.env.example`은 예외다.
+- [ ] `.env`, `.env.*`, `.envrc`, `.npmrc`, `.pypirc`, `.netrc`, `.ssh/`, `.docker/`, `.aws/`, `.gcloud/`, `.azure/`, `.kube/`가 staging에 없다. 단, placeholder만 담은 `.env.example`은 예외다.
 - [ ] `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.p12`, `*.pfx`, `id_rsa`, `id_ed25519` 같은 key/certificate 파일이 staging에 없다.
 - [ ] `data/local_ai.sqlite3`가 staging에 없다.
 - [ ] `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*` 같은 SQLite/DB 파일 변형이 staging에 없다.

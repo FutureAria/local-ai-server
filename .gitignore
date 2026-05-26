@@ -12,6 +12,8 @@ venv/
 .npmrc
 .pypirc
 .netrc
+.ssh/
+.docker/
 .aws/
 .gcloud/
 .azure/
