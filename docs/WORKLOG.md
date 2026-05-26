@@ -1305,3 +1305,12 @@
 - targeted contract self-check에서 `.venv/bin/pytest tests/test_next_chat_handoff.py tests/test_portfolio_docs_contract.py tests/test_public_release_summary.py` 결과는 `19 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
 - `git diff --check` 결과는 성공이다.
+
+### README onboarding snapshot heading guard
+
+- 2026-05-26 20:34 KST 기준으로 `tests/test_readme_quick_start.py`가 README 상단 온보딩 섹션에 `Runtime Contract Snapshot` heading이 남아 있는지 확인하도록 보강했다.
+- 이 guard는 README 첫 진입자가 quick start, verification, assistant flow, safe boundaries, runtime snapshot, key docs를 같은 상단 흐름에서 볼 수 있게 유지한다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_readme_quick_start.py tests/test_public_docs_contract.py tests/test_next_chat_handoff.py` 결과는 `33 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `312 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+- `git diff --check` 결과는 성공이다.

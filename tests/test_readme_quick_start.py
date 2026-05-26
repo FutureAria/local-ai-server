@@ -17,6 +17,7 @@ def test_readme_has_top_level_onboarding_sections() -> None:
         "## Verification",
         "## Local Assistant Quick Flow",
         "## Safe Boundaries",
+        "## Runtime Contract Snapshot",
         "## Key Docs",
     ]:
         assert heading in text
