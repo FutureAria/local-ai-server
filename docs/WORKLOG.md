@@ -1399,3 +1399,12 @@
 - 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_public_docs_contract.py tests/test_ui_bridge_examples.py tests/test_ui_contract_cheatsheet.py tests/test_api_contracts.py` 결과는 `42 passed, 1 warning`이다.
 - full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `314 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.
+
+### UI connect guide request schema guard
+
+- 2026-05-26 21:40 KST 기준으로 `docs/UI_CONNECT_GUIDE.md`의 copy-ready fetch 예시가 `POST /assistant/bootstrap` 요청에 `project_root`, `include_sessions`, `sessions_limit`을 명시하도록 보강했다.
+- 같은 예시가 `POST /assistant/message` 요청에 `message`, `session_id`, `project_root`, `mode`, `top_k`, `temperature`를 명시하도록 보강했다.
+- `tests/test_ui_connect_guide.py`가 `AssistantBootstrapRequest`와 `AssistantMessageRequest`의 field 이름이 copy-ready fetch 예시에 남아 있는지 검증하도록 보강했다.
+- 실제 서버 실행, smoke 실행, 문서 업로드, SQLite/Chroma 쓰기, Ollama 호출, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_ui_connect_guide.py tests/test_api_docs_payloads.py tests/test_assistant_api.py` 결과는 `39 passed, 1 warning`이다.
+- full local CI에서 `.venv/bin/python scripts/local_ci_check.py --root .` 결과는 성공이며, 내부 `pytest` 결과는 `314 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=120`, finding 없음, `git diff --check` 성공이다.

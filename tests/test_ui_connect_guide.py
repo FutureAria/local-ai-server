@@ -1,6 +1,11 @@
 from pathlib import Path
 
-from app.schemas.assistant import AssistantBootstrapResponse, AssistantStartupResponse
+from app.schemas.assistant import (
+    AssistantBootstrapRequest,
+    AssistantBootstrapResponse,
+    AssistantMessageRequest,
+    AssistantStartupResponse,
+)
 from app.services.assistant_service import AssistantService
 
 
@@ -68,6 +73,12 @@ def test_ui_connect_guide_includes_copy_ready_fetch_example() -> None:
         'mode: "auto"',
     ]:
         assert phrase in text
+
+    for field in AssistantBootstrapRequest.model_fields:
+        assert field in text
+
+    for field in AssistantMessageRequest.model_fields:
+        assert field in text
 
     assert '"mode":"auto"' in text
     assert '"mode":"status"' not in text

@@ -213,7 +213,11 @@ export async function bootstrapAssistant(localApiKey) {
       "Content-Type": "application/json",
       ...authHeaders(localApiKey),
     },
-    body: JSON.stringify({ project_root: PROJECT_ROOT }),
+    body: JSON.stringify({
+      project_root: PROJECT_ROOT,
+      include_sessions: true,
+      sessions_limit: 10,
+    }),
   });
   if (!response.ok) {
     throw new Error(`bootstrap failed: ${response.status}`);
@@ -230,8 +234,11 @@ export async function sendAssistantMessage(localApiKey, message) {
     },
     body: JSON.stringify({
       message,
+      session_id: null,
       project_root: PROJECT_ROOT,
       mode: "auto",
+      top_k: 5,
+      temperature: 0.2,
     }),
   });
   if (!response.ok) {
