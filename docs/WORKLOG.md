@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-26 23:51 KST
+
+### Public release env variant and bearer guard
+
+- `.gitignore`, `scripts/public_release_check.py`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`, `SECURITY.md`가 `.env.*` 환경 파일 변형을 GitHub 공개 전 제외 대상으로 함께 다루도록 맞췄다.
+- `scripts/public_release_check.py`가 `credential` key-value 후보와 긴 `Authorization: Bearer ...` token 후보를 secret 후보로 감지하도록 보강했다.
+- `tests/test_public_release_check.py`가 `.env.local`, `.env.production`, `credential`, Bearer token 후보 탐지와 `.env.example` 허용 계약을 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `350 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py` | `57 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `350 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-26 23:46 KST
 
 ### Public release Hugging Face token guard

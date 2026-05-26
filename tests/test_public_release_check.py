@@ -10,6 +10,8 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
     ("relative_path", "content"),
     [
         (".env", "LOCAL_API_KEY=" + "a" * 24),
+        (".env.local", "LOCAL_API_KEY=" + "a" * 24),
+        (".env.production", "LOCAL_API_KEY=" + "a" * 24),
         (".ENV", "LOCAL_API_KEY=" + "a" * 24),
         ("secrets/local.key", "key"),
         ("secrets/local.pem", "pem"),
@@ -70,7 +72,9 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
     [
         "OPENAI_API_KEY=" + "sk-" + "a" * 24,
         '"api_key": "' + "a" * 24 + '"',
+        '"credential": "' + "a" * 24 + '"',
         "token: " + "a" * 24,
+        "Authorization: Bearer " + "a" * 24,
         "github token " + "ghp_" + "a" * 36,
         "huggingface token " + "hf_" + "a" * 30,
         "aws key " + "AKIA" + "A" * 16,
@@ -156,6 +160,7 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
 
     gitignore_coverage = {
         ".env": [".env"],
+        ".env.*": [".env.*", "!.env.example"],
         "*.key": ["*.key"],
         "*.pem": ["*.pem"],
         "*.p12": ["*.p12"],

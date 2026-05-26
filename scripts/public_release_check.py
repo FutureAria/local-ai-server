@@ -22,6 +22,7 @@ DEFAULT_EXCLUDED_DIRS = {
 
 PUBLIC_RELEASE_PRIVATE_DATA = (
     ".env",
+    ".env.*",
     "*.key",
     "*.pem",
     "*.p12",
@@ -59,9 +60,10 @@ SENSITIVE_PATH_PATTERNS = [
 ]
 
 SECRET_TEXT_PATTERNS = [
-    re.compile(r"(?i)(api[_-]?key|secret|token|password)\s*=\s*['\"]?[A-Za-z0-9_\-]{16,}"),
-    re.compile(r"(?i)(api[_-]?key|secret|token|password)['\"]?\s*:\s*['\"][A-Za-z0-9_\-]{16,}"),
-    re.compile(r"(?im)^\s*(api[_-]?key|secret|token|password)\s*:\s*[A-Za-z0-9_\-]{16,}\s*$"),
+    re.compile(r"(?i)(api[_-]?key|secret|token|password|credential)\s*=\s*['\"]?[A-Za-z0-9_\-]{16,}"),
+    re.compile(r"(?i)(api[_-]?key|secret|token|password|credential)['\"]?\s*:\s*['\"][A-Za-z0-9_\-]{16,}"),
+    re.compile(r"(?im)^\s*(api[_-]?key|secret|token|password|credential)\s*:\s*[A-Za-z0-9_\-]{16,}\s*$"),
+    re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._\-]{20,}"),
     re.compile(r"sk-[A-Za-z0-9_\-]{20,}"),
     re.compile(r"ghp_[A-Za-z0-9]{36,}"),
     re.compile(r"hf_[A-Za-z0-9]{30,}"),
