@@ -1072,3 +1072,12 @@
 - `tests/test_api_docs_payloads.py`와 `tests/test_ui_bridge_examples.py`가 문서 JSON 예시를 `DocumentRepairPreviewResponse` schema로 직접 검증한다.
 - 실제 repair/delete/rebuild, DB 수정, Chroma write/delete, shell/browser/file-write 실행 활성화는 수행하지 않았다.
 - targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_ui_bridge_examples.py tests/test_ui_connect_guide.py tests/test_ui_contract_cheatsheet.py tests/test_repair_preview.py tests/test_document_stats.py tests/test_preview_activation_policy.py` 결과는 `33 passed, 1 warning`이다.
+
+### Document stats and integrity response schema examples
+
+- 2026-05-26 18:49 KST 기준으로 `GET /documents/stats`와 `GET /documents/integrity`의 read-only response example을 API reference에 추가했다.
+- stats 예시는 SQLite/Chroma count와 `missing_stored_files` 목록을 포함한다.
+- integrity 예시는 `status=needs_attention`, missing stored file, missing vector, orphan vector, `repair_available=false`를 포함한다.
+- `tests/test_api_docs_payloads.py`가 문서 JSON 예시를 `DocumentStatsResponse`, `DocumentIntegrityResponse` schema로 직접 검증한다.
+- 실제 repair/delete/rebuild, DB 수정, Chroma write/delete, shell/browser/file-write 실행 활성화는 수행하지 않았다.
+- targeted self-check에서 `.venv/bin/pytest tests/test_api_docs_payloads.py tests/test_document_stats.py tests/test_operations_runbook.py tests/test_public_docs_contract.py` 결과는 `29 passed, 1 warning`이다.

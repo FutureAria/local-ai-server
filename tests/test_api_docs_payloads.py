@@ -16,7 +16,9 @@ from app.schemas.assistant import (
     ProjectRootValidateRequest,
 )
 from app.schemas.documents import (
+    DocumentIntegrityResponse,
     DocumentRepairPreviewResponse,
+    DocumentStatsResponse,
     DocumentVectorRebuildPreviewResponse,
     IndexFolderJobPreviewResponse,
     IndexFolderRequest,
@@ -153,6 +155,33 @@ def test_api_docs_index_job_preview_response_example_matches_schema() -> None:
     assert validated.progress.embedding_batches_completed == 0
     assert validated.progress.percent == 0
     assert "queue 생성" in validated.note
+
+
+def test_api_docs_document_stats_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/stats")
+    validated = DocumentStatsResponse.model_validate(example)
+
+    assert validated.documents_count == 3
+    assert validated.chunks_count == 12
+    assert validated.chroma_vectors_count == 12
+    assert validated.missing_stored_files_count == 0
+    assert validated.missing_stored_files == []
+
+
+def test_api_docs_document_integrity_response_example_matches_schema() -> None:
+    text = Path("docs/API.md").read_text(encoding="utf-8")
+    example = _json_block_after_endpoint_heading(text, "GET /documents/integrity")
+    validated = DocumentIntegrityResponse.model_validate(example)
+
+    assert validated.status == "needs_attention"
+    assert validated.sqlite_chunks_count == 12
+    assert validated.chroma_vectors_count == 11
+    assert validated.missing_stored_files_count == 1
+    assert validated.chunks_missing_vectors_count == 1
+    assert validated.orphan_vectors_count == 1
+    assert validated.repair_available is False
+    assert "read-only dry-run" in validated.repair_note
 
 
 def test_api_docs_vector_rebuild_preview_response_example_matches_schema() -> None:

@@ -656,6 +656,30 @@ SQLite/Chroma 저장 상태를 read-only로 확인한다.
 curl http://127.0.0.1:8000/documents/stats
 ```
 
+응답 예시:
+
+```json
+{
+  "documents_count": 3,
+  "chunks_count": 12,
+  "chat_logs_count": 5,
+  "feedback_count": 1,
+  "chroma_vectors_count": 12,
+  "missing_stored_files_count": 0,
+  "missing_stored_files": []
+}
+```
+
+응답 핵심 필드:
+
+- `documents_count`
+- `chunks_count`
+- `chat_logs_count`
+- `feedback_count`
+- `chroma_vectors_count`
+- `missing_stored_files_count`
+- `missing_stored_files`
+
 ### `GET /documents/integrity`
 
 SQLite chunk와 Chroma vector 정합성을 read-only로 확인한다.
@@ -663,6 +687,52 @@ SQLite chunk와 Chroma vector 정합성을 read-only로 확인한다.
 ```bash
 curl http://127.0.0.1:8000/documents/integrity
 ```
+
+응답 예시:
+
+```json
+{
+  "status": "needs_attention",
+  "sqlite_chunks_count": 12,
+  "chroma_vectors_count": 11,
+  "missing_stored_files_count": 1,
+  "missing_stored_files": [
+    {
+      "document_id": 1,
+      "original_filename": "missing.md",
+      "stored_path": "/Users/example/local-ai-server/data/uploads/missing.md"
+    }
+  ],
+  "chunks_missing_vectors_count": 1,
+  "chunks_missing_vectors": [
+    {
+      "chunk_id": 10,
+      "document_id": 1,
+      "chunk_index": 0
+    }
+  ],
+  "orphan_vectors_count": 1,
+  "orphan_vector_chunk_ids": [
+    99
+  ],
+  "repair_available": false,
+  "repair_note": "현재 endpoint는 read-only dry-run입니다. 실제 repair/delete는 사용자 승인 후 별도 구현하세요."
+}
+```
+
+응답 핵심 필드:
+
+- `status`
+- `sqlite_chunks_count`
+- `chroma_vectors_count`
+- `missing_stored_files_count`
+- `missing_stored_files`
+- `chunks_missing_vectors_count`
+- `chunks_missing_vectors`
+- `orphan_vectors_count`
+- `orphan_vector_chunk_ids`
+- `repair_available`
+- `repair_note`
 
 ### `GET /documents/repair-preview`
 
