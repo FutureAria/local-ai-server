@@ -100,7 +100,18 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
     assert "secret" in result["findings"][0]["message"]
 
 
-@pytest.mark.parametrize("relative_path", ["setup.sh", "settings.ini", "app.conf", "app.properties"])
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "setup.sh",
+        "settings.ini",
+        "app.conf",
+        "app.properties",
+        "settings.xml",
+        "build.gradle",
+        "build.gradle.kts",
+    ],
+)
 def test_public_release_check_scans_common_config_and_script_files(
     tmp_path: Path,
     relative_path: str,
