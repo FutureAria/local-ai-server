@@ -32,6 +32,8 @@ secrets/
 .docker/
 .config/gh/hosts.yml
 .config/gh/hosts.yaml
+.config/doctl/config.yaml
+.config/doctl/config.yml
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
