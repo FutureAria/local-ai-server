@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 14:46 KST
+
+### Public release scanner private-data enforcement contract
+
+- `tests/test_public_release_check.py`에 `PUBLIC_RELEASE_PRIVATE_DATA`의 모든 항목이 실제 public release scanner에서 민감 경로로 flag되는지 검증하는 계약 테스트를 추가했다.
+- glob, directory, exact path 항목은 synthetic path로 변환해 항목별 임시 root에서 검사하므로 대소문자 충돌과 실제 credential 없이 drift를 잡는다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `524 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `217 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `245 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `524 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 14:45 KST
 
 ### Public release secret-management credential guard

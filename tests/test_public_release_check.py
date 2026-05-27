@@ -336,6 +336,31 @@ def test_public_release_private_data_has_no_duplicate_entries() -> None:
     assert len(PUBLIC_RELEASE_PRIVATE_DATA) == len(set(PUBLIC_RELEASE_PRIVATE_DATA))
 
 
+def test_public_release_private_data_entries_are_scanner_enforced(tmp_path: Path) -> None:
+    for index, item in enumerate(PUBLIC_RELEASE_PRIVATE_DATA):
+        relative_path = _sample_private_data_path(item)
+        root = tmp_path / f"case_{index}"
+        target = root / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("token=" + "a" * 24, encoding="utf-8")
+
+        result = run_public_release_check(root)
+
+        flagged_paths = {finding["path"] for finding in result["findings"]}
+        assert result["ok"] is False
+        assert relative_path in flagged_paths
+
+
+def _sample_private_data_path(pattern: str) -> str:
+    if pattern == ".env.*":
+        return ".env.local"
+    if pattern.endswith("/"):
+        return f"{pattern}private.txt"
+    if "*" in pattern:
+        return pattern.replace("*", "local")
+    return pattern
+
+
 def test_public_release_private_data_is_documented_and_ignored() -> None:
     gitignore = Path(".gitignore").read_text(encoding="utf-8")
     security = Path("SECURITY.md").read_text(encoding="utf-8")
