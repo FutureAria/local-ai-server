@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-27 11:14 KST
+
+### Local CI public release contract guard
+
+- `tests/test_local_ci_check.py`가 `scripts/local_ci_check.py` 실행 시 project root를 `cwd`로 고정하고 stdout/stderr capture, text mode, non-raising subprocess policy를 유지하는지 검증하도록 보강했다.
+- 같은 테스트가 public release check 명령이 resolved project root와 `--json`을 포함하고, 마지막 단계가 `git diff --check`인지 확인한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `445 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_local_ci_check.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `25 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `445 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 11:12 KST
 
 ### Public release Sentry CLI credential guard

@@ -64,3 +64,30 @@ def test_run_local_ci_check_returns_all_steps_when_success(monkeypatch, tmp_path
         "git-diff-check",
     ]
     assert len(calls) == 4
+
+
+def test_run_local_ci_check_uses_project_root_and_captures_output(monkeypatch, tmp_path) -> None:
+    observed_kwargs = []
+
+    def fake_run(command, **kwargs):
+        observed_kwargs.append(kwargs)
+        return subprocess.CompletedProcess(args=command, returncode=0, stdout="safe", stderr="")
+
+    monkeypatch.setattr(local_ci.subprocess, "run", fake_run)
+
+    result = local_ci.run_local_ci_check(tmp_path)
+
+    public_release_step = result["steps"][2]
+    assert public_release_step["name"] == "public-release-check"
+    assert public_release_step["command"] == [
+        sys.executable,
+        "scripts/public_release_check.py",
+        "--root",
+        str(tmp_path.resolve()),
+        "--json",
+    ]
+    assert result["steps"][3]["command"] == ["git", "diff", "--check"]
+    assert all(kwargs["cwd"] == tmp_path.resolve() for kwargs in observed_kwargs)
+    assert all(kwargs["capture_output"] is True for kwargs in observed_kwargs)
+    assert all(kwargs["text"] is True for kwargs in observed_kwargs)
+    assert all(kwargs["check"] is False for kwargs in observed_kwargs)
