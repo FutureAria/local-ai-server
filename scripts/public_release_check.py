@@ -206,6 +206,7 @@ SECRET_TEXT_PATTERNS = [
     re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}"),
     re.compile(r"sk-[A-Za-z0-9_\-]{20,}"),
     re.compile(r"ghp_[A-Za-z0-9]{36,}"),
+    re.compile(r"github_pat_[A-Za-z0-9_]{30,}"),
     re.compile(r"glpat-[A-Za-z0-9_\-]{20,}"),
     re.compile(r"hf_[A-Za-z0-9]{30,}"),
     re.compile(r"\bnpm_[A-Za-z0-9]{30,}\b"),
