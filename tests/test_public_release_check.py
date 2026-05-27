@@ -358,6 +358,16 @@ def test_public_release_check_allows_ignored_untracked_sensitive_file(tmp_path: 
     assert result["findings"] == []
 
 
+def test_public_release_check_fallback_flags_sensitive_files_outside_git(tmp_path: Path) -> None:
+    (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    paths = {finding["path"] for finding in result["findings"]}
+    assert result["ok"] is False
+    assert ".env" in paths
+
+
 def test_public_release_private_data_has_no_duplicate_entries() -> None:
     assert len(PUBLIC_RELEASE_PRIVATE_DATA) == len(set(PUBLIC_RELEASE_PRIVATE_DATA))
 

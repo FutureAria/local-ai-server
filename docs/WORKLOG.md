@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 14:56 KST
+
+### Public release non-git fallback scanner guard
+
+- `tests/test_public_release_check.py`에 git repo가 아닌 폴더를 검사할 때 fallback file walk가 민감 파일을 flag하는지 검증하는 계약 테스트를 추가했다.
+- 이 테스트는 `git ls-files`를 사용할 수 없는 압축본/임시 복사본 점검 상황에서도 `.env` 같은 민감 파일이 release blocker로 잡히는 경계를 고정한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `527 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `220 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `248 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `527 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 14:53 KST
 
 ### Public release ignored local secret boundary
