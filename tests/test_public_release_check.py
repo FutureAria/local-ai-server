@@ -395,6 +395,18 @@ def test_public_release_check_flags_real_secret_inside_env_example(tmp_path: Pat
     assert "secret" in result["findings"][0]["message"]
 
 
+def test_public_release_check_counts_allowed_path_exceptions_as_scanned_text(tmp_path: Path) -> None:
+    uploads = tmp_path / "data" / "uploads"
+    uploads.mkdir(parents=True)
+    (uploads / ".gitkeep").write_text("", encoding="utf-8")
+    (tmp_path / ".env.example").write_text("LOCAL_API_KEY=\n", encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is True
+    assert result["scanned_files"] == 2
+
+
 def test_public_release_check_flags_tracked_sensitive_file_even_when_ignored(tmp_path: Path) -> None:
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True, text=True)
     (tmp_path / ".gitignore").write_text(".env\n", encoding="utf-8")
