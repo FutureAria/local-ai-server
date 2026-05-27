@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 15:06 KST
+
+### Public release secret text finding dedupe
+
+- `scripts/public_release_check.py`가 한 텍스트 파일에서 여러 secret regex가 동시에 매칭되어도 첫 finding만 보고하도록 정리해 public release check 출력 중복을 줄였다.
+- `tests/test_public_release_check.py`에 같은 `docs.md` 파일 안의 API key, bearer token, GitHub token 후보가 한 건의 text-secret finding으로 보고되는지 검증하는 계약 테스트를 추가했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `531 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `224 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `252 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `531 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 15:03 KST
 
 ### Public release sensitive path finding dedupe

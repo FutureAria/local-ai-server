@@ -480,6 +480,7 @@ def _scan_text_file(root: Path, path: Path) -> list[Finding]:
                     message="secret, token, password, private key로 보이는 문자열 후보가 있습니다.",
                 )
             )
+            break
     return findings
 
 

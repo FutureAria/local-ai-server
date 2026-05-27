@@ -255,6 +255,26 @@ def test_public_release_check_flags_secret_text_patterns(tmp_path: Path, content
     assert "secret" in result["findings"][0]["message"]
 
 
+def test_public_release_check_reports_secret_text_file_once(tmp_path: Path) -> None:
+    (tmp_path / "docs.md").write_text(
+        "\n".join(
+            [
+                "OPENAI_API_KEY=sk-" + "a" * 24,
+                "Authorization: Bearer " + "b" * 24,
+                "github token ghp_" + "c" * 36,
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_public_release_check(tmp_path)
+
+    docs_findings = [finding for finding in result["findings"] if finding["path"] == "docs.md"]
+    assert result["ok"] is False
+    assert len(docs_findings) == 1
+    assert "secret" in docs_findings[0]["message"]
+
+
 @pytest.mark.parametrize(
     "relative_path",
     [
