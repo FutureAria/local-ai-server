@@ -1,6 +1,9 @@
+import json
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 import scripts.local_ci_check as local_ci
 
@@ -91,3 +94,50 @@ def test_run_local_ci_check_uses_project_root_and_captures_output(monkeypatch, t
     assert all(kwargs["capture_output"] is True for kwargs in observed_kwargs)
     assert all(kwargs["text"] is True for kwargs in observed_kwargs)
     assert all(kwargs["check"] is False for kwargs in observed_kwargs)
+
+
+def test_local_ci_check_json_cli_reports_public_release_step(
+    monkeypatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    def fake_run_local_ci_check(root: Path) -> dict:
+        resolved = root.resolve()
+        return {
+            "ok": True,
+            "root": str(resolved),
+            "steps": [
+                {
+                    "name": "public-release-check",
+                    "command": [
+                        sys.executable,
+                        "scripts/public_release_check.py",
+                        "--root",
+                        str(resolved),
+                        "--json",
+                    ],
+                    "returncode": 0,
+                    "ok": True,
+                    "stdout": '{"ok": true, "findings": []}',
+                    "stderr": "",
+                }
+            ],
+        }
+
+    monkeypatch.setattr(local_ci, "run_local_ci_check", fake_run_local_ci_check)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["local_ci_check.py", "--root", str(tmp_path), "--json"],
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        local_ci.main()
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exc_info.value.code == 0
+    assert captured.err == ""
+    assert payload["ok"] is True
+    assert payload["steps"][0]["name"] == "public-release-check"
+    assert payload["steps"][0]["command"][-1] == "--json"
