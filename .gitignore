@@ -49,6 +49,11 @@ secrets/
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
+.composer/auth.json
+.config/composer/auth.json
+.condarc
+.config/conda/condarc
+.continuum/anaconda-client/tokens
 .gradle/gradle.properties
 .m2/settings.xml
 NuGet.Config
