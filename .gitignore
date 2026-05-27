@@ -52,6 +52,7 @@ secrets/
 .config/gcloud/application_default_credentials.json
 .config/gcloud/credentials.db
 .config/gcloud/access_tokens.db
+.config/gcloud/legacy_credentials/
 .azure/
 .kube/
 kubeconfig
