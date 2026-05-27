@@ -76,7 +76,7 @@
 - `secrets/`, `.secrets/`
 - `.ssh/`, `.docker/`
 - `.config/gh/hosts.yml`, `.config/gh/hosts.yaml`
-- `.aws/`, `.gcloud/`, `.config/gcloud/application_default_credentials.json`, `.config/gcloud/credentials.db`, `.config/gcloud/access_tokens.db`, `.azure/`, `.kube/`
+- `.aws/`, `.gcloud/`, `.config/gcloud/application_default_credentials.json`, `.config/gcloud/credentials.db`, `.config/gcloud/access_tokens.db`, `.azure/`, `.kube/`, `kubeconfig`, `kube.config`
 - `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json`
 - `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.der`, `*.csr`, `*.p7b`, `*.p7c`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.truststore`
 - `id_rsa`, `id_dsa`, `id_ecdsa`, `id_ecdsa_sk`, `id_ed25519`, `id_ed25519_sk`
@@ -107,7 +107,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `432 passed`
+- `.venv/bin/pytest`: `434 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

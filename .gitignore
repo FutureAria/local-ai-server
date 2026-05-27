@@ -43,6 +43,8 @@ secrets/
 .config/gcloud/access_tokens.db
 .azure/
 .kube/
+kubeconfig
+kube.config
 credentials.json
 application_default_credentials.json
 client_secret*.json
