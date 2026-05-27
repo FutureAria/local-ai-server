@@ -34,6 +34,7 @@ secrets/
 .config/containers/auth.json
 .config/helm/registry/config.json
 .config/helm/repositories.yaml
+.config/hub
 .config/gh/hosts.yml
 .config/gh/hosts.yaml
 .config/doctl/config.yaml
