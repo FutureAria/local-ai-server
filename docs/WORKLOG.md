@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-27 13:44 KST
+
+### Public release GitHub alternate token prefix guard
+
+- `tests/test_public_release_check.py`가 GitHub OAuth/User/App/refresh token prefix 후보(`gho_`, `ghu_`, `ghs_`, `ghr_`)를 synthetic 문자열로 각각 검증하도록 보강했다.
+- `scripts/public_release_check.py`의 기존 GitHub alternate token regex가 특정 prefix 하나에만 기대지 않는지 테스트 계약으로 고정했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `459 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `173 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `459 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 13:26 KST
 
 ### Public release GitHub app token candidate guard
