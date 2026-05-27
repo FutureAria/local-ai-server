@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 15:09 KST
+
+### Public release sensitive-path scan count contract
+
+- `tests/test_public_release_check.py`에 민감 경로로 이미 차단된 파일은 추가 text scan을 건너뛰며 `scanned_files`에도 포함하지 않는지 검증하는 계약 테스트를 추가했다.
+- 이 테스트는 `.env` 같은 파일이 path finding 한 건으로 차단되고 scan count를 부풀리지 않는 현재 scanner 동작을 고정한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `532 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `225 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `253 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `532 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 15:06 KST
 
 ### Public release secret text finding dedupe

@@ -216,6 +216,15 @@ def test_public_release_check_reports_sensitive_path_once(tmp_path: Path) -> Non
     assert "민감 경로" in env_findings[0]["message"]
 
 
+def test_public_release_check_does_not_count_sensitive_paths_as_scanned_text(tmp_path: Path) -> None:
+    (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["scanned_files"] == 0
+
+
 @pytest.mark.parametrize(
     "content",
     [
