@@ -60,6 +60,13 @@ secrets/
 .httpie/
 .config/httpie/
 .bruno/
+.cursor/mcp.json
+.cursor/settings.json
+.continue/config.json
+.aider.conf.yml
+.aider.env
+.codeium/config.json
+.config/Codeium/config.json
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
