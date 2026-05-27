@@ -90,6 +90,8 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
         ("secrets/id_ed25519_sk", "ssh"),
         ("data/local_ai.sqlite3", "sqlite"),
         ("data/local_ai.sqlite3-wal", "wal"),
+        ("data/cache.sqlite3", "sqlite"),
+        ("data/cache.sqlite3-shm", "shm"),
         ("data/local_ai.sqlite", "sqlite"),
         ("data/local_ai.sqlite-wal", "wal"),
         ("data/local_ai.sqlite-shm", "shm"),
@@ -357,6 +359,8 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
         "id_ed25519": ["id_ed25519"],
         "id_ed25519_sk": ["id_ed25519_sk"],
         "data/local_ai.sqlite3": ["data/*.sqlite3", "data/*.sqlite3-*"],
+        "data/*.sqlite3": ["data/*.sqlite3"],
+        "data/*.sqlite3-*": ["data/*.sqlite3-*"],
         "data/*.sqlite": ["data/*.sqlite"],
         "data/*.sqlite-*": ["data/*.sqlite-*"],
         "data/*.db": ["data/*.db"],
@@ -384,6 +388,8 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
         assert item in security
     for item in [
         "data/local_ai.sqlite3",
+        "data/*.sqlite3",
+        "data/*.sqlite3-*",
         "data/chroma/",
         "data/uploads/",
         "data/logs/",

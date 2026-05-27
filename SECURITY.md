@@ -68,7 +68,7 @@
 
 | 데이터 | 기본 위치 | Git 포함 |
 |---|---|---|
-| SQLite DB | `data/local_ai.sqlite3` | 제외 |
+| SQLite DB | `data/local_ai.sqlite3`, `data/*.sqlite3`, `data/*.sqlite3-*`, `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*` | 제외 |
 | Chroma vector index | `data/chroma/` | 제외 |
 | 업로드 파일 | `data/uploads/` | 제외 |
 | 운영 로그 | `data/logs/` | 제외 |

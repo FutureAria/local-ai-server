@@ -84,7 +84,7 @@
 - `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.der`, `*.csr`, `*.p7b`, `*.p7c`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.truststore`
 - `id_rsa`, `id_dsa`, `id_ecdsa`, `id_ecdsa_sk`, `id_ed25519`, `id_ed25519_sk`
 - `data/local_ai.sqlite3`
-- `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*`
+- `data/*.sqlite3`, `data/*.sqlite3-*`, `data/*.sqlite`, `data/*.sqlite-*`, `data/*.db`, `data/*.db-*`
 - `data/chroma/`
 - `data/uploads/`
 - `data/logs/`
@@ -110,7 +110,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `459 passed`
+- `.venv/bin/pytest`: `461 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
