@@ -153,6 +153,7 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
         "discord bot token " + "a" * 24 + "." + "b" * 6 + "." + "c" * 27,
         "anthropic key " + "sk-ant-" + "a" * 32,
         "github token " + "ghp_" + "a" * 36,
+        "github app token " + "ghs_" + "a" * 36,
         "github fine-grained token " + "github_pat_" + "a" * 36,
         "gitlab token " + "glpat-" + "a" * 20,
         "huggingface token " + "hf_" + "a" * 30,
