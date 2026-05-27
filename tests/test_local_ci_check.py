@@ -232,6 +232,8 @@ def test_local_ci_check_json_cli_reports_public_release_failure(
     assert payload["steps"][0]["name"] == "public-release-check"
     assert payload["steps"][0]["returncode"] == 1
     assert payload["steps"][0]["ok"] is False
+    assert '"ok": false' in payload["steps"][0]["stdout"]
+    assert '"path": ".env"' in payload["steps"][0]["stdout"]
 
 
 def test_local_ci_check_human_cli_reports_public_release_failure(
