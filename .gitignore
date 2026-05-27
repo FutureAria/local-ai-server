@@ -64,6 +64,8 @@ rclone.conf
 .config/rclone/rclone.conf
 .azure/
 .kube/
+.oci/
+.oraclebmc/
 kubeconfig
 kube.config
 credentials.json
