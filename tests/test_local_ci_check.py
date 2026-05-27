@@ -274,4 +274,6 @@ def test_local_ci_check_human_cli_reports_public_release_failure(
     assert "[failed] public-release-check:" in captured.out
     assert "scripts/public_release_check.py" in captured.out
     assert "--json" in captured.out
+    assert '"ok": false' in captured.out
+    assert '"path": ".env"' in captured.out
     assert "release blocked" in captured.err

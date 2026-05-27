@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 15:39 KST
+
+### Local CI human release-failure stdout contract
+
+- `tests/test_local_ci_check.py`의 일반 출력 실패 계약에 public release scanner stdout JSON 요약이 그대로 표시되는지 확인하는 assertion을 추가했다.
+- `ok=false`와 `.env` finding path가 stdout에 남고, stderr의 실패 메시지는 stderr로 분리되는 경계를 고정했다.
+- 테스트 개수는 변하지 않아 최신 전체 수치는 `542 passed`를 유지한다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_local_ci_check.py` | `8 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_local_ci_check.py tests/test_security_docs_contract.py tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `267 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `542 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 15:37 KST
 
 ### Local CI human release-failure contract
