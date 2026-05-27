@@ -347,6 +347,17 @@ def test_public_release_check_flags_tracked_sensitive_file_even_when_ignored(tmp
     assert ".env" in paths
 
 
+def test_public_release_check_allows_ignored_untracked_sensitive_file(tmp_path: Path) -> None:
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True, text=True)
+    (tmp_path / ".gitignore").write_text(".env\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is True
+    assert result["findings"] == []
+
+
 def test_public_release_private_data_has_no_duplicate_entries() -> None:
     assert len(PUBLIC_RELEASE_PRIVATE_DATA) == len(set(PUBLIC_RELEASE_PRIVATE_DATA))
 
