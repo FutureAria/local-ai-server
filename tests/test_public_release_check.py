@@ -284,6 +284,17 @@ def test_public_release_check_human_cli_reports_private_key_without_key_material
     assert key_material not in captured.out
 
 
+def test_public_release_check_result_payload_omits_private_key_material(tmp_path: Path) -> None:
+    key_material = "-----BEGIN " + "PRIVATE KEY-----\nabc\n-----END " + "PRIVATE KEY-----"
+    (tmp_path / "docs.md").write_text(key_material, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["findings"][0]["path"] == "docs.md"
+    assert key_material not in json.dumps(result, ensure_ascii=False)
+
+
 def test_public_release_check_json_cli_reports_success(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
