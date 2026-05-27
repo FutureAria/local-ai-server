@@ -15,7 +15,7 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
 
     assert ".venv/bin/pytest" in text
-    assert "545 passed" in text
+    assert "546 passed" in text
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert ".venv/bin/python scripts/local_ci_check.py --root ." in text
