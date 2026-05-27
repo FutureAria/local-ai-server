@@ -324,6 +324,18 @@ def test_public_release_check_allows_gitkeep_files(tmp_path: Path) -> None:
     assert result["findings"] == []
 
 
+def test_public_release_check_flags_real_secret_inside_gitkeep(tmp_path: Path) -> None:
+    uploads = tmp_path / "data" / "uploads"
+    uploads.mkdir(parents=True)
+    (uploads / ".gitkeep").write_text("token=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["findings"][0]["path"] == "data/uploads/.gitkeep"
+    assert "secret" in result["findings"][0]["message"]
+
+
 def test_public_release_check_allows_env_example(tmp_path: Path) -> None:
     (tmp_path / ".env.example").write_text("LOCAL_API_KEY=\n", encoding="utf-8")
 
