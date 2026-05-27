@@ -30,6 +30,8 @@ terraform.rc
 secrets/
 .secrets/
 .ssh/
+.gnupg/
+.password-store/
 .docker/
 .config/containers/auth.json
 .config/helm/registry/config.json
