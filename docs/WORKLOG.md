@@ -1,5 +1,23 @@
 # WORKLOG
 
+## 2026-05-27 15:03 KST
+
+### Public release sensitive path finding dedupe
+
+- `scripts/public_release_check.py`가 민감 경로 자체를 flag한 파일은 추가 text secret scan을 건너뛰도록 정리해 같은 파일의 중복 finding을 줄였다.
+- `tests/test_public_release_check.py`에 `.env`처럼 경로와 내용이 모두 민감한 파일도 path finding 한 건으로 보고되는지 검증하는 계약 테스트를 추가했다.
+- `.env.example`과 `.gitkeep` 경로 예외는 기존처럼 내용 scan을 계속 수행하므로 실제 secret 후보가 들어가면 release blocker로 남는다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `530 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `223 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `251 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `530 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 15:01 KST
 
 ### Public release gitkeep secret-content guard

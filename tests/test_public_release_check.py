@@ -205,6 +205,17 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
     assert "data/local_ai.sqlite3" in paths
 
 
+def test_public_release_check_reports_sensitive_path_once(tmp_path: Path) -> None:
+    (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    env_findings = [finding for finding in result["findings"] if finding["path"] == ".env"]
+    assert result["ok"] is False
+    assert len(env_findings) == 1
+    assert "민감 경로" in env_findings[0]["message"]
+
+
 @pytest.mark.parametrize(
     "content",
     [

@@ -351,6 +351,7 @@ def run_public_release_check(root: Path) -> dict:
         path_finding = _check_sensitive_path(relative)
         if path_finding is not None:
             findings.append(path_finding)
+            continue
 
         if _should_scan_text(path):
             scanned_files += 1
