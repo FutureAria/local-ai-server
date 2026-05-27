@@ -333,6 +333,16 @@ def test_public_release_check_allows_env_example(tmp_path: Path) -> None:
     assert result["findings"] == []
 
 
+def test_public_release_check_flags_real_secret_inside_env_example(tmp_path: Path) -> None:
+    (tmp_path / ".env.example").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["findings"][0]["path"] == ".env.example"
+    assert "secret" in result["findings"][0]["message"]
+
+
 def test_public_release_check_flags_tracked_sensitive_file_even_when_ignored(tmp_path: Path) -> None:
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True, text=True)
     (tmp_path / ".gitignore").write_text(".env\n", encoding="utf-8")

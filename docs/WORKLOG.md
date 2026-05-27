@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 14:59 KST
+
+### Public release env example secret-content guard
+
+- `tests/test_public_release_check.py`에 `.env.example` 경로 예외가 실제 secret 내용까지 허용하지 않는지 검증하는 계약 테스트를 추가했다.
+- placeholder-only `.env.example`은 허용하되, `LOCAL_API_KEY`에 실제 값처럼 보이는 긴 token 후보가 들어가면 text secret scan이 release blocker로 flag하는 경계를 고정했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `528 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `221 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `249 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `528 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 14:56 KST
 
 ### Public release non-git fallback scanner guard
