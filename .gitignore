@@ -23,6 +23,7 @@ pypoetry/auth.toml
 .boto
 .s3cfg
 .pgpass
+.sentryclirc
 auth.json
 .terraformrc
 terraform.rc

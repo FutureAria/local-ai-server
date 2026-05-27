@@ -70,7 +70,7 @@
 - `.env.*`
 - `.envrc`
 - `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.pnpmrc`, `.pypirc`, `pip.conf`, `.config/pip/pip.conf`, `.config/pypoetry/auth.toml`, `pypoetry/auth.toml`, `.netrc`
-- `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`
+- `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`, `.sentryclirc`
 - `auth.json`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`
 - `.terraformrc`, `terraform.rc`, `.pulumi/credentials.json`
 - `secrets/`, `.secrets/`
@@ -110,7 +110,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `443 passed`
+- `.venv/bin/pytest`: `444 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
