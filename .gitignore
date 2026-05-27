@@ -57,6 +57,8 @@ clouds.yaml
 secure.yaml
 .config/openstack/clouds.yaml
 .config/openstack/secure.yaml
+rclone.conf
+.config/rclone/rclone.conf
 .azure/
 .kube/
 kubeconfig
