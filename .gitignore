@@ -34,6 +34,8 @@ secrets/
 .config/gh/hosts.yaml
 .config/doctl/config.yaml
 .config/doctl/config.yml
+.vercel/auth.json
+.netlify/config.json
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
