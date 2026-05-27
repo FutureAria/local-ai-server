@@ -317,6 +317,26 @@ def test_public_release_check_sensitive_path_payload_omits_file_content(tmp_path
     assert secret_value not in json.dumps(result, ensure_ascii=False)
 
 
+def test_public_release_check_json_cli_sensitive_path_omits_file_content(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    secret_value = "a" * 24
+    (tmp_path / ".env").write_text("LOCAL_API_KEY=" + secret_value, encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path), "--json"]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exc_info.value.code == 1
+    assert captured.err == ""
+    assert payload["ok"] is False
+    assert payload["findings"][0]["path"] == ".env"
+    assert secret_value not in captured.out
+
+
 def test_public_release_check_json_cli_reports_success(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
