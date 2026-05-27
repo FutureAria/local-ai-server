@@ -59,6 +59,14 @@ secrets/
 .config/databricks/credentials
 .snowsql/config
 .config/snowflake/config.toml
+.huggingface/token
+.cache/huggingface/token
+.cache/huggingface/stored_tokens
+.config/huggingface/token
+.kaggle/kaggle.json
+.config/kaggle/kaggle.json
+.wandb/settings
+.config/wandb/settings
 .gradle/gradle.properties
 .m2/settings.xml
 NuGet.Config
