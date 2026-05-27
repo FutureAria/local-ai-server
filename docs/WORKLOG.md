@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-27 15:26 KST
+
+### Security private-data mirror contract
+
+- `tests/test_security_docs_contract.py`에 `SECURITY.md`가 public release scanner의 `PUBLIC_RELEASE_PRIVATE_DATA` 전체 목록을 literal로 mirror하는지 검증하는 계약 테스트를 추가했다.
+- `SECURITY.md`에 key/certificate, log, Terraform/Pulumi state, Ansible vault 계열 private data 패턴을 명시해 scanner, `.gitignore`, release checklist, public release summary와 보안 정책 문서의 제외 범위를 맞췄다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `538 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_security_docs_contract.py tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `259 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `538 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 15:21 KST
 
 ### Public release CLI success contract

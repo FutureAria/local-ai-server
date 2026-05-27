@@ -2,6 +2,7 @@ from pathlib import Path
 
 from app.main import app
 from app.services.project_status_service import build_api_inventory
+from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA
 
 
 README = Path("README.md")
@@ -121,3 +122,10 @@ def test_security_docs_use_venv_public_release_check_command() -> None:
         assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text, (
             f"{path} missing venv public release check command"
         )
+
+
+def test_security_doc_mirrors_public_release_private_data_surface() -> None:
+    text = SECURITY.read_text(encoding="utf-8")
+
+    for item in PUBLIC_RELEASE_PRIVATE_DATA:
+        assert item in text, f"SECURITY.md missing public release private data item: {item}"
