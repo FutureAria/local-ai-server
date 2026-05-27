@@ -1,10 +1,11 @@
+import json
 from pathlib import Path
 import subprocess
 from unittest.mock import patch
 
 import pytest
 
-from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public_release_check
+from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, main, run_public_release_check
 
 
 @pytest.mark.parametrize(
@@ -203,6 +204,26 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
     paths = {finding["path"] for finding in result["findings"]}
     assert ".env" in paths
     assert "data/local_ai.sqlite3" in paths
+
+
+def test_public_release_check_json_cli_reports_failure_without_secret_value(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    secret_value = "a" * 24
+    (tmp_path / "docs.md").write_text("LOCAL_API_KEY=" + secret_value, encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path), "--json"]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exc_info.value.code == 1
+    assert captured.err == ""
+    assert payload["ok"] is False
+    assert payload["findings"][0]["path"] == "docs.md"
+    assert secret_value not in captured.out
 
 
 def test_public_release_check_reports_sensitive_path_once(tmp_path: Path) -> None:
