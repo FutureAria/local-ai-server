@@ -232,3 +232,46 @@ def test_local_ci_check_json_cli_reports_public_release_failure(
     assert payload["steps"][0]["name"] == "public-release-check"
     assert payload["steps"][0]["returncode"] == 1
     assert payload["steps"][0]["ok"] is False
+
+
+def test_local_ci_check_human_cli_reports_public_release_failure(
+    monkeypatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    def fake_run_local_ci_check(root: Path) -> dict:
+        resolved = root.resolve()
+        return {
+            "ok": False,
+            "root": str(resolved),
+            "steps": [
+                {
+                    "name": "public-release-check",
+                    "command": [
+                        sys.executable,
+                        "scripts/public_release_check.py",
+                        "--root",
+                        str(resolved),
+                        "--json",
+                    ],
+                    "returncode": 1,
+                    "ok": False,
+                    "stdout": '{"ok": false, "findings": [{"path": ".env"}]}',
+                    "stderr": "release blocked",
+                }
+            ],
+        }
+
+    monkeypatch.setattr(local_ci, "run_local_ci_check", fake_run_local_ci_check)
+    monkeypatch.setattr(sys, "argv", ["local_ci_check.py", "--root", str(tmp_path)])
+
+    with pytest.raises(SystemExit) as exc_info:
+        local_ci.main()
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 1
+    assert "ok=False root=" in captured.out
+    assert "[failed] public-release-check:" in captured.out
+    assert "scripts/public_release_check.py" in captured.out
+    assert "--json" in captured.out
+    assert "release blocked" in captured.err
