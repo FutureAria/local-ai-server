@@ -75,6 +75,7 @@
 - `.terraformrc`, `terraform.rc`, `.pulumi/credentials.json`
 - `secrets/`, `.secrets/`
 - `.ssh/`, `.docker/`
+- `.config/gh/hosts.yml`, `.config/gh/hosts.yaml`
 - `.aws/`, `.gcloud/`, `.azure/`, `.kube/`
 - `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json`
 - `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.der`, `*.csr`, `*.p7b`, `*.p7c`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.truststore`
@@ -106,7 +107,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `424 passed`
+- `.venv/bin/pytest`: `426 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
