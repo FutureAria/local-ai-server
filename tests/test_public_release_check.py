@@ -258,6 +258,7 @@ def test_public_release_check_allows_env_example(tmp_path: Path) -> None:
 
 def test_public_release_private_data_is_documented_and_ignored() -> None:
     gitignore = Path(".gitignore").read_text(encoding="utf-8")
+    security = Path("SECURITY.md").read_text(encoding="utf-8")
     release_checklist = Path("docs/RELEASE_CHECKLIST.md").read_text(encoding="utf-8")
     public_summary = Path("docs/PUBLIC_RELEASE_SUMMARY.md").read_text(encoding="utf-8")
 
@@ -360,6 +361,19 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
     }
 
     assert set(PUBLIC_RELEASE_PRIVATE_DATA) == set(gitignore_coverage)
+    security_mirrored_private_data = PUBLIC_RELEASE_PRIVATE_DATA[
+        : PUBLIC_RELEASE_PRIVATE_DATA.index("*.key")
+    ]
+    for item in security_mirrored_private_data:
+        assert item in security
+    for item in [
+        "data/local_ai.sqlite3",
+        "data/chroma/",
+        "data/uploads/",
+        "data/logs/",
+        "data/*.jsonl",
+    ]:
+        assert item in security
     for item in PUBLIC_RELEASE_PRIVATE_DATA:
         assert item in release_checklist
         assert item in public_summary

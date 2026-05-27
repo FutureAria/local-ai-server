@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 11:19 KST
+
+### Public release security docs mirror guard
+
+- `tests/test_public_release_check.py`가 `PUBLIC_RELEASE_PRIVATE_DATA`의 credential mirror 항목이 `SECURITY.md`에도 남아 있는지 검증하도록 보강했다.
+- 같은 테스트가 `SECURITY.md`의 grouped local data 항목(`data/local_ai.sqlite3`, `data/chroma/`, `data/uploads/`, `data/logs/`, `data/*.jsonl`)도 계속 확인한다.
+- `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`, `.gitignore` 전체 mirror 검증은 기존 계약 그대로 유지했다.
+- 테스트 개수 변화는 없어서 공개/최종/handoff 문서의 최신 pytest 수치 `446 passed`는 유지했다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py` | `152 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `446 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 11:16 KST
 
 ### Public release hub CLI credential guard
