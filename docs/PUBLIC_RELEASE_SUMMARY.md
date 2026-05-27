@@ -75,6 +75,7 @@
 - `.terraformrc`, `terraform.rc`, `.pulumi/credentials.json`
 - `secrets/`, `.secrets/`
 - `.ssh/`, `.gnupg/`, `.password-store/`, `.config/sops/age/keys.txt`, `.docker/`, `.config/containers/auth.json`, `.config/helm/registry/config.json`, `.config/helm/repositories.yaml`
+- `.vault-token`, `.config/doppler/config.yaml`, `.config/infisical/infisical-config.json`, `.config/op/config`, `.config/1Password/credentials.json`
 - `.config/hub`, `.config/gh/hosts.yml`, `.config/gh/hosts.yaml`
 - `.config/doctl/config.yaml`, `.config/doctl/config.yml`
 - `.vercel/auth.json`, `.netlify/config.json`
@@ -113,7 +114,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `518 passed`
+- `.venv/bin/pytest`: `523 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
