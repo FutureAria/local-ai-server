@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 23:20 KST
+
+### Public release private key JSON output redaction contract
+
+- `tests/test_public_release_check.py`에 synthetic private key header가 JSON CLI 실패 출력에서 key material 원문을 노출하지 않는지 검증하는 계약 테스트를 추가했다.
+- public release scanner의 finding payload가 path/message 중심으로 유지되고 secret 원문을 싣지 않는 경계를 private-key text 후보에도 고정했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `549 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `237 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `266 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `549 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 23:12 KST
 
 ### Public release lowercase private key text contract
