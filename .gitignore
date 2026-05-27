@@ -54,6 +54,11 @@ secrets/
 .condarc
 .config/conda/condarc
 .continuum/anaconda-client/tokens
+.dbt/profiles.yml
+.databrickscfg
+.config/databricks/credentials
+.snowsql/config
+.config/snowflake/config.toml
 .gradle/gradle.properties
 .m2/settings.xml
 NuGet.Config
