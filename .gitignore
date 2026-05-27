@@ -10,7 +10,11 @@ venv/
 !.env.example
 .envrc
 .npmrc
+.yarnrc
+.yarnrc.yml
+.pnpmrc
 .pypirc
+pip.conf
 .netrc
 .git-credentials
 .boto

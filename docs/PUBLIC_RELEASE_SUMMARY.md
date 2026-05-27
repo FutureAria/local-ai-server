@@ -69,7 +69,7 @@
 - `.env`
 - `.env.*`
 - `.envrc`
-- `.npmrc`, `.pypirc`, `.netrc`
+- `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.pnpmrc`, `.pypirc`, `pip.conf`, `.netrc`
 - `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`
 - `secrets/`, `.secrets/`
 - `.ssh/`, `.docker/`
@@ -104,7 +104,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `413 passed`
+- `.venv/bin/pytest`: `417 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
