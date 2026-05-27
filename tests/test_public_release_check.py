@@ -245,6 +245,41 @@ def test_public_release_check_human_cli_reports_failure_without_secret_value(
     assert secret_value not in captured.out
 
 
+def test_public_release_check_json_cli_reports_success(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "README.md").write_text("# ok", encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path), "--json"]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exc_info.value.code == 0
+    assert captured.err == ""
+    assert payload["ok"] is True
+    assert payload["findings"] == []
+    assert payload["scanned_files"] == 1
+
+
+def test_public_release_check_human_cli_reports_success(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "README.md").write_text("# ok", encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path)]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 0
+    assert captured.err == ""
+    assert captured.out == "ok=True scanned_files=1\n"
+
+
 def test_public_release_check_reports_sensitive_path_once(tmp_path: Path) -> None:
     (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
 
