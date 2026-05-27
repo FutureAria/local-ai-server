@@ -15,6 +15,9 @@ venv/
 .pnpmrc
 .pypirc
 pip.conf
+.config/pip/pip.conf
+.config/pypoetry/auth.toml
+pypoetry/auth.toml
 .netrc
 .git-credentials
 .boto
