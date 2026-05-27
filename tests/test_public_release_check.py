@@ -327,6 +327,7 @@ def test_public_release_check_does_not_count_sensitive_paths_as_scanned_text(tmp
         "stripe secret key " + "sk_live_" + "a" * 24,
         "stripe restricted key " + "rk_test_" + "a" * 24,
         "-----BEGIN " + "PRIVATE KEY-----\nabc\n-----END " + "PRIVATE KEY-----",
+        "-----BEGIN DSA " + "PRIVATE KEY-----\nabc\n-----END DSA " + "PRIVATE KEY-----",
         "-----BEGIN ENCRYPTED " + "PRIVATE KEY-----\nabc\n-----END ENCRYPTED " + "PRIVATE KEY-----",
     ],
 )

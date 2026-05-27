@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 22:55 KST
+
+### Public release DSA private key text guard
+
+- `scripts/public_release_check.py`가 DSA private-key header 형태의 민감 키 후보도 text secret으로 flag하도록 보강했다.
+- `tests/test_public_release_check.py`에 synthetic DSA private-key header 예시를 추가해 실제 credential 없이 탐지 계약을 고정했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `544 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `232 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `261 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `544 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 22:51 KST
 
 ### Public release encrypted private key text guard

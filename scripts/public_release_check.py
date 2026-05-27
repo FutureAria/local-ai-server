@@ -330,7 +330,7 @@ SECRET_TEXT_PATTERNS = [
     re.compile(r"AKIA[0-9A-Z]{16}"),
     re.compile(r"\bSG\.[A-Za-z0-9_\-]{16,}\.[A-Za-z0-9_\-]{16,}"),
     re.compile(r"\b[rs]k_(live|test)_[A-Za-z0-9]{20,}"),
-    re.compile(r"(?i)BEGIN (RSA |OPENSSH |EC |ENCRYPTED )?PRIVATE KEY"),
+    re.compile(r"(?i)BEGIN (RSA |OPENSSH |EC |DSA |ENCRYPTED )?PRIVATE KEY"),
 ]
 
 
