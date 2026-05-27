@@ -71,7 +71,7 @@
 - `.envrc`
 - `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.pnpmrc`, `.pypirc`, `pip.conf`, `.config/pip/pip.conf`, `.config/pypoetry/auth.toml`, `pypoetry/auth.toml`, `.netrc`
 - `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`, `.sentryclirc`
-- `auth.json`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`
+- `auth.json`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`, `.gradle/gradle.properties`, `.m2/settings.xml`, `NuGet.Config`, `nuget.config`, `.nuget/NuGet/NuGet.Config`
 - `.terraformrc`, `terraform.rc`, `.pulumi/credentials.json`
 - `secrets/`, `.secrets/`
 - `.ssh/`, `.gnupg/`, `.password-store/`, `.config/sops/age/keys.txt`, `.docker/`, `.config/containers/auth.json`, `.config/helm/registry/config.json`, `.config/helm/repositories.yaml`
@@ -110,7 +110,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `473 passed`
+- `.venv/bin/pytest`: `479 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

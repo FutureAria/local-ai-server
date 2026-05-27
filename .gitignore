@@ -49,6 +49,11 @@ secrets/
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
+.gradle/gradle.properties
+.m2/settings.xml
+NuGet.Config
+nuget.config
+.nuget/NuGet/NuGet.Config
 .pulumi/credentials.json
 .aws/
 .gcloud/
