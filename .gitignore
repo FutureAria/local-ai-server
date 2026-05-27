@@ -53,6 +53,13 @@ secrets/
 .claude/settings.local.json
 .gemini/settings.json
 .config/gemini/settings.json
+.postman/
+.config/Postman/
+.insomnia/
+.config/Insomnia/
+.httpie/
+.config/httpie/
+.bruno/
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml

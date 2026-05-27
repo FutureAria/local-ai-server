@@ -80,6 +80,7 @@
 - `.vercel/auth.json`, `.netlify/config.json`
 - `.fly/config.yml`, `.fly/config.yaml`
 - `.openai/`, `.config/openai/`, `.anthropic/`, `.claude.json`, `.claude/settings.local.json`, `.gemini/settings.json`, `.config/gemini/settings.json`
+- `.postman/`, `.config/Postman/`, `.insomnia/`, `.config/Insomnia/`, `.httpie/`, `.config/httpie/`, `.bruno/`
 - `.aws/`, `.gcloud/`, `.config/gcloud/application_default_credentials.json`, `.config/gcloud/credentials.db`, `.config/gcloud/access_tokens.db`, `.config/gcloud/legacy_credentials/`, `clouds.yaml`, `secure.yaml`, `.config/openstack/clouds.yaml`, `.config/openstack/secure.yaml`, `rclone.conf`, `.config/rclone/rclone.conf`, `.azure/`, `.kube/`, `.oci/`, `.oraclebmc/`, `kubeconfig`, `kube.config`
 - `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json`
 - `*.key`, `*.pem`, `*.crt`, `*.cer`, `*.der`, `*.csr`, `*.p7b`, `*.p7c`, `*.p12`, `*.pfx`, `*.jks`, `*.keystore`, `*.truststore`
@@ -111,7 +112,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `504 passed`
+- `.venv/bin/pytest`: `511 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
