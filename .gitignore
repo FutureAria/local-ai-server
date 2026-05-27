@@ -46,6 +46,13 @@ secrets/
 .netlify/config.json
 .fly/config.yml
 .fly/config.yaml
+.openai/
+.config/openai/
+.anthropic/
+.claude.json
+.claude/settings.local.json
+.gemini/settings.json
+.config/gemini/settings.json
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
