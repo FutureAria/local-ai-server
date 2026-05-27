@@ -256,6 +256,10 @@ def test_public_release_check_allows_env_example(tmp_path: Path) -> None:
     assert result["findings"] == []
 
 
+def test_public_release_private_data_has_no_duplicate_entries() -> None:
+    assert len(PUBLIC_RELEASE_PRIVATE_DATA) == len(set(PUBLIC_RELEASE_PRIVATE_DATA))
+
+
 def test_public_release_private_data_is_documented_and_ignored() -> None:
     gitignore = Path(".gitignore").read_text(encoding="utf-8")
     security = Path("SECURITY.md").read_text(encoding="utf-8")
