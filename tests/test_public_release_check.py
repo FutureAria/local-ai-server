@@ -150,6 +150,7 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
         "token: " + "a" * 24,
         "Authorization: Bearer " + "a" * 24,
         "telegram bot token " + "123456789:" + "a" * 35,
+        "discord bot token " + "a" * 24 + "." + "b" * 6 + "." + "c" * 27,
         "anthropic key " + "sk-ant-" + "a" * 32,
         "github token " + "ghp_" + "a" * 36,
         "gitlab token " + "glpat-" + "a" * 20,
