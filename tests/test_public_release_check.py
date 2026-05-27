@@ -226,6 +226,25 @@ def test_public_release_check_json_cli_reports_failure_without_secret_value(
     assert secret_value not in captured.out
 
 
+def test_public_release_check_human_cli_reports_failure_without_secret_value(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    secret_value = "a" * 24
+    (tmp_path / "docs.md").write_text("LOCAL_API_KEY=" + secret_value, encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path)]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 1
+    assert captured.err == ""
+    assert "ok=False" in captured.out
+    assert "[high] docs.md:" in captured.out
+    assert secret_value not in captured.out
+
+
 def test_public_release_check_reports_sensitive_path_once(tmp_path: Path) -> None:
     (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
 

@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 15:18 KST
+
+### Public release human CLI failure contract
+
+- `tests/test_public_release_check.py`에 public release scanner 일반 CLI 실패 출력 계약 테스트를 추가했다.
+- 테스트는 `--json` 없이 synthetic `LOCAL_API_KEY` 후보를 검사해 exit code `1`, `ok=False` 출력, finding path 표시, secret 원문 미출력을 함께 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `535 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `228 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `256 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `535 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 15:15 KST
 
 ### Public release JSON CLI failure contract
