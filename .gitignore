@@ -53,6 +53,10 @@ secrets/
 .config/gcloud/credentials.db
 .config/gcloud/access_tokens.db
 .config/gcloud/legacy_credentials/
+clouds.yaml
+secure.yaml
+.config/openstack/clouds.yaml
+.config/openstack/secure.yaml
 .azure/
 .kube/
 kubeconfig

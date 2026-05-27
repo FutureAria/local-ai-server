@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 13:51 KST
+
+### Public release OpenStack credential guard
+
+- `scripts/public_release_check.py`가 OpenStack credential 후보 `clouds.yaml`, `secure.yaml`, `.config/openstack/clouds.yaml`, `.config/openstack/secure.yaml`을 공개 전 private data 목록과 sensitive path regex에서 다루도록 보강했다.
+- `.gitignore`, `SECURITY.md`, `docs/RELEASE_CHECKLIST.md`, `docs/PUBLIC_RELEASE_SUMMARY.md`에 같은 OpenStack credential 제외 경계를 반영했다.
+- `tests/test_public_release_check.py`가 실제 credential 없이 synthetic YAML 경로만으로 OpenStack credential 후보 탐지를 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `466 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py tests/test_security_docs_contract.py` | `187 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `466 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 13:48 KST
 
 ### Public release gcloud legacy credentials guard
