@@ -1,5 +1,21 @@
 # WORKLOG
 
+## 2026-05-27 13:03 KST
+
+### Public release SendGrid token candidate guard
+
+- `scripts/public_release_check.py`가 SendGrid-style API key 후보(`SG.<segment>.<segment>`)를 공개 전 secret text candidate로 감지하도록 보강했다.
+- `tests/test_public_release_check.py`가 실제 token 값 없이 synthetic 문자열 조립 방식으로 SendGrid key 후보 탐지를 검증한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `450 passed` 기준으로 맞췄다.
+- 브라우저 조작, shell 실행 활성화, 파일 write/delete 활성화, 운영 배포, 외부 LLM API 추가는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `164 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `450 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 11:24 KST
 
 ### Public release Stripe token candidate guard
