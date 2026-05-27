@@ -43,6 +43,9 @@ from scripts.public_release_check import PUBLIC_RELEASE_PRIVATE_DATA, run_public
         (".pulumi/credentials.json", '{"accessTokens": {"api.pulumi.com": "' + "a" * 24 + '"}}'),
         (".aws/credentials", "aws_access_key_id=" + "A" * 20),
         (".gcloud/application_default_credentials.json", "{}"),
+        (".config/gcloud/application_default_credentials.json", "{}"),
+        (".config/gcloud/credentials.db", "sqlite"),
+        (".config/gcloud/access_tokens.db", "sqlite"),
         (".azure/accessTokens.json", "{}"),
         (".kube/config", "apiVersion: v1"),
         ("credentials.json", "{}"),
@@ -278,6 +281,11 @@ def test_public_release_private_data_is_documented_and_ignored() -> None:
         ".pulumi/credentials.json": [".pulumi/credentials.json"],
         ".aws/": [".aws/"],
         ".gcloud/": [".gcloud/"],
+        ".config/gcloud/application_default_credentials.json": [
+            ".config/gcloud/application_default_credentials.json"
+        ],
+        ".config/gcloud/credentials.db": [".config/gcloud/credentials.db"],
+        ".config/gcloud/access_tokens.db": [".config/gcloud/access_tokens.db"],
         ".azure/": [".azure/"],
         ".kube/": [".kube/"],
         "credentials.json": ["credentials.json"],

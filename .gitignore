@@ -38,6 +38,9 @@ secrets/
 .pulumi/credentials.json
 .aws/
 .gcloud/
+.config/gcloud/application_default_credentials.json
+.config/gcloud/credentials.db
+.config/gcloud/access_tokens.db
 .azure/
 .kube/
 credentials.json
