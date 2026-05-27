@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 14:50 KST
+
+### Public release tracked sensitive file guard
+
+- `tests/test_public_release_check.py`에 git index 기반 계약 테스트를 추가해 `.gitignore`에 있는 민감 파일이라도 이미 tracked/cached 상태면 public release scanner가 flag하는지 검증했다.
+- 테스트는 임시 git repo에서 `.env`를 ignore한 뒤 `git add -f .env`로 public release 대상이 된 상황을 synthetic secret으로 재현한다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `525 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `218 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `246 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `525 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 14:46 KST
 
 ### Public release scanner private-data enforcement contract

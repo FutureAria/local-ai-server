@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -330,6 +331,20 @@ def test_public_release_check_allows_env_example(tmp_path: Path) -> None:
 
     assert result["ok"] is True
     assert result["findings"] == []
+
+
+def test_public_release_check_flags_tracked_sensitive_file_even_when_ignored(tmp_path: Path) -> None:
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True, text=True)
+    (tmp_path / ".gitignore").write_text(".env\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("LOCAL_API_KEY=" + "a" * 24, encoding="utf-8")
+    subprocess.run(["git", "add", ".gitignore"], cwd=tmp_path, check=True, capture_output=True, text=True)
+    subprocess.run(["git", "add", "-f", ".env"], cwd=tmp_path, check=True, capture_output=True, text=True)
+
+    result = run_public_release_check(tmp_path)
+
+    paths = {finding["path"] for finding in result["findings"]}
+    assert result["ok"] is False
+    assert ".env" in paths
 
 
 def test_public_release_private_data_has_no_duplicate_entries() -> None:
