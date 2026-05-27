@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-27 23:12 KST
+
+### Public release lowercase private key text contract
+
+- `tests/test_public_release_check.py`에 synthetic lowercase `private key` header 예시를 추가해 private-key text scanner의 case-insensitive 탐지 계약을 고정했다.
+- `scripts/public_release_check.py`의 기존 private-key text scanner 범위를 바꾸지 않고, `(?i)` 대소문자 무시 동작이 회귀로 빠지지 않도록 테스트만 보강했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `548 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `236 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `265 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `548 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-27 23:08 KST
 
 ### Public release EC private key text contract
