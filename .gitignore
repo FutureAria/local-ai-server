@@ -36,6 +36,8 @@ secrets/
 .config/doctl/config.yml
 .vercel/auth.json
 .netlify/config.json
+.fly/config.yml
+.fly/config.yaml
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
