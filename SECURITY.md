@@ -73,7 +73,7 @@
 | 업로드 파일 | `data/uploads/` | 제외 |
 | 운영 로그 | `data/logs/` | 제외 |
 | SFT export | `data/*.jsonl` | 제외 |
-| 환경변수/credential 파일 | `.env`, `.env.*`, `.envrc`, `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.pnpmrc`, `.pypirc`, `pip.conf`, `.netrc`, `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`, `auth.json`, `secrets/`, `.secrets/`, `.ssh/`, `.docker/`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`, `.aws/`, `.gcloud/`, `.azure/`, `.kube/`, `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json` (`.env.example` 예외) | 제외 |
+| 환경변수/credential 파일 | `.env`, `.env.*`, `.envrc`, `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.pnpmrc`, `.pypirc`, `pip.conf`, `.netrc`, `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`, `auth.json`, `.terraformrc`, `terraform.rc`, `secrets/`, `.secrets/`, `.ssh/`, `.docker/`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`, `.pulumi/credentials.json`, `.aws/`, `.gcloud/`, `.azure/`, `.kube/`, `credentials.json`, `application_default_credentials.json`, `client_secret*.json`, `service-account*.json`, `firebase-adminsdk*.json`, `google-credentials*.json` (`.env.example` 예외) | 제외 |
 
 ## 로그 정책
 

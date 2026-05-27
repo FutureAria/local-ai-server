@@ -72,6 +72,7 @@
 - `.npmrc`, `.yarnrc`, `.yarnrc.yml`, `.pnpmrc`, `.pypirc`, `pip.conf`, `.netrc`
 - `.git-credentials`, `.boto`, `.s3cfg`, `.pgpass`
 - `auth.json`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`
+- `.terraformrc`, `terraform.rc`, `.pulumi/credentials.json`
 - `secrets/`, `.secrets/`
 - `.ssh/`, `.docker/`
 - `.aws/`, `.gcloud/`, `.azure/`, `.kube/`
@@ -105,7 +106,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `421 passed`
+- `.venv/bin/pytest`: `424 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공

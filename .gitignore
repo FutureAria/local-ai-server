@@ -21,6 +21,8 @@ pip.conf
 .s3cfg
 .pgpass
 auth.json
+.terraformrc
+terraform.rc
 secrets/
 .secrets/
 .ssh/
@@ -28,6 +30,7 @@ secrets/
 .gem/credentials
 .cargo/credentials
 .cargo/credentials.toml
+.pulumi/credentials.json
 .aws/
 .gcloud/
 .azure/
