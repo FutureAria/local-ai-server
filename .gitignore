@@ -30,6 +30,7 @@ secrets/
 .secrets/
 .ssh/
 .docker/
+.config/containers/auth.json
 .config/gh/hosts.yml
 .config/gh/hosts.yaml
 .config/doctl/config.yaml

@@ -75,6 +75,7 @@ def test_public_release_summary_keeps_private_data_and_verification_visible() ->
         "data/uploads/",
         "data/logs/",
         "data/*.jsonl",
+        ".config/containers/auth.json",
     ]
     verification_commands = [
         ".venv/bin/pytest",
@@ -87,7 +88,7 @@ def test_public_release_summary_keeps_private_data_and_verification_visible() ->
     for item in private_paths + verification_commands:
         assert item in text
 
-    assert "440 passed" in text
+    assert "441 passed" in text
 
 
 def test_public_release_summary_contract_snapshot_matches_runtime() -> None:

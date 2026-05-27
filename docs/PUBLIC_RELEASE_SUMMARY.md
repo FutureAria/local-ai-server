@@ -74,7 +74,7 @@
 - `auth.json`, `.gem/credentials`, `.cargo/credentials`, `.cargo/credentials.toml`
 - `.terraformrc`, `terraform.rc`, `.pulumi/credentials.json`
 - `secrets/`, `.secrets/`
-- `.ssh/`, `.docker/`
+- `.ssh/`, `.docker/`, `.config/containers/auth.json`
 - `.config/gh/hosts.yml`, `.config/gh/hosts.yaml`
 - `.config/doctl/config.yaml`, `.config/doctl/config.yml`
 - `.vercel/auth.json`, `.netlify/config.json`
@@ -110,7 +110,7 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `440 passed`
+- `.venv/bin/pytest`: `441 passed`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
 - `git diff --check`: 성공
