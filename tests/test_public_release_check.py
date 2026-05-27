@@ -295,6 +295,17 @@ def test_public_release_check_result_payload_omits_private_key_material(tmp_path
     assert key_material not in json.dumps(result, ensure_ascii=False)
 
 
+def test_public_release_check_result_payload_omits_secret_value(tmp_path: Path) -> None:
+    secret_value = "a" * 24
+    (tmp_path / "docs.md").write_text("LOCAL_API_KEY=" + secret_value, encoding="utf-8")
+
+    result = run_public_release_check(tmp_path)
+
+    assert result["ok"] is False
+    assert result["findings"][0]["path"] == "docs.md"
+    assert secret_value not in json.dumps(result, ensure_ascii=False)
+
+
 def test_public_release_check_json_cli_reports_success(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
