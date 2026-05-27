@@ -155,6 +155,8 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
         "slack token " + "xoxb-" + "a" * 24,
         "google api key " + "AIza" + "A" * 35,
         "aws key " + "AKIA" + "A" * 16,
+        "stripe secret key " + "sk_live_" + "a" * 24,
+        "stripe restricted key " + "rk_test_" + "a" * 24,
         "-----BEGIN " + "PRIVATE KEY-----\nabc\n-----END " + "PRIVATE KEY-----",
     ],
 )
