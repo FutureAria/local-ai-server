@@ -265,6 +265,25 @@ def test_public_release_check_json_cli_reports_private_key_without_key_material(
     assert key_material not in captured.out
 
 
+def test_public_release_check_human_cli_reports_private_key_without_key_material(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    key_material = "-----BEGIN " + "PRIVATE KEY-----\nabc\n-----END " + "PRIVATE KEY-----"
+    (tmp_path / "docs.md").write_text(key_material, encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path)]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 1
+    assert captured.err == ""
+    assert "ok=False" in captured.out
+    assert "[high] docs.md:" in captured.out
+    assert key_material not in captured.out
+
+
 def test_public_release_check_json_cli_reports_success(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
