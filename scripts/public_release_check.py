@@ -208,6 +208,7 @@ SECRET_TEXT_PATTERNS = [
     re.compile(r"ghp_[A-Za-z0-9]{36,}"),
     re.compile(r"glpat-[A-Za-z0-9_\-]{20,}"),
     re.compile(r"hf_[A-Za-z0-9]{30,}"),
+    re.compile(r"\bnpm_[A-Za-z0-9]{30,}\b"),
     re.compile(r"xox[baprs]-[A-Za-z0-9\-]{20,}"),
     re.compile(r"AIza[0-9A-Za-z\-_]{35}"),
     re.compile(r"AKIA[0-9A-Z]{16}"),

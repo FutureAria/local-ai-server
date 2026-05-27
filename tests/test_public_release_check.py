@@ -155,6 +155,7 @@ def test_public_release_check_flags_local_data_and_secret_candidate(tmp_path: Pa
         "github token " + "ghp_" + "a" * 36,
         "gitlab token " + "glpat-" + "a" * 20,
         "huggingface token " + "hf_" + "a" * 30,
+        "npm token " + "npm_" + "a" * 36,
         "slack token " + "xoxb-" + "a" * 24,
         "google api key " + "AIza" + "A" * 35,
         "aws key " + "AKIA" + "A" * 16,
