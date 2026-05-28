@@ -334,6 +334,7 @@ def test_public_release_check_json_cli_sensitive_path_omits_file_content(
     assert captured.err == ""
     assert payload["ok"] is False
     assert payload["findings"][0]["path"] == ".env"
+    assert payload["scanned_files"] == 0
     assert secret_value not in captured.out
 
 
