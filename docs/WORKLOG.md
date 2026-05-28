@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-28 09:07 KST
+
+### Public release sensitive path human scanned-files contract
+
+- `tests/test_public_release_check.py`의 `.env` human CLI 실패 출력 계약에 `scanned_files=0` assertion을 추가했다.
+- 민감 경로는 text scan을 건너뛰며 human CLI 출력에서도 scanned text file 개수에 포함되지 않는 경계를 고정했다.
+- 새 테스트를 추가하지 않고 기존 계약을 보강해 최신 전체 테스트 개수는 `555 passed`를 유지한다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `243 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `272 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `555 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-28 09:01 KST
 
 ### Public release sensitive path JSON scanned-files contract

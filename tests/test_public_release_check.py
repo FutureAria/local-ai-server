@@ -353,6 +353,7 @@ def test_public_release_check_human_cli_sensitive_path_omits_file_content(
     assert exc_info.value.code == 1
     assert captured.err == ""
     assert "ok=False" in captured.out
+    assert "scanned_files=0" in captured.out
     assert "[high] .env:" in captured.out
     assert secret_value not in captured.out
 
