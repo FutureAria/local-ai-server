@@ -1,5 +1,22 @@
 # WORKLOG
 
+## 2026-05-28 09:12 KST
+
+### Public release env example human redaction contract
+
+- `tests/test_public_release_check.py`에 `.env.example` 안의 실제 secret 후보가 human CLI 실패 출력에서 원문 노출 없이 보고되는지 검증하는 계약 테스트를 추가했다.
+- `.env.example`은 민감 경로 예외지만 text scan 대상이므로 실패 출력에서 `scanned_files=1`이 유지되는 경계를 고정했다.
+- 공개/최종/handoff 문서의 최신 pytest 수치 문구를 새 전체 테스트 개수인 `556 passed` 기준으로 맞췄다.
+- 외부 LLM API 추가, 시스템 의존성 설치, 운영 배포, Oracle 리소스 연결, 브라우저 조작, shell 실행 활성화, 파일 write/delete 실행 기능 활성화는 하지 않았다.
+
+### 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/pytest tests/test_public_release_check.py` | `244 passed, 1 warning` |
+| `.venv/bin/pytest tests/test_public_release_check.py tests/test_security_docs_contract.py tests/test_public_release_summary.py tests/test_portfolio_docs_contract.py tests/test_next_chat_handoff.py` | `273 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공, 내부 pytest `556 passed, 1 warning`, compileall 성공, public release check 성공, git diff check 성공 |
+
 ## 2026-05-28 09:07 KST
 
 ### Public release sensitive path human scanned-files contract

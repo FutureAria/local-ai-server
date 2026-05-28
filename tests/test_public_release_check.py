@@ -589,6 +589,26 @@ def test_public_release_check_flags_real_secret_inside_env_example(tmp_path: Pat
     assert "secret" in result["findings"][0]["message"]
 
 
+def test_public_release_check_human_cli_env_example_secret_omits_secret_value(
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    secret_value = "a" * 24
+    (tmp_path / ".env.example").write_text("LOCAL_API_KEY=" + secret_value, encoding="utf-8")
+
+    with patch("sys.argv", ["public_release_check.py", "--root", str(tmp_path)]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 1
+    assert captured.err == ""
+    assert "ok=False" in captured.out
+    assert "scanned_files=1" in captured.out
+    assert "[high] .env.example:" in captured.out
+    assert secret_value not in captured.out
+
+
 def test_public_release_check_counts_allowed_path_exceptions_as_scanned_text(tmp_path: Path) -> None:
     uploads = tmp_path / "data" / "uploads"
     uploads.mkdir(parents=True)
