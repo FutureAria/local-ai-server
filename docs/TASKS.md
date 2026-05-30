@@ -33,6 +33,7 @@
 
 ## Codex가 바로 이어서 할 수 있는 안전 작업
 
+- [x] OpenAI Codex for OSS 신청 준비용 공개 문구, GitHub checklist, 기여 가이드, 라이선스 정리
 - [x] README, API 문서, UI bridge 문서의 endpoint/response field 계약 테스트 유지
 - [x] runtime endpoint count drift check 유지
 - [x] README/Project Summary Runtime Contract Snapshot 값을 실제 API/CLI/smoke flow inventory와 비교하는 테스트 유지
@@ -48,6 +49,9 @@
 
 ## 사용자 수동 확인 작업
 
+- [ ] GitHub repository description과 topics를 `docs/CODEX_FOR_OSS_APPLICATION.md` 기준으로 설정
+- [ ] OpenAI Platform에서 Organization ID를 직접 확인해 공식 Codex for Open Source form에 입력
+- [ ] 공식 form 제출은 사용자가 로그인된 브라우저에서 직접 진행
 - [ ] 로컬 서버 실행 후 `GET /assistant/startup`이 실제 브라우저 UI 첫 화면에 올바르게 표시되는지 확인
 - [ ] `GET /assistant/ui-contract`의 startup sequence, refresh endpoint, response type, blocked action 표시 확인
 - [ ] `POST /assistant/bootstrap`의 project root, session, UI hint 표시 확인

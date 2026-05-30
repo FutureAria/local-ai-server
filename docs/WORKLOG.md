@@ -1,5 +1,18 @@
 # WORKLOG
 
+## 2026-05-31 00:20 KST
+
+### Codex for Open Source application prep
+
+- OpenAI 공식 Codex for Open Source form을 확인하고, 선정 가능성을 보장하지 않는 전제로 신청 가능한 공개 자료를 정리했다.
+- 대표 신청 후보를 `https://github.com/FutureAria/local-ai-server`로 잡았다.
+- `LICENSE`를 추가해 저장소의 오픈소스 사용 조건을 명시했다.
+- `CONTRIBUTING.md`를 추가해 local-first, Ollama-only, no-secrets, no-cloud/default-safe 기여 경계를 정리했다.
+- `docs/CODEX_FOR_OSS_APPLICATION.md`를 추가해 신청서 copy-ready 문구, GitHub profile/repo checklist, Decision Required 항목을 정리했다.
+- `README.md`의 상단에 `Who This Helps`를 추가하고 Key Docs에 신청 준비 문서, 기여 가이드, 라이선스를 연결했다.
+- `docs/TASKS.md`에 신청 전 GitHub 수동 작업과 공식 form 제출 작업을 추가했다.
+- 민감 정보, OpenAI Organization ID, API key, 계정 credential은 저장하지 않았다.
+
 ## 2026-05-28 09:12 KST
 
 ### Public release env example human redaction contract

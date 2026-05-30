@@ -10,6 +10,15 @@
 - Typer CLI는 FastAPI 백엔드를 HTTP로 호출해 API 계약을 재사용합니다.
 - Agent/assistant 기능은 preview, dry-run, approval, read-only 경계를 기본값으로 둡니다.
 
+## Who This Helps
+
+This project is for developers and students who want to experiment with private, local-first AI workflows:
+
+- Build a local document RAG backend without sending personal notes to external LLM APIs by default.
+- Reuse one FastAPI contract from CLI, tests, and future local UI surfaces.
+- Study practical backend boundaries for document upload, indexing, vector search, chat logs, feedback, and assistant-style previews.
+- Keep shell, browser, file automation, cloud resources, and external provider calls outside the default safe runtime.
+
 ## Current Status Snapshot
 
 | 구분 | 상태 | 공개용 설명 |
@@ -161,9 +170,12 @@ local-ai assistant
 - 브라우저 UI 연동 예시 payload: [docs/UI_BRIDGE_EXAMPLES.md](docs/UI_BRIDGE_EXAMPLES.md)
 - 브라우저 UI 수동 QA 기준: [docs/UI_QA_CHECKLIST.md](docs/UI_QA_CHECKLIST.md)
 - 문서 정합성 리뷰 handoff: [docs/CLAUDE_REVIEW_HANDOFF.md](docs/CLAUDE_REVIEW_HANDOFF.md)
+- OpenAI Codex for OSS 신청 준비: [docs/CODEX_FOR_OSS_APPLICATION.md](docs/CODEX_FOR_OSS_APPLICATION.md)
+- 기여 가이드: [CONTRIBUTING.md](CONTRIBUTING.md)
 - 작업 기록: [docs/WORKLOG.md](docs/WORKLOG.md)
 - 다음 작업 인계: [docs/NEXT_CHAT_HANDOFF.md](docs/NEXT_CHAT_HANDOFF.md)
 - 보안 기준: [SECURITY.md](SECURITY.md)
+- 라이선스: [LICENSE](LICENSE)
 
 ## 개발 배경
 
