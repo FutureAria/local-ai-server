@@ -49,7 +49,8 @@
 
 ## 사용자 수동 확인 작업
 
-- [ ] GitHub repository description과 topics를 `docs/CODEX_FOR_OSS_APPLICATION.md` 기준으로 설정
+- [x] GitHub repository description과 topics를 `docs/CODEX_FOR_OSS_APPLICATION.md` 기준으로 설정
+- [ ] GitHub profile bio를 직접 설정
 - [ ] OpenAI Platform에서 Organization ID를 직접 확인해 공식 Codex for Open Source form에 입력
 - [ ] 공식 form 제출은 사용자가 로그인된 브라우저에서 직접 진행
 - [ ] 로컬 서버 실행 후 `GET /assistant/startup`이 실제 브라우저 UI 첫 화면에 올바르게 표시되는지 확인

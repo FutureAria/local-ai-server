@@ -13,6 +13,14 @@
 - `docs/TASKS.md`에 신청 전 GitHub 수동 작업과 공식 form 제출 작업을 추가했다.
 - 민감 정보, OpenAI Organization ID, API key, 계정 credential은 저장하지 않았다.
 
+### GitHub setup follow-up
+
+- `Prepare Codex for OSS application` 커밋을 `origin/main`에 push했다.
+- GitHub API로 `FutureAria/local-ai-server` repository description을 설정했다.
+- GitHub API로 repository topics를 설정했다: `ai-assistant`, `chroma`, `developer-tools`, `fastapi`, `local-ai`, `ollama`, `privacy`, `rag`, `sqlite`, `typer`.
+- GitHub profile bio 변경은 현재 Git credential 권한에서 `404`가 반환되어 자동 완료하지 못했다.
+- OpenAI Organization ID 확인과 공식 form 제출은 로그인된 OpenAI 계정 화면에서 사용자가 직접 처리해야 하므로 저장하거나 자동 제출하지 않았다.
+
 ## 2026-05-28 09:12 KST
 
 ### Public release env example human redaction contract

@@ -95,13 +95,13 @@ Do these before submitting:
 - [ ] Set GitHub profile name and short bio.
 - [ ] Make sure profile visibility is public.
 - [ ] Set repository visibility to public.
-- [ ] Add repository description:
+- [x] Add repository description:
 
 ```text
 Local-first AI knowledge server with FastAPI, Ollama, SQLite, Chroma, RAG, and Typer CLI workflows.
 ```
 
-- [ ] Add repository topics:
+- [x] Add repository topics:
 
 ```text
 ollama, fastapi, rag, local-ai, chroma, sqlite, typer, privacy, ai-assistant, developer-tools
@@ -110,6 +110,20 @@ ollama, fastapi, rag, local-ai, chroma, sqlite, typer, privacy, ai-assistant, de
 - [ ] Confirm `README.md`, `SECURITY.md`, `CONTRIBUTING.md`, and `LICENSE` are visible on GitHub.
 - [ ] Confirm public release check passes before pushing.
 - [ ] Do not upload `.env`, local DB files, Chroma data, uploads, logs, API keys, OpenAI Organization ID, or private documents.
+
+## 2026-05-31 GitHub Setup Status
+
+Completed:
+
+- Committed and pushed application prep files to `main`.
+- Set repository description through the GitHub API.
+- Set repository topics through the GitHub API:
+  `ai-assistant`, `chroma`, `developer-tools`, `fastapi`, `local-ai`, `ollama`, `privacy`, `rag`, `sqlite`, `typer`.
+
+Not completed automatically:
+
+- GitHub profile bio update returned `404` through the available Git credential, likely because the credential can push to the repository but cannot update the user profile.
+- OpenAI Organization ID lookup and official form submission require the user's logged-in OpenAI account and should be completed directly by the user.
 
 ## Submit Link
 
