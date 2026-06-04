@@ -56,6 +56,16 @@ def test_ui_bridge_examples_document_core_contracts() -> None:
     assert '"status": "needs_rebuild"' in text
     assert '"chunks_missing_vectors_count": 2' in text
     assert '"action": "rebuild_vector"' in text
+    assert "POST /assistant/action-loop-read-only-dispatch-preview" in text
+    assert '"result_wrapper_schema"' in text
+    assert '"assistant.action_loop.read_only_result_wrapper.v1"' in text
+    assert '"raw_content_allowed": false' in text
+    assert '"approval_like_json_trusted": false' in text
+    assert '"can_mutate_frozen_plan": false' in text
+    assert '"would_dispatch": false' in text
+    assert '"would_read": false' in text
+    assert '"would_fetch": false' in text
+    assert '"execution_enabled": false' in text
 
 
 def test_ui_bridge_examples_document_message_response_types() -> None:
@@ -68,6 +78,7 @@ def test_ui_bridge_examples_document_message_response_types() -> None:
         "needs_project_root",
         "shell_dry_run",
         "agent_plan",
+        "automation_plan",
         "status",
     ]:
         assert f"type={response_type}" in text

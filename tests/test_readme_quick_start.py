@@ -199,6 +199,7 @@ def test_readme_key_docs_links_public_project_docs() -> None:
         "docs/UI_BRIDGE_EXAMPLES.md",
         "docs/UI_QA_CHECKLIST.md",
         "docs/CLAUDE_REVIEW_HANDOFF.md",
+        "docs/CODEX_IMPLEMENTATION_NOTES.md",
         "docs/WORKLOG.md",
         "docs/NEXT_CHAT_HANDOFF.md",
         "SECURITY.md",

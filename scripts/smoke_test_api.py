@@ -55,6 +55,7 @@ ASSISTANT_BRIDGE_SMOKE_FLOW = [
     "api-inventory",
     "assistant-bootstrap",
     "assistant-action-preview",
+    "assistant-read-only-result-wrapper",
     "assistant-message",
     "assistant-sessions",
     "assistant-messages",
@@ -330,6 +331,34 @@ def run_assistant_bridge_smoke_test(base_url: str, project_root: str | None = No
             }
         )
 
+        wrapper_preview = client.post(
+            f"{base_url}/assistant/action-loop-read-only-dispatch-preview",
+            json={
+                "goal": "read-only result wrapper smoke",
+                "project_root": project_root,
+                "proposed_steps": [],
+            },
+            headers=headers,
+        )
+        _raise_for_status("assistant-read-only-result-wrapper", wrapper_preview)
+        wrapper_body = wrapper_preview.json()
+        wrapper_schema = wrapper_body.get("result_wrapper_schema", {})
+        summary["steps"].append(
+            {
+                "step": "assistant-read-only-result-wrapper",
+                "status": wrapper_preview.status_code,
+                "schema": wrapper_schema.get("schema"),
+                "contract_mode": wrapper_schema.get("contract_mode"),
+                "raw_content_allowed": wrapper_schema.get("raw_content_allowed"),
+                "approval_like_json_trusted": wrapper_schema.get("approval_like_json_trusted"),
+                "can_mutate_frozen_plan": wrapper_schema.get("can_mutate_frozen_plan"),
+                "would_dispatch": wrapper_body.get("would_dispatch"),
+                "would_read": wrapper_body.get("would_read"),
+                "would_fetch": wrapper_body.get("would_fetch"),
+                "execution_enabled": wrapper_body.get("execution_enabled"),
+            }
+        )
+
         message = client.post(
             f"{base_url}/assistant/message",
             json={"message": "현재 상태 알려줘", "project_root": project_root, "mode": "auto"},
@@ -418,6 +447,15 @@ def build_sanitized_smoke_summary(summary: dict) -> dict:
             "has_project_root",
             "intent",
             "would_execute",
+            "schema",
+            "contract_mode",
+            "raw_content_allowed",
+            "approval_like_json_trusted",
+            "can_mutate_frozen_plan",
+            "would_dispatch",
+            "would_read",
+            "would_fetch",
+            "execution_enabled",
             "response_type",
             "sessions_count",
             "total_messages",

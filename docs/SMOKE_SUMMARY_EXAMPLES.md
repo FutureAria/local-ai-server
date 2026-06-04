@@ -91,8 +91,8 @@
     {
       "step": "api-inventory",
       "status": 200,
-      "endpoints_count": 51,
-      "protected_endpoints_count": 35
+      "endpoints_count": 94,
+      "protected_endpoints_count": 78
     },
     {
       "step": "assistant-bootstrap",
@@ -105,6 +105,19 @@
       "status": 200,
       "intent": "status",
       "would_execute": false
+    },
+    {
+      "step": "assistant-read-only-result-wrapper",
+      "status": 200,
+      "schema": "assistant.action_loop.read_only_result_wrapper.v1",
+      "contract_mode": "preview-only",
+      "raw_content_allowed": false,
+      "approval_like_json_trusted": false,
+      "can_mutate_frozen_plan": false,
+      "would_dispatch": false,
+      "would_read": false,
+      "would_fetch": false,
+      "execution_enabled": false
     },
     {
       "step": "assistant-message",

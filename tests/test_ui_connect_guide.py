@@ -36,6 +36,7 @@ def test_ui_connect_guide_documents_startup_flow() -> None:
         "GET /assistant/startup",
         "POST /assistant/bootstrap",
         "POST /assistant/action-preview",
+        "POST /assistant/automation-plan",
         "POST /assistant/message",
         "GET /assistant/sessions/{session_id}/messages",
         "GET /project/api-inventory",

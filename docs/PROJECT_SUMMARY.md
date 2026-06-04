@@ -49,10 +49,20 @@ CLI / curl
 |---|---|---|
 | 문서 업로드, 검색, RAG | 가능 | 로컬 파일을 chunking, embedding, SQLite/Chroma 저장 후 Ollama로 답변한다. |
 | CLI와 HTTP API | 가능 | CLI는 백엔드 HTTP API를 호출하며 비즈니스 로직을 중복 구현하지 않는다. |
-| Assistant UI bridge | 가능 | startup, bootstrap, action-preview, message, sessions API를 제공하되 UI 자체는 만들지 않는다. |
+| Assistant UI bridge | 가능 | startup, bootstrap, action-preview, automation-plan, workflow-presets, task-queue locked preview, failure-recovery preview, rollback approval/execute, read-only scan/file-preview/url-preview/web-search-provider-preview/app-os-interaction-preview/workspace-brief, shell sandbox, patch sandbox, message, sessions API를 제공하되 UI 자체는 만들지 않는다. |
 | Agent plan/approval | 가능 | 요청을 실행하지 않고 action 후보, 위험도, 승인 상태로 기록한다. |
 | Agent execution v1 | 조건부 read-only | 기본값은 차단이며, 활성화해도 허용 root 폴더 목록 조회, 텍스트 preview, 명시 URL 단건 read-only fetch만 지원한다. |
-| shell 명령 | dry-run only | `shell-policy`, `shell-dry-run`은 정책 판단만 수행하고 실제 shell 실행은 하지 않는다. |
+| shell 명령 | dry-run only 기본값 / locked preview / env opt-in allowlist execution | `shell-policy`, `shell-dry-run`, `assistant-shell-preview`, `assistant-shell-approval-preview`는 정책 판단과 audit만 수행한다. `assistant-shell-run`은 `SHELL_EXECUTION_ENABLED=true`에서만 27차 allowlist 단건 subprocess를 실행한다. |
+| patch 명령 | locked preview 기본값 / env opt-in single-file apply | `assistant-patch-preview`, `assistant-patch-approval-preview`는 diff preview, secret scan, rollback note, approval binding만 수행한다. `assistant-patch-apply`는 `PATCH_APPLY_ENABLED=true`, 서버 approval, path allowlist, `original_sha256` precondition을 통과한 기존 UTF-8 단일 파일만 덮어쓴다. |
+| browser/app interaction | locked preview / env opt-in observe and candidate validation only | `assistant-browser-preview`, `assistant-browser-approval-preview`, `assistant-browser-interact`은 read-only action taxonomy, approval binding, locked audit만 수행한다. `POST /assistant/browser-observe`는 `BROWSER_OBSERVE_ENABLED=true`에서만 loopback/명시 allowlist URL의 read-only metadata를 untrusted wrapper로 반환한다. `POST /assistant/browser-limited-interact`는 `BROWSER_LIMITED_INTERACTION_ENABLED=true`에서도 selector/origin/field/approval 후보 검증만 수행한다. 실제 click/fill/submit/login/payment/delete, browser profile/session mutation, OS app control은 하지 않는다. |
+| external web search provider | locked preview / env opt-in brave search | `/assistant/web-search-provider-preview`는 provider_not_configured, query masking, private/LAN/metadata URL block, untrusted result wrapper required를 반환한다. `/assistant/web-search-provider/search`는 `EXTERNAL_WEB_SEARCH_ENABLED=true`, `EXTERNAL_WEB_SEARCH_PROVIDER=brave`, API key, rate limit, query safety, untrusted wrapper를 모두 통과한 단건 search만 수행한다. action-loop external dispatch에는 연결하지 않는다. |
+| app/os interaction | locked preview only | `/assistant/app-os-interaction-preview`는 observe-plan 후보와 permission model만 반환하고 실제 app open/click/type/hotkey/file dialog를 수행하지 않는다. |
+| workflow presets | preview only | `/assistant/workflow-presets` 계열은 안전한 preset list/detail과 frozen proposed_steps 후보만 반환하고 실제 dispatch를 수행하지 않는다. |
+| long-running task queue | env opt-in one-shot drain | `/assistant/task-queue` 계열은 no-op/read-only task 상태와 cancellation state를 반환한다. `/assistant/task-queue/drain`은 `TASK_QUEUE_WORKER_ENABLED=true`에서만 request-scoped one-shot drain으로 `noop`, `read_only_scan`, `file_preview` task를 처리하며 daemon/service/background loop나 shell/patch/browser 실행을 시작하지 않는다. |
+| failure recovery / rollback | locked preview 기본값 / env opt-in single-file restore | `/assistant/failure-recovery-preview`는 failure reason taxonomy와 rollback plan만 반환한다. `/assistant/rollback-execute`는 `ROLLBACK_EXECUTOR_ENABLED=true`, rollback 전용 approval, allowed root, existing UTF-8 file, current/original hash precondition을 모두 통과한 단일 파일 restore만 수행한다. git reset, bulk restore, shell/browser/app-os rollback은 수행하지 않는다. |
+| production hardening | docs/tests/contracts | 1~24차 capabilities honesty, locked/preview/read-only/candidate 경계, public release scanner, local CI green 상태를 테스트와 문서로 고정했다. 운영 배포는 수행하지 않았다. |
+| action-loop dispatch | preflight / no-op / read-only env opt-in / shell allowlist env opt-in / patch single-file env opt-in | `assistant-action-loop-preflight`는 frozen plan gate, `assistant-action-loop-noop-dispatch`는 route plan/noop audit, `assistant-action-loop-read-only-dispatch-preview`는 read-only adapter boundary와 `docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md`의 result wrapper schema를 확인한다. `assistant-action-loop-read-only-dispatch`는 `docs/READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md` 기준 read-only adapter만, `assistant-action-loop-shell-dispatch`는 27차 shell allowlist step만, `assistant-action-loop-patch-dispatch`는 29차 단일 파일 patch step만 env opt-in으로 호출한다. browser/external API/task worker/rollback/app-os dispatch는 수행하지 않는다. |
+| full personal automation | env opt-in safe orchestrator | `POST /assistant/full-automation-preflight`, `POST /assistant/full-automation-dispatch`는 shell/patch/read-only/rollback/task/browser/external/app-os 후보를 통합 route plan으로 분류한다. 기본값 `FULL_AUTOMATION_DISPATCH_ENABLED=false`에서는 dispatch와 approval consume을 하지 않는다. 47차 기준 flag true와 read-only adapter, allowlist shell, single-file patch, single-file rollback, read-only task queue, browser observe, browser limited candidate validation, `brave` external web search flag/precondition, app-os observe-plan preview를 각각 만족한 category step만 기존 boundary로 처리한다. browser observe는 HTTP metadata/title/current URL 수준이고 browser limited는 candidate validation only이며 external search는 provider-gated 단건 search only, app-os는 preview wrapper only다. gate/audit/safety matrix는 safe/preview/mutating connector 상태를 명시하고 browser actual interaction/app-os actual action/action-loop full dispatch는 미연결이다. 48차에서는 Full Automation Action-loop Dispatch Decision Required를 문서/테스트로 고정했고, 61~70차 Local Jarvis runtime drift guard, failure/timeout drill, manual review packet, approval console state-only/hash/cleanup review, API surface Decision Required, approval-console-read-only API는 실제 action-loop full dispatch를 계속 금지한다. 70차 approval console read-only API는 pending/list/detail/cleanup만 protected endpoint로 열고 approve/reject routes not added, raw approval id not included, payload_hash not included, `audit_summary_hash`, `approval_consumed=false`, `would_execute=false`, cleanup is not approval consume을 유지한다. 71차 Durable Automation v2 Candidate Decision Required는 durable-automation-v2-candidate-decision-required 상태로 persistence/recovery/replay boundary만 문서화하고 no durable worker started, no scheduler started, no daemon/service/background loop, no automatic replay, no autonomous recovery를 고정한다. 72차 Durable State Preview Schema Candidate는 durable-state-preview-schema-candidate 상태로 `state_schema_version=durable_state_preview.v1`, `state_status=candidate-preview`, proposal-only contract, schema-only, no durable storage migration, no durable table created, `state_preview_is_not_execution`, `state_preview_does_not_consume_approval`, `state_preview_does_not_mutate_queue`, `would_persist=false`, `approval_consumed=false`를 고정한다. 73차 Durable State Preview API Surface Decision Required는 endpoint exposure remains blocked, no durable-state-preview endpoints added, route_absence_is_required, `would_expose_endpoint=false`를 고정했다. 74차 Durable State Preview Read-only API Candidate는 `POST /assistant/durable-state-preview/preview` 하나만 protected endpoint only로 열고 durable-state-preview-read-only, response-only/read-only/schema-only, masked response only, raw approval id not included, payload_hash not included, `audit_summary_hash`, `would_execute=false`, `would_persist=false`, `would_dispatch=false`, `approval_consumed=false`를 유지한다. 75차 Durable State Preview API Regression Guard는 nested sensitive key redaction, route inventory drift, absent stored preview routes, no persistence mutation, no approval consume, no queue mutation을 테스트로 보강한다. 76차 Durable State Preview Docs/API Drift Guard는 API docs response fields, public docs endpoint listing, security boundary, release summary, handoff 문구가 `AssistantDurableStatePreviewResponse`와 runtime route inventory를 계속 반영하는지 고정한다. stored preview lookup/list/cleanup remain Decision Required이며 `GET /assistant/durable-state-preview/{preview_state_id} remains absent`, `GET /assistant/durable-state-preview remains absent`, `POST /assistant/durable-state-preview/cleanup-expired remains absent`다. 사용자 최종 승인과 Opus 리뷰 전까지 `action_loop_full_dispatch_connected=false`, `browser_actual_interaction_connected=false`, `app_os_actual_action_connected=false`를 유지한다. |
 | 브라우저/파일/배포 | 금지 | 브라우저 클릭/입력, 폴더 UI 열기, 파일 생성/수정/삭제, 운영 배포, 클라우드/Oracle 리소스 변경은 구현 범위 밖이다. |
 | 외부 LLM API/cloud vector DB | 금지 | 런타임 AI 호출은 Ollama local API만 사용한다. |
 
@@ -60,12 +70,12 @@ CLI / curl
 
 | 항목 | 현재 값 | 기준 |
 |---|---:|---|
-| FastAPI endpoints | 51 | `build_api_inventory(app.routes).endpoints_count` |
-| Protected endpoints | 35 | `build_api_inventory(app.routes).protected_endpoints_count` |
+| FastAPI endpoints | 94 | `build_api_inventory(app.routes).endpoints_count` |
+| Protected endpoints | 78 | `build_api_inventory(app.routes).protected_endpoints_count` |
 | Public endpoints | 16 | `build_api_inventory(app.routes).public_endpoints_count` |
-| Typer CLI commands | 52 | `typer.main.get_command(cli.main.app).commands` |
+| Typer CLI commands | 69 | `typer.main.get_command(cli.main.app).commands` |
 | Document/RAG smoke steps | 6 | `DOCUMENT_RAG_SMOKE_FLOW` |
-| Assistant bridge smoke steps | 7 | `ASSISTANT_BRIDGE_SMOKE_FLOW` |
+| Assistant bridge smoke steps | 8 | `ASSISTANT_BRIDGE_SMOKE_FLOW` |
 | Assistant bridge preflight steps | 3 | `ASSISTANT_BRIDGE_PREFLIGHT_FLOW` |
 
 이 표는 Project Summary의 요약 숫자가 실제 route, CLI command, smoke flow와 어긋나지 않도록 pytest로 검증한다.
@@ -87,6 +97,49 @@ Assistant:
 
 - `GET /assistant/capabilities`
 - `POST /assistant/action-preview`
+- `POST /assistant/action-loop-preflight`
+- `POST /assistant/action-loop-noop-dispatch`
+- `POST /assistant/action-loop-read-only-dispatch-preview`
+- `POST /assistant/action-loop-read-only-dispatch`
+- `POST /assistant/action-loop-shell-dispatch`
+- `POST /assistant/action-loop-patch-dispatch`
+- `POST /assistant/full-automation-preflight`
+- `POST /assistant/full-automation-dispatch`
+- `POST /assistant/automation-plan`
+- `GET /assistant/workflow-presets`
+- `GET /assistant/workflow-presets/{preset_id}`
+- `POST /assistant/workflow-presets/{preset_id}/preview`
+- `POST /assistant/task-queue/preview`
+- `GET /assistant/task-queue`
+- `POST /assistant/task-queue/drain`
+- `GET /assistant/task-queue/{task_id}`
+- `POST /assistant/task-queue/{task_id}/cancel-preview`
+- `POST /assistant/failure-recovery-preview`
+- `POST /assistant/rollback-approval-preview`
+- `POST /assistant/rollback-execute`
+- `POST /assistant/read-only-scan`
+- `POST /assistant/file-preview`
+- `POST /assistant/url-preview`
+- `POST /assistant/read-only-adapter/execute`
+- `POST /assistant/web-search-provider-preview`
+- `POST /assistant/web-search-provider/search`
+- `POST /assistant/app-os-interaction-preview`
+- `POST /assistant/workspace-brief`
+- `POST /assistant/shell-preview`
+- `POST /assistant/shell-approval-preview`
+- `POST /assistant/shell-run`
+- `POST /assistant/durable-state-preview/preview`
+- `GET /assistant/approval-console/pending`
+- `GET /assistant/approval-console/{approval_id}`
+- `POST /assistant/approval-console/cleanup-expired`
+- `POST /assistant/patch-preview`
+- `POST /assistant/patch-approval-preview`
+- `POST /assistant/patch-apply`
+- `POST /assistant/browser-preview`
+- `POST /assistant/browser-approval-preview`
+- `POST /assistant/browser-interact`
+- `POST /assistant/browser-observe`
+- `POST /assistant/browser-limited-interact`
 - `GET /assistant/ping`
 - `GET /assistant/config`
 - `GET /assistant/ui-contract`
@@ -157,6 +210,23 @@ local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-preflight "개인 API dispatch" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-noop-dispatch "개인 API dispatch" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-read-only-dispatch-preview "read only dispatch" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-automation-plan "내 개인 API 자동화" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-read-only-scan /Users/juyoung/local-ai-server
+local-ai assistant-file-preview /Users/juyoung/local-ai-server/README.md --project-root /Users/juyoung/local-ai-server
+local-ai assistant-url-preview https://example.com
+local-ai assistant-workspace-brief /Users/juyoung/local-ai-server
+local-ai assistant-shell-preview "git status" --cwd /Users/juyoung/local-ai-server
+local-ai assistant-shell-approval-preview "git status" --cwd /Users/juyoung/local-ai-server --reason "local CI"
+local-ai assistant-shell-run "git status" --cwd /Users/juyoung/local-ai-server
+local-ai assistant-patch-preview /Users/juyoung/local-ai-server/README.md "# local-ai-server"
+local-ai assistant-patch-approval-preview /Users/juyoung/local-ai-server/README.md "# local-ai-server" --reason "docs"
+local-ai assistant-patch-apply /Users/juyoung/local-ai-server/README.md "# local-ai-server"
+local-ai assistant-browser-preview observe --target-url https://example.com
+local-ai assistant-browser-approval-preview screenshot --target-url https://example.com --reason "read-only QA"
+local-ai assistant-browser-interact observe --target-url https://example.com
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-ui-contract
@@ -227,18 +297,22 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `556 passed`
+- `.venv/bin/pytest`: `815 passed, 1 warning`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
 - `.venv/bin/python scripts/local_ci_check.py --root .`: pytest, compileall, public release check, git diff check를 순서대로 실행 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000`: 실행 중인 서버 기준 문서/RAG E2E smoke test 가능
 - `python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server`: 실행 중인 서버 기준 Assistant UI bridge smoke test 가능
-- `.venv/bin/python scripts/public_release_check.py --root . --json`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능
+- `.venv/bin/python scripts/public_release_check.py --root . --json`: GitHub 공개 전 로컬 데이터/secret 후보 read-only 점검 가능. 최신 검증 기준 `ok=true`, `scanned_files=134`, finding 없음
 - `local-ai agent-plan "GitHub 웹 열고 내 폴더도 열어줘"`: 실행형 Agent 계획 생성 가능
 - `local-ai agent-approve 1`: agent plan 승인 상태 기록 가능. 실제 실행은 하지 않음
 - `local-ai agent-execute 1`: 승인된 run 실행 시도 가능. 기본 설정에서는 고위험 실행을 차단함
 - `local-ai assistant` 내부 `/summary`, `/roots`, `/status`, `/next`, `/shell-policy`, `/shell-dry-run pwd`: 로컬 비서 세션과 안전 정책 확인 가능
 - `local-ai assistant-message "질문" --project-root /Users/juyoung/local-ai-server`: UI bridge와 같은 `/assistant/message` 호출 가능
 - `local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server`: 실제 실행 없이 intent, 위험도, 필요 입력값 preview 가능
+- `local-ai assistant-action-loop-preflight "개인 API dispatch" --project-root /Users/juyoung/local-ai-server`: 실제 dispatch 없이 frozen plan preflight 확인 가능
+- `local-ai assistant-action-loop-noop-dispatch "개인 API dispatch" --project-root /Users/juyoung/local-ai-server`: 실제 dispatch 없이 no-op route plan과 audit 확인 가능
+- `local-ai assistant-action-loop-read-only-dispatch-preview "read only dispatch" --project-root /Users/juyoung/local-ai-server`: 실제 dispatch/파일 읽기/URL fetch 없이 read-only boundary 분류 가능
+- `local-ai assistant-automation-plan "내 개인 API 자동화" --project-root /Users/juyoung/local-ai-server`: 현재 가능/차단/승인 필요 범위를 plan-only로 확인 가능
 - `local-ai assistant-ping`, `local-ai assistant-config`, `local-ai assistant-dashboard`: UI 연결 확인, secret 없는 설정 조회, 대시보드 카드 상태 확인 가능
 - `local-ai assistant-ui-contract`: UI 시작 순서, refresh endpoint, 메시지 흐름, 응답 타입, 차단 기능 계약 요약 확인 가능
 - `local-ai assistant-startup`: UI 초기 렌더링용 ping/config/dashboard/ui-contract snapshot 확인 가능
@@ -287,6 +361,11 @@ optional dependency 설치 시 지원:
 - `README.md`
 - `docs/API.md`
 - `docs/TASKS.md`
+- `docs/DURABLE_AUTOMATION_V2_CANDIDATE_DECISION_REQUIRED.md`
+- `docs/DURABLE_STATE_PREVIEW_SCHEMA_CANDIDATE.md`
+- `docs/DURABLE_STATE_PREVIEW_API_SURFACE_DECISION_REQUIRED.md`
+- `docs/LOCAL_JARVIS_V1_CANDIDATE_DECISION_REQUIRED.md`
+- `docs/LOCAL_JARVIS_APPROVAL_GATE_REVIEW.md`
 - `docs/OCR_INTEGRATION_PLAN.md`
 - `docs/USER_DOCUMENT_E2E_PLAN.md`
 - `docs/SMOKE_SUMMARY_EXAMPLES.md`

@@ -45,8 +45,11 @@ ollama pull nomic-embed-text
 1. `GET /assistant/startup`
 2. `POST /assistant/bootstrap`
 3. `POST /assistant/action-preview`
-4. 사용자가 확인한 뒤 `POST /assistant/message`
-5. 필요하면 `GET /assistant/sessions/{session_id}/messages`
+4. 자동화 목표가 있으면 `POST /assistant/automation-plan`
+5. shell 후보는 `POST /assistant/shell-preview`로 locked preview만 확인
+6. patch 후보는 `POST /assistant/patch-preview`로 diff/secret scan/rollback note만 확인
+7. 사용자가 확인한 뒤 `POST /assistant/message`
+8. 필요하면 `GET /assistant/sessions/{session_id}/messages`
 
 개발/디버그 화면에서 현재 endpoint 목록을 보여주려면 `GET /project/api-inventory`를 호출한다.
 
@@ -95,7 +98,8 @@ python scripts/smoke_test_api.py --base-url http://127.0.0.1:8010 --assistant-br
 | `api-inventory` | `endpoints_count`, `protected_endpoints_count` | endpoint 수와 보호 endpoint 수가 표시됨 |
 | `assistant-bootstrap` | `ui_ready`, `has_project_root` | `ui_ready=true`, project root 검증 결과 포함 |
 | `assistant-action-preview` | `intent`, `would_execute` | `intent=status`, `would_execute=false` |
-| `assistant-message` | `session_id`, `response_type` | `session_id` 존재, `response_type=status` |
+| `assistant-read-only-result-wrapper` | `schema`, `contract_mode`, `raw_content_allowed`, `approval_like_json_trusted`, `can_mutate_frozen_plan`, `would_dispatch`, `would_read`, `would_fetch`, `execution_enabled` | `assistant.action_loop.read_only_result_wrapper.v1`, `preview-only`, 모든 실행 flag `false` |
+| `assistant-message` | `response_type` | `response_type=status` |
 | `assistant-sessions` | `sessions_count` | 최근 세션 수 표시 |
 | `assistant-messages` | `total_messages` | paging 가능한 메시지 수 표시 |
 
@@ -163,6 +167,8 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 | `capabilities.safe_defaults` | 기본 차단 정책 표시 |
 | `status.current_phase` | 현재 프로젝트 차수 표시 |
 | `status.safety` | shell/browser/file/external LLM 상태 표시 |
+| `status.safety.shell_sandbox_execution` | shell sandbox가 `locked`인지 표시 |
+| `status.safety.patch_apply` | 기본값 patch apply가 `locked`인지, env opt-in 결과가 단일 파일 apply인지 표시 |
 | `project_root.safe_for_read_only_agent` | 입력한 project root 사용 가능 여부 표시 |
 | `sessions.sessions` | 최근 대화 목록 표시 |
 | `recommended_calls` | 다음 호출 후보 표시 |
@@ -179,6 +185,44 @@ curl -X POST http://127.0.0.1:8000/assistant/message \
 | `needs_project_root` | project root 입력 warning |
 | `shell_dry_run` | shell 정책 판단 panel |
 | `agent_plan` | 실행 대신 계획/승인 필요 panel |
+| `automation_plan` | 개인 API 자동화 준비도 panel |
+| `workflow_presets` | personal workflow preset list panel |
+| `workflow_preset_detail` | personal workflow preset detail panel |
+| `workflow_preset_preview` | personal workflow preset preview panel |
+| `task_queue_preview` | locked long-running task queue create preview panel |
+| `task_queue` | locked long-running task queue list panel |
+| `task_queue_drain` | one-shot task queue worker drain panel |
+| `task_queue_detail` | locked long-running task queue detail panel |
+| `task_queue_cancel_preview` | locked long-running task cancellation preview panel |
+| `failure_recovery_preview` | locked failure recovery and rollback plan panel |
+| `rollback_approval_preview` | rollback approval binding preview panel |
+| `rollback_execute` | single-file rollback execution panel |
+| `read_only_scan` | 프로젝트 구조 read-only scan panel |
+| `file_preview` | masked 파일 preview panel |
+| `url_preview` | URL fetch preflight panel |
+| `web_search_provider_preview` | locked external web search provider gate panel |
+| `web_search_provider_search` | external web search provider result panel |
+| `app_os_interaction_preview` | locked app/OS interaction gate panel |
+| `workspace_brief` | workspace brief panel |
+| `shell_preview` | locked shell sandbox preview panel |
+| `shell_approval_preview` | approval binding preview panel |
+| `shell_run_locked` | shell run locked response panel |
+| `patch_preview` | locked patch diff preview panel |
+| `patch_approval_preview` | patch approval binding preview panel |
+| `patch_apply_locked` | patch apply locked response panel |
+| `patch_apply` | single-file patch apply result panel |
+| `browser_preview` | locked browser/app interaction preview panel |
+| `browser_approval_preview` | browser/app approval binding preview panel |
+| `browser_interact_locked` | browser/app interact locked response panel |
+| `browser_observe` | browser observe read-only result panel |
+| `browser_limited_interact` | browser limited interaction candidate panel |
+| `action_loop_preflight` | locked action-loop dispatch preflight panel |
+| `action_loop_noop_dispatch` | no-op action-loop route plan panel |
+| `action_loop_read_only_dispatch_preview` | read-only dispatch boundary preview panel |
+| `action_loop_shell_dispatch` | shell action-loop allowlist dispatch panel |
+| `action_loop_patch_dispatch` | patch action-loop single-file dispatch panel |
+| `full_automation_preflight` | full personal automation route preflight panel |
+| `full_automation_dispatch` | full personal automation dispatch gate panel |
 | `status` | 프로젝트 상태 panel |
 | `action_preview` | 전송 전 intent preview panel |
 
@@ -253,11 +297,39 @@ export async function sendAssistantMessage(localApiKey, message) {
 - `safety.shell_execution`: `disabled`
 - `safety.shell_dry_run`: `blocked` 또는 dry-run 정책 판단 결과
 - `safety.browser_interaction`: `blocked`
+- `safety.browser_interaction_preview`: `locked`
+- `safety.action_loop_dispatch`: `disabled`
+- `safety.action_loop_preflight`: `locked`
 - `safety.file_write_delete`: `blocked`
+- `safety.patch_apply`: 기본값 `locked`; env opt-in 결과에서는 단일 파일 apply 상태
 - `safety.folder_index`: `preview-only via assistant`
 - `safety.external_llm_api`: `not-used`
+- `safety.external_web_search`: `disabled`
+- `safety.external_api_enabled`: `false`
+- `safety.app_os_control`: `disabled`
+- `safety.os_action_execution`: `disabled`
+
+`blocked_actions`에는 `shell_execution`, `browser_interaction`, `file_write_delete`, `external_llm_api`, `external_web_search`, `app_os_control`이 표시되어야 한다.
 
 이 값이 위와 다르게 보이거나, UI가 실행 버튼을 활성화하려고 하면 연결을 멈추고 보안 리뷰를 먼저 진행한다.
+
+7차 browser/app interaction preview를 표시할 때는 `browser_preview`, `browser_approval_preview`, `browser_interact_locked` response type만 panel로 렌더링한다. `would_interact=false`, `execution_enabled=false`가 아닌 응답은 안전한 UI 계약으로 취급하지 않는다.
+
+31차 browser observe를 표시할 때는 `browser_observe` response type만 panel로 렌더링한다. `observe_result`와 `result_wrapper`는 untrusted metadata로만 표시하고, raw page content, approval-like JSON, next action, frozen plan mutation으로 승격하지 않는다.
+
+32차 browser limited interaction을 표시할 때는 `browser_limited_interact` response type만 panel로 렌더링한다. `policy`, `interaction_result`, `result_wrapper`는 candidate validation 결과로만 표시하고 실제 browser launch/click/fill 완료로 표현하지 않는다.
+
+33차 external web search를 표시할 때는 `web_search_provider_search` response type만 panel로 렌더링한다. `search_result`와 `result_wrapper`는 untrusted 결과로만 표시하고 API key 원문, raw content, approval-like JSON, next action으로 승격하지 않는다.
+
+8차 action-loop preflight를 표시할 때는 `action_loop_preflight` response type만 panel로 렌더링한다. `would_dispatch=false`, `execution_enabled=false`가 아닌 응답은 안전한 UI 계약으로 취급하지 않는다.
+
+10차 no-op dispatcher를 표시할 때는 `action_loop_noop_dispatch` response type만 panel로 렌더링한다. `route_plan`과 `noop_audit`은 routing preview로만 보여주고, `approval_consume_mode=validate-only`, `would_dispatch=false`, `execution_enabled=false`가 아닌 응답은 안전한 UI 계약으로 취급하지 않는다.
+
+11차 read-only dispatch boundary preview를 표시할 때는 `action_loop_read_only_dispatch_preview` response type만 panel로 렌더링한다. `route_plan`과 `boundary_audit`은 classification-only preview로만 보여주고, `would_dispatch=false`, `would_read=false`, `would_fetch=false`, `execution_enabled=false`가 아닌 응답은 안전한 UI 계약으로 취급하지 않는다.
+
+28차 shell action-loop dispatch를 표시할 때는 `action_loop_shell_dispatch` response type만 panel로 렌더링한다. `route_plan`과 `shell_results`를 표시하되 shell 결과는 untrusted wrapper이며 frozen plan이나 다음 step으로 승격하지 않는다.
+
+30차 patch action-loop dispatch를 표시할 때는 `action_loop_patch_dispatch` response type만 panel로 렌더링한다. `route_plan`과 `patch_results`를 표시하되 patch 결과는 untrusted wrapper이며 frozen plan이나 다음 step으로 승격하지 않는다.
 
 ## 연결 문제 확인
 

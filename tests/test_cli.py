@@ -19,6 +19,23 @@ DIRECT_HTTP_CLI_ROUTE_CASES = [
     (["assistant-status"], "GET", "/assistant/status"),
     (["assistant-dashboard"], "GET", "/assistant/dashboard"),
     (["assistant-action-preview", "브라우저 열어줘"], "POST", "/assistant/action-preview"),
+    (["assistant-action-loop-preflight", "개인 API dispatch"], "POST", "/assistant/action-loop-preflight"),
+    (["assistant-action-loop-noop-dispatch", "개인 API dispatch"], "POST", "/assistant/action-loop-noop-dispatch"),
+    (["assistant-action-loop-read-only-dispatch-preview", "read only"], "POST", "/assistant/action-loop-read-only-dispatch-preview"),
+    (["assistant-automation-plan", "내 개인 API 자동화"], "POST", "/assistant/automation-plan"),
+    (["assistant-read-only-scan", "/tmp/project"], "POST", "/assistant/read-only-scan"),
+    (["assistant-file-preview", "/tmp/project/README.md"], "POST", "/assistant/file-preview"),
+    (["assistant-url-preview", "https://example.com"], "POST", "/assistant/url-preview"),
+    (["assistant-workspace-brief", "/tmp/project"], "POST", "/assistant/workspace-brief"),
+    (["assistant-shell-preview", "git status"], "POST", "/assistant/shell-preview"),
+    (["assistant-shell-approval-preview", "git status"], "POST", "/assistant/shell-approval-preview"),
+    (["assistant-shell-run", "git status"], "POST", "/assistant/shell-run"),
+    (["assistant-patch-preview", "/tmp/project/note.md", "hello"], "POST", "/assistant/patch-preview"),
+    (["assistant-patch-approval-preview", "/tmp/project/note.md", "hello"], "POST", "/assistant/patch-approval-preview"),
+    (["assistant-patch-apply", "/tmp/project/note.md", "hello"], "POST", "/assistant/patch-apply"),
+    (["assistant-browser-preview", "observe"], "POST", "/assistant/browser-preview"),
+    (["assistant-browser-approval-preview", "screenshot"], "POST", "/assistant/browser-approval-preview"),
+    (["assistant-browser-interact", "observe"], "POST", "/assistant/browser-interact"),
     (["assistant-ui-contract"], "GET", "/assistant/ui-contract"),
     (["assistant-startup"], "GET", "/assistant/startup"),
     (["assistant-bootstrap"], "POST", "/assistant/bootstrap"),
@@ -186,6 +203,76 @@ class FakeClient:
                     "needs": [],
                 }
             )
+        if url.endswith("/assistant/automation-plan"):
+            return FakeResponse(
+                {
+                    "goal": kwargs.get("json", {}).get("goal", "personal API automation"),
+                    "would_execute": False,
+                    "blocked_until_review": ["실제 shell 실행"],
+                }
+            )
+        if url.endswith("/assistant/action-loop-preflight"):
+            return FakeResponse(
+                {
+                    "mode": "action-loop-dispatch-preflight-locked",
+                    "would_dispatch": False,
+                    "execution_enabled": False,
+                    "fail_closed": True,
+                }
+            )
+        if url.endswith("/assistant/action-loop-noop-dispatch"):
+            return FakeResponse(
+                {
+                    "mode": "action-loop-noop-dispatch-preview",
+                    "would_dispatch": False,
+                    "would_dispatch_noop_only": False,
+                    "execution_enabled": False,
+                    "approval_consume_mode": "validate-only",
+                }
+            )
+        if url.endswith("/assistant/action-loop-read-only-dispatch-preview"):
+            return FakeResponse(
+                {
+                    "mode": "action-loop-read-only-dispatch-boundary-preview",
+                    "would_dispatch": False,
+                    "would_read": False,
+                    "would_fetch": False,
+                    "execution_enabled": False,
+                    "boundary_mode": "classification-only",
+                }
+            )
+        if url.endswith("/assistant/read-only-scan"):
+            return FakeResponse({"mode": "read-only", "would_execute": False})
+        if url.endswith("/assistant/file-preview"):
+            return FakeResponse({"mode": "read-only", "status": "completed", "would_execute": False})
+        if url.endswith("/assistant/url-preview"):
+            return FakeResponse({"mode": "read-only-url-preflight", "status": "disabled", "would_fetch": False})
+        if url.endswith("/assistant/workspace-brief"):
+            return FakeResponse({"mode": "read-only-workspace-brief", "would_execute": False})
+        if url.endswith("/assistant/shell-preview"):
+            return FakeResponse({"mode": "shell-sandbox-preview", "status": "allowed_preview", "would_execute": False})
+        if url.endswith("/assistant/shell-approval-preview"):
+            return FakeResponse(
+                {"mode": "shell-approval-binding-preview", "approval_required": True, "would_execute": False}
+            )
+        if url.endswith("/assistant/shell-run"):
+            return FakeResponse({"mode": "shell-run-locked", "status": "locked", "execution_enabled": False})
+        if url.endswith("/assistant/patch-preview"):
+            return FakeResponse({"mode": "patch-preview-locked", "status": "allowed_preview", "would_apply": False})
+        if url.endswith("/assistant/patch-approval-preview"):
+            return FakeResponse(
+                {"mode": "patch-approval-binding-preview", "approval_required": True, "would_apply": False}
+            )
+        if url.endswith("/assistant/patch-apply"):
+            return FakeResponse({"mode": "patch-apply-locked", "status": "locked", "execution_enabled": False})
+        if url.endswith("/assistant/browser-preview"):
+            return FakeResponse({"mode": "browser-interaction-preview-locked", "status": "allowed_preview", "would_interact": False})
+        if url.endswith("/assistant/browser-approval-preview"):
+            return FakeResponse(
+                {"mode": "browser-approval-binding-preview", "approval_required": True, "would_interact": False}
+            )
+        if url.endswith("/assistant/browser-interact"):
+            return FakeResponse({"mode": "browser-interact-locked", "status": "locked", "execution_enabled": False})
         if url.endswith("/assistant/bootstrap"):
             return FakeResponse(
                 {
@@ -365,6 +452,52 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
         cli_main.app,
         ["assistant-action-preview", "브라우저 열어줘", "--project-root", "/tmp/project"],
     )
+    action_loop_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-action-loop-preflight", "개인 API dispatch", "--project-root", "/tmp/project"],
+    )
+    action_loop_noop_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-action-loop-noop-dispatch", "개인 API dispatch", "--project-root", "/tmp/project"],
+    )
+    action_loop_read_only_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-action-loop-read-only-dispatch-preview", "read only", "--project-root", "/tmp/project"],
+    )
+    automation_plan_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-automation-plan", "내 개인 API 자동화", "--project-root", "/tmp/project"],
+    )
+    shell_preview_result = CliRunner().invoke(cli_main.app, ["assistant-shell-preview", "git status", "--cwd", "/tmp/project"])
+    shell_approval_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-shell-approval-preview", "git status", "--cwd", "/tmp/project", "--reason", "local CI"],
+    )
+    shell_run_result = CliRunner().invoke(cli_main.app, ["assistant-shell-run", "git status", "--cwd", "/tmp/project"])
+    patch_preview_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-patch-preview", "/tmp/project/note.md", "hello", "--project-root", "/tmp/project"],
+    )
+    patch_approval_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-patch-approval-preview", "/tmp/project/note.md", "hello", "--project-root", "/tmp/project", "--reason", "docs"],
+    )
+    patch_apply_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-patch-apply", "/tmp/project/note.md", "hello", "--project-root", "/tmp/project"],
+    )
+    browser_preview_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-browser-preview", "observe", "--target-url", "https://example.com"],
+    )
+    browser_approval_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-browser-approval-preview", "screenshot", "--target-url", "https://example.com", "--reason", "qa"],
+    )
+    browser_interact_result = CliRunner().invoke(
+        cli_main.app,
+        ["assistant-browser-interact", "observe", "--target-url", "https://example.com"],
+    )
     bootstrap_result = CliRunner().invoke(cli_main.app, ["assistant-bootstrap", "--project-root", "/tmp/project"])
     session_result = CliRunner().invoke(
         cli_main.app,
@@ -400,6 +533,19 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
     assert ui_contract_result.exit_code == 0
     assert startup_result.exit_code == 0
     assert action_preview_result.exit_code == 0
+    assert action_loop_result.exit_code == 0
+    assert action_loop_noop_result.exit_code == 0
+    assert action_loop_read_only_result.exit_code == 0
+    assert automation_plan_result.exit_code == 0
+    assert shell_preview_result.exit_code == 0
+    assert shell_approval_result.exit_code == 0
+    assert shell_run_result.exit_code == 0
+    assert patch_preview_result.exit_code == 0
+    assert patch_approval_result.exit_code == 0
+    assert patch_apply_result.exit_code == 0
+    assert browser_preview_result.exit_code == 0
+    assert browser_approval_result.exit_code == 0
+    assert browser_interact_result.exit_code == 0
     assert bootstrap_result.exit_code == 0
     assert session_result.exit_code == 0
     assert sessions_result.exit_code == 0
@@ -447,6 +593,127 @@ def test_cli_assistant_bridge_commands_send_api_key(monkeypatch) -> None:
             "method": "POST",
             "url": "http://127.0.0.1:8000/assistant/action-preview",
             "json": {"message": "브라우저 열어줘", "project_root": "/tmp/project", "mode": "auto"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/action-loop-preflight",
+            "json": {"goal": "개인 API dispatch", "project_root": "/tmp/project", "proposed_steps": []},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/action-loop-noop-dispatch",
+            "json": {"goal": "개인 API dispatch", "project_root": "/tmp/project", "proposed_steps": []},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/action-loop-read-only-dispatch-preview",
+            "json": {"goal": "read only", "project_root": "/tmp/project", "proposed_steps": []},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/automation-plan",
+            "json": {"goal": "내 개인 API 자동화", "project_root": "/tmp/project"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/shell-preview",
+            "json": {"command": "git status", "cwd": "/tmp/project"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/shell-approval-preview",
+            "json": {"command": "git status", "cwd": "/tmp/project", "reason": "local CI", "session_id": None},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/shell-run",
+            "json": {
+                "command": "git status",
+                "cwd": "/tmp/project",
+                "approval_id": None,
+                "approval_payload_hash": None,
+                "session_id": None,
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/patch-preview",
+            "json": {"path": "/tmp/project/note.md", "proposed_content": "hello", "project_root": "/tmp/project"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/patch-approval-preview",
+            "json": {
+                "path": "/tmp/project/note.md",
+                "proposed_content": "hello",
+                "project_root": "/tmp/project",
+                "reason": "docs",
+                "session_id": None,
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/patch-apply",
+            "json": {
+                "path": "/tmp/project/note.md",
+                "proposed_content": "hello",
+                "project_root": "/tmp/project",
+                "approval_id": None,
+                "approval_payload_hash": None,
+                "session_id": None,
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/browser-preview",
+            "json": {
+                "action": "observe",
+                "target_url": "https://example.com",
+                "app_name": None,
+                "selector": None,
+                "input_preview": None,
+                "reason": None,
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/browser-approval-preview",
+            "json": {
+                "action": "screenshot",
+                "target_url": "https://example.com",
+                "app_name": None,
+                "selector": None,
+                "input_preview": None,
+                "reason": "qa",
+                "session_id": None,
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/browser-interact",
+            "json": {
+                "action": "observe",
+                "target_url": "https://example.com",
+                "app_name": None,
+                "selector": None,
+                "input_preview": None,
+                "approval_id": None,
+                "approval_payload_hash": None,
+                "session_id": None,
+            },
             "headers": {"X-API-Key": "secret"},
         },
         {
@@ -688,7 +955,12 @@ def test_cli_assistant_repl_routes_docs_and_questions(monkeypatch) -> None:
     result = CliRunner().invoke(
         cli_main.app,
         ["assistant", "--top-k", "4"],
-        input="JWT 설명해줘\n/search JWT\n/docs\n/roots\n/status\n/next\n/shell-policy\n/shell-dry-run pwd\n/summary\n/agent README 읽어줘\n/quit\n",
+        input=(
+            "JWT 설명해줘\n/search JWT\n/docs\n/roots\n/status\n/next\n/shell-policy\n"
+            "/shell-dry-run pwd\n/shell-preview git status\n/shell-approval-preview git status\n"
+            "/shell-run git status\n/patch-preview README.md\n/patch-approval-preview README.md\n"
+            "/patch-apply README.md\n/summary\n/agent README 읽어줘\n/quit\n"
+        ),
     )
 
     assert result.exit_code == 0
@@ -721,6 +993,47 @@ def test_cli_assistant_repl_routes_docs_and_questions(monkeypatch) -> None:
             "method": "POST",
             "url": "http://127.0.0.1:8000/project/shell-dry-run",
             "json": {"command": "pwd"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/shell-preview",
+            "json": {"command": "git status", "cwd": "."},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/shell-approval-preview",
+            "json": {"command": "git status", "cwd": ".", "reason": "assistant repl preview"},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/shell-run",
+            "json": {"command": "git status", "cwd": "."},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/patch-preview",
+            "json": {"path": "README.md", "proposed_content": Path("README.md").read_text(encoding="utf-8"), "project_root": None},
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/patch-approval-preview",
+            "json": {
+                "path": "README.md",
+                "proposed_content": Path("README.md").read_text(encoding="utf-8"),
+                "project_root": None,
+                "reason": "assistant repl preview",
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
+            "url": "http://127.0.0.1:8000/assistant/patch-apply",
+            "json": {"path": "README.md", "proposed_content": Path("README.md").read_text(encoding="utf-8"), "project_root": None},
             "headers": {"X-API-Key": "secret"},
         },
         {

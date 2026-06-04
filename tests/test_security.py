@@ -39,6 +39,77 @@ PROTECTED_ENDPOINT_CASES = [
     ("post", "/project/shell-dry-run", {"json": {"command": "pwd"}}),
     ("get", "/assistant/capabilities", {}),
     ("post", "/assistant/action-preview", {"json": {"message": "hello"}}),
+    ("post", "/assistant/action-loop-preflight", {"json": {"goal": "personal API dispatch", "proposed_steps": []}}),
+    ("post", "/assistant/action-loop-noop-dispatch", {"json": {"goal": "personal API dispatch", "proposed_steps": []}}),
+    ("post", "/assistant/action-loop-read-only-dispatch-preview", {"json": {"goal": "read-only dispatch", "proposed_steps": []}}),
+    ("post", "/assistant/action-loop-read-only-dispatch", {"json": {"goal": "read-only dispatch", "proposed_steps": []}}),
+    ("post", "/assistant/action-loop-shell-dispatch", {"json": {"goal": "shell dispatch", "proposed_steps": []}}),
+    ("post", "/assistant/action-loop-patch-dispatch", {"json": {"goal": "patch dispatch", "proposed_steps": []}}),
+    ("post", "/assistant/full-automation-preflight", {"json": {"goal": "full automation", "proposed_steps": []}}),
+    ("post", "/assistant/full-automation-dispatch", {"json": {"goal": "full automation", "proposed_steps": []}}),
+    ("post", "/assistant/automation-plan", {"json": {"goal": "personal API automation"}}),
+    ("get", "/assistant/workflow-presets", {}),
+    ("get", "/assistant/workflow-presets/{preset_id}", {}),
+    ("post", "/assistant/workflow-presets/{preset_id}/preview", {"json": {"params": {"project_root": "/tmp/project"}}}),
+    ("post", "/assistant/task-queue/preview", {"json": {"task_type": "noop", "params": {"note": "plan"}}}),
+    ("get", "/assistant/task-queue", {}),
+    ("post", "/assistant/task-queue/drain", {"json": {"limit": 1}}),
+    ("get", "/assistant/task-queue/task-1", {}),
+    ("post", "/assistant/task-queue/task-1/cancel-preview", {}),
+    ("post", "/assistant/failure-recovery-preview", {"json": {"tool": "patch", "failure_reason": "hash_mismatch"}}),
+    (
+        "post",
+        "/assistant/rollback-approval-preview",
+        {"json": {"path": "/tmp/project/a.md", "restored_content": "old\n", "current_sha256": "a" * 64, "original_sha256": "b" * 64}},
+    ),
+    (
+        "post",
+        "/assistant/rollback-execute",
+        {"json": {"path": "/tmp/project/a.md", "restored_content": "old\n", "current_sha256": "a" * 64, "original_sha256": "b" * 64}},
+    ),
+    ("post", "/assistant/read-only-scan", {"json": {"project_root": "/tmp/project"}}),
+    ("post", "/assistant/file-preview", {"json": {"path": "/tmp/project/README.md"}}),
+    ("post", "/assistant/url-preview", {"json": {"url": "https://example.com"}}),
+    (
+        "post",
+        "/assistant/read-only-adapter/execute",
+        {"json": {"adapter_type": "file_preview", "path": "/tmp/project/README.md", "result_wrapper": {"untrusted": True}}},
+    ),
+    (
+        "post",
+        "/assistant/web-search-provider-preview",
+        {"json": {"query": "latest FastAPI release notes", "result_wrapper": {"untrusted": True}}},
+    ),
+    (
+        "post",
+        "/assistant/web-search-provider/search",
+        {"json": {"query": "latest FastAPI release notes", "result_wrapper": {"untrusted": True}}},
+    ),
+    ("post", "/assistant/app-os-interaction-preview", {"json": {"action": "observe-plan", "app_name": "Preview"}}),
+    ("post", "/assistant/workspace-brief", {"json": {"project_root": "/tmp/project"}}),
+    ("post", "/assistant/shell-preview", {"json": {"command": "git status", "cwd": "/tmp/project"}}),
+    ("post", "/assistant/shell-approval-preview", {"json": {"command": "git status", "cwd": "/tmp/project"}}),
+    ("post", "/assistant/shell-run", {"json": {"command": "git status", "cwd": "/tmp/project"}}),
+    ("get", "/assistant/approval-console/pending", {}),
+    ("get", "/assistant/approval-console/approval-1", {}),
+    ("post", "/assistant/approval-console/cleanup-expired", {}),
+    (
+        "post",
+        "/assistant/durable-state-preview/preview",
+        {"json": {"goal": "preview durable state", "proposed_steps": []}},
+    ),
+    ("post", "/assistant/patch-preview", {"json": {"path": "/tmp/project/note.md", "proposed_content": "hello"}}),
+    ("post", "/assistant/patch-approval-preview", {"json": {"path": "/tmp/project/note.md", "proposed_content": "hello"}}),
+    ("post", "/assistant/patch-apply", {"json": {"path": "/tmp/project/note.md", "proposed_content": "hello"}}),
+    ("post", "/assistant/browser-preview", {"json": {"action": "observe", "target_url": "https://example.com"}}),
+    ("post", "/assistant/browser-approval-preview", {"json": {"action": "screenshot", "target_url": "https://example.com"}}),
+    ("post", "/assistant/browser-interact", {"json": {"action": "observe", "target_url": "https://example.com"}}),
+    ("post", "/assistant/browser-observe", {"json": {"action": "observe", "target_url": "http://127.0.0.1:8000"}}),
+    (
+        "post",
+        "/assistant/browser-limited-interact",
+        {"json": {"action": "click", "target_url": "http://127.0.0.1:8000", "selector": "#ok"}},
+    ),
     ("get", "/assistant/ping", {}),
     ("get", "/assistant/config", {}),
     ("get", "/assistant/status", {}),
@@ -62,6 +133,10 @@ def _case_path_to_template(path: str) -> str:
         return path.replace("/agent/runs/1", "/agent/runs/{run_id}", 1)
     if path.startswith("/assistant/sessions/session-1"):
         return path.replace("/assistant/sessions/session-1", "/assistant/sessions/{session_id}", 1)
+    if path.startswith("/assistant/task-queue/task-1"):
+        return path.replace("/assistant/task-queue/task-1", "/assistant/task-queue/{task_id}", 1)
+    if path == "/assistant/approval-console/approval-1":
+        return "/assistant/approval-console/{approval_id}"
     return path
 
 

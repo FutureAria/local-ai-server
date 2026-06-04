@@ -13,6 +13,7 @@ def test_ui_qa_checklist_documents_required_flows() -> None:
     assert "/documents/vector-rebuild-preview" in text
     assert "POST /assistant/bootstrap" in text
     assert "POST /assistant/action-preview" in text
+    assert "POST /assistant/automation-plan" in text
     assert "POST /assistant/message" in text
     assert "GET /assistant/sessions/{session_id}/messages" in text
     assert "endpoints" in text

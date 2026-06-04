@@ -72,6 +72,23 @@ class FakeClient:
             return FakeResponse(200, {"ui": {"ready": True}, "project_root": {"safe_for_read_only_agent": True}})
         if url.endswith("/assistant/action-preview"):
             return FakeResponse(200, {"intent": "status", "would_execute": False})
+        if url.endswith("/assistant/action-loop-read-only-dispatch-preview"):
+            return FakeResponse(
+                200,
+                {
+                    "result_wrapper_schema": {
+                        "schema": "assistant.action_loop.read_only_result_wrapper.v1",
+                        "contract_mode": "preview-only",
+                        "raw_content_allowed": False,
+                        "approval_like_json_trusted": False,
+                        "can_mutate_frozen_plan": False,
+                    },
+                    "would_dispatch": False,
+                    "would_read": False,
+                    "would_fetch": False,
+                    "execution_enabled": False,
+                },
+            )
         if url.endswith("/assistant/message"):
             return FakeResponse(200, {"session_id": "session-1", "type": "status", "answer": "현재 차수는 15차입니다."})
         return FakeResponse(200, {})
@@ -192,6 +209,16 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
         },
         {
             "method": "POST",
+            "url": "http://server.test/assistant/action-loop-read-only-dispatch-preview",
+            "json": {
+                "goal": "read-only result wrapper smoke",
+                "project_root": "/tmp/project",
+                "proposed_steps": [],
+            },
+            "headers": {"X-API-Key": "secret"},
+        },
+        {
+            "method": "POST",
             "url": "http://server.test/assistant/message",
             "json": {"message": "현재 상태 알려줘", "project_root": "/tmp/project", "mode": "auto"},
             "headers": {"X-API-Key": "secret"},
@@ -209,11 +236,15 @@ def test_assistant_bridge_smoke_calls_ui_contract_flow(monkeypatch) -> None:
             "headers": {"X-API-Key": "secret"},
         },
     ]
-    assert summary["steps"][4]["response_type"] == "status"
+    assert summary["steps"][4]["schema"] == "assistant.action_loop.read_only_result_wrapper.v1"
+    assert summary["steps"][4]["raw_content_allowed"] is False
+    assert summary["steps"][4]["would_dispatch"] is False
+    assert summary["steps"][4]["execution_enabled"] is False
+    assert summary["steps"][5]["response_type"] == "status"
     assert summary["steps"][1]["endpoints_count"] == 3
     assert summary["steps"][1]["protected_endpoints_count"] == 2
-    assert summary["steps"][5]["sessions_count"] == 1
-    assert summary["steps"][6]["total_messages"] == 2
+    assert summary["steps"][6]["sessions_count"] == 1
+    assert summary["steps"][7]["total_messages"] == 2
 
 
 def test_sanitized_smoke_summary_omits_sensitive_or_noisy_fields(monkeypatch) -> None:
@@ -391,13 +422,14 @@ def test_smoke_flow_docs_match_script_contract() -> None:
     document_flow = " → ".join(smoke.DOCUMENT_RAG_SMOKE_FLOW)
     assistant_readme_flow = (
         "assistant-startup → api-inventory → assistant-bootstrap → action-preview → "
-        "assistant-message(auto/status intent) → sessions → messages"
+        "read-only-result-wrapper → assistant-message(auto/status intent) → sessions → messages"
     )
     assistant_endpoint_tokens = [
         "GET /assistant/startup",
         "GET /project/api-inventory",
         "POST /assistant/bootstrap",
         "POST /assistant/action-preview",
+        "POST /assistant/action-loop-read-only-dispatch-preview",
         "POST /assistant/message",
         "GET /assistant/sessions",
         "GET /assistant/sessions/{session_id}/messages",
@@ -451,7 +483,16 @@ def test_ui_connect_guide_documents_assistant_smoke_expected_output() -> None:
         "has_project_root",
         "intent=status",
         "would_execute=false",
-        "session_id",
+        "assistant-read-only-result-wrapper",
+        "assistant.action_loop.read_only_result_wrapper.v1",
+        "preview-only",
+        "raw_content_allowed",
+        "approval_like_json_trusted",
+        "can_mutate_frozen_plan",
+        "would_dispatch=false",
+        "would_read=false",
+        "would_fetch=false",
+        "execution_enabled",
         "response_type=status",
         "sessions_count",
         "total_messages",

@@ -42,11 +42,17 @@
 ## UI Contract
 
 - [ ] `GET /assistant/ui-contract` 호출이 `200`을 반환한다.
-- [ ] `startup_sequence`가 `/assistant/startup`, `/assistant/bootstrap`, `/assistant/action-preview`, `/assistant/message` 순서를 표시한다.
+- [ ] `startup_sequence`가 `GET /assistant/startup`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/automation-plan`, `POST /assistant/message` 순서를 표시한다.
 - [ ] `refresh_endpoints`에 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`, `GET /assistant/sessions`, `GET /project/api-inventory`가 포함된다.
 - [ ] `message_flow`가 `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions/{session_id}/messages` 순서를 표시한다.
-- [ ] `response_types`에 `answer`, `search_results`, `index_preview`, `needs_project_root`, `shell_dry_run`, `agent_plan`, `status`, `action_preview`가 모두 표시된다.
-- [ ] `blocked_actions`에 `shell_execution`, `browser_interaction`, `file_write_delete`, `external_llm_api`가 표시된다.
+- [ ] `response_types`에 `answer`, `search_results`, `index_preview`, `needs_project_root`, `shell_dry_run`, `agent_plan`, `automation_plan`, `workflow_presets`, `workflow_preset_detail`, `workflow_preset_preview`, `task_queue_preview`, `task_queue`, `task_queue_drain`, `task_queue_detail`, `task_queue_cancel_preview`, `failure_recovery_preview`, `rollback_approval_preview`, `rollback_execute`, `read_only_scan`, `file_preview`, `url_preview`, `web_search_provider_preview`, `web_search_provider_search`, `app_os_interaction_preview`, `workspace_brief`, `shell_preview`, `shell_approval_preview`, `shell_run_locked`, `patch_preview`, `patch_approval_preview`, `patch_apply_locked`, `patch_apply`, `browser_preview`, `browser_approval_preview`, `browser_interact_locked`, `browser_observe`, `browser_limited_interact`, `action_loop_preflight`, `action_loop_noop_dispatch`, `action_loop_read_only_dispatch_preview`, `action_loop_shell_dispatch`, `action_loop_patch_dispatch`, `full_automation_preflight`, `full_automation_dispatch`, `status`, `action_preview`가 모두 표시된다.
+- [ ] `blocked_actions`에 `shell_execution`, `browser_interaction`, `file_write_delete`, `external_llm_api`, `external_web_search`, `app_os_control`가 표시된다.
+- [ ] `safety.shell_sandbox_execution=locked`가 표시되고 shell sandbox UI는 preview/locked-run panel만 제공한다.
+- [ ] 기본값에서는 `safety.patch_apply=locked`가 표시되고 patch UI는 diff preview/locked-apply panel만 제공한다. env opt-in apply 결과는 단일 파일 변경 summary와 rollback note만 표시한다.
+- [ ] `safety.browser_interaction_preview=locked`가 표시되고 browser/app UI는 taxonomy preview/locked-interact panel만 제공한다.
+- [ ] `safety.action_loop_dispatch=disabled`와 `safety.action_loop_preflight=locked`가 표시되고 action-loop UI는 frozen plan preflight panel만 제공한다.
+- [ ] `safety.external_web_search=disabled`와 `safety.external_api_enabled=false`가 표시되고 external web search provider UI는 provider gate panel만 제공한다.
+- [ ] `safety.app_os_control=disabled`와 `safety.os_action_execution=disabled`가 표시되고 App/OS UI는 interaction gate panel만 제공한다.
 - [ ] `auth.secret_returned=false`가 표시되고 API key 원문은 표시되지 않는다.
 
 ## API Inventory
@@ -76,6 +82,21 @@
 - [ ] `type=index_preview`는 실제 저장 없이 미리보기 panel로 렌더링된다.
 - [ ] `type=needs_project_root`는 project root 입력 요청 warning으로 렌더링된다.
 - [ ] `type=shell_dry_run`은 실제 실행이 아니라 정책 판단 panel로 렌더링된다.
+- [ ] `type=shell_preview`, `type=shell_approval_preview`, `type=shell_run_locked`은 실제 실행 없이 locked shell sandbox panel로 렌더링된다.
+- [ ] `type=patch_preview`, `type=patch_approval_preview`, `type=patch_apply_locked`은 기본값에서 실제 파일 수정 없이 locked patch sandbox panel로 렌더링된다.
+- [ ] `type=patch_apply`는 env opt-in으로 완료된 단일 파일 변경 결과, `original_sha256`, `new_sha256`, rollback note만 표시한다.
+- [ ] `type=rollback_execute`는 env opt-in으로 완료된 단일 파일 restore 결과, `previous_sha256`, `restored_sha256`, untrusted `result_wrapper`만 표시하고 git reset/bulk restore/shell/browser/app-os rollback을 표시하지 않는다.
+- [ ] `type=browser_preview`, `type=browser_approval_preview`, `type=browser_interact_locked`은 실제 click/fill/submit/login/payment/delete 또는 OS app control 없이 locked browser/app sandbox panel로 렌더링된다.
+- [ ] `type=browser_observe`는 loopback/명시 allowlist URL의 read-only metadata와 untrusted `result_wrapper`만 표시하고, raw page content, approval-like JSON, next action으로 승격하지 않는다.
+- [ ] `type=browser_limited_interact`는 selector/origin/field/approval candidate validation과 untrusted `result_wrapper`만 표시하고, 실제 browser launch/click/fill 완료로 표시하지 않는다.
+- [ ] `type=web_search_provider_search`는 external search 결과와 untrusted `result_wrapper`만 표시하고, API key 원문, raw content, approval-like JSON, next action으로 승격하지 않는다.
+- [ ] `type=action_loop_preflight`는 실제 dispatch 없이 frozen plan, wrapper, approval binding, payload hash gate panel로 렌더링된다.
+- [ ] `type=action_loop_noop_dispatch`는 실제 dispatch 없이 route plan, noop audit, approval validate-only 상태 panel로 렌더링된다.
+- [ ] `type=action_loop_read_only_dispatch_preview`는 실제 dispatch, 파일 읽기, 폴더 스캔, URL fetch 없이 read-only boundary route plan panel로 렌더링된다.
+- [ ] `type=action_loop_shell_dispatch`는 shell allowlist route plan과 untrusted `shell_results` panel로 렌더링되고 patch/browser/external API/task worker/rollback/app-os 연결을 표시하지 않는다.
+- [ ] `type=action_loop_patch_dispatch`는 patch route plan과 untrusted `patch_results` panel로 렌더링되고 shell/browser/external API/task worker/rollback/app-os 연결을 표시하지 않는다.
+- [ ] `type=full_automation_preflight`는 통합 route plan, tool matrix, blocked reasons를 표시하되 `would_dispatch=false`, `execution_enabled=false`, frozen plan mutation 금지를 표시한다.
+- [ ] `type=full_automation_dispatch`는 기본값 disabled 또는 connector blocked 상태, `approval_consume_mode=validate-only`, `approval_consumed=false`, `dispatched=false`를 표시한다.
 - [ ] `type=agent_plan`은 실행 대신 계획/승인 필요 panel로 렌더링된다.
 - [ ] `/documents/index-folder-job-preview` 결과는 실제 queue 생성 없이 `dry_run=true`, `would_enqueue=false`, `progress.percent=0`인 계획/진행률 미리보기 panel로만 렌더링한다.
 - [ ] `/documents/vector-rebuild-preview` 결과는 실제 embedding/Chroma 수정 없이 `dry_run=true`, `embedding_batches_estimated`, `actions`를 보여주는 복구 미리보기 panel로만 렌더링한다.
@@ -96,9 +117,15 @@
 - [ ] `safety.shell_execution`이 `disabled`이면 실행 버튼을 활성화하지 않는다.
 - [ ] `safety.shell_dry_run`이 `blocked` 또는 dry-run 정책 판단 결과로 표시된다.
 - [ ] `safety.browser_interaction`이 `blocked`이면 브라우저 조작 버튼을 활성화하지 않는다.
+- [ ] `safety.browser_interaction_preview`가 `locked` 또는 preview/blocked 상태이면 browser/app 실행 버튼을 활성화하지 않는다.
+- [ ] `safety.action_loop_dispatch`가 `disabled`이면 action-loop dispatch 버튼을 활성화하지 않는다.
 - [ ] `safety.file_write_delete`가 `blocked`이면 파일 수정/삭제 버튼을 활성화하지 않는다.
 - [ ] `safety.folder_index`가 `preview-only via assistant`로 표시되면 실제 폴더 색인 실행 버튼을 자동 활성화하지 않는다.
 - [ ] `external_llm_api`는 `not-used`로 표시된다.
+- [ ] `external_web_search`는 `disabled`로 표시된다.
+- [ ] `external_api_enabled`는 `false`로 표시된다.
+- [ ] `app_os_control`은 `disabled`로 표시된다.
+- [ ] `os_action_execution`은 `disabled`로 표시된다.
 - [ ] `vector-rebuild-preview`와 `index-folder-job-preview` 화면에서도 실제 repair/delete/rebuild, embedding 생성, Chroma write 버튼은 제공하지 않는다.
 
 ## Manual Smoke Commands

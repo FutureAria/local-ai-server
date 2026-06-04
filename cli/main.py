@@ -35,8 +35,24 @@ ASSISTANT_REPL_HELP_LINES = [
     "/results <id>",
     "/shell-policy",
     "/shell-dry-run <command>",
+    "/shell-preview <command>",
+    "/shell-approval-preview <command>",
+    "/shell-run <command>",
+    "/patch-preview <path>",
+    "/patch-approval-preview <path>",
+    "/patch-apply <path>",
+    "/browser-preview <action>",
+    "/browser-approval-preview <action>",
+    "/browser-interact <action>",
+    "/action-loop-preflight <goal>",
+    "/action-loop-noop-dispatch <goal>",
+    "/action-loop-read-only-dispatch-preview <goal>",
     "/api-inventory",
     "/capabilities",
+    "/automation-plan <goal>",
+    "/workspace-brief <project_root>",
+    "/file-preview <path>",
+    "/url-preview <url>",
     "/root <project_root>",
     "/summary",
     "/status",
@@ -274,6 +290,212 @@ def assistant_dashboard() -> None:
 def assistant_action_preview(message: str, project_root: str | None = None, mode: str = "auto") -> None:
     payload = {"message": message, "project_root": project_root, "mode": mode}
     _print_json(_request_json("post", "/assistant/action-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-automation-plan")
+def assistant_automation_plan(
+    goal: str = typer.Argument("personal API automation"),
+    project_root: str | None = None,
+) -> None:
+    payload = {"goal": goal, "project_root": project_root}
+    _print_json(_request_json("post", "/assistant/automation-plan", json=payload, headers=_headers()))
+
+
+@app.command("assistant-action-loop-preflight")
+def assistant_action_loop_preflight(
+    goal: str,
+    project_root: str | None = None,
+) -> None:
+    payload = {"goal": goal, "project_root": project_root, "proposed_steps": []}
+    _print_json(_request_json("post", "/assistant/action-loop-preflight", json=payload, headers=_headers()))
+
+
+@app.command("assistant-action-loop-noop-dispatch")
+def assistant_action_loop_noop_dispatch(
+    goal: str,
+    project_root: str | None = None,
+) -> None:
+    payload = {"goal": goal, "project_root": project_root, "proposed_steps": []}
+    _print_json(_request_json("post", "/assistant/action-loop-noop-dispatch", json=payload, headers=_headers()))
+
+
+@app.command("assistant-action-loop-read-only-dispatch-preview")
+def assistant_action_loop_read_only_dispatch_preview(
+    goal: str,
+    project_root: str | None = None,
+) -> None:
+    payload = {"goal": goal, "project_root": project_root, "proposed_steps": []}
+    _print_json(
+        _request_json("post", "/assistant/action-loop-read-only-dispatch-preview", json=payload, headers=_headers())
+    )
+
+
+@app.command("assistant-read-only-scan")
+def assistant_read_only_scan(project_root: str, max_items: int = 120) -> None:
+    payload = {"project_root": project_root, "max_items": max_items}
+    _print_json(_request_json("post", "/assistant/read-only-scan", json=payload, headers=_headers()))
+
+
+@app.command("assistant-file-preview")
+def assistant_file_preview(path: str, project_root: str | None = None, max_bytes: int = 8000) -> None:
+    payload = {"path": path, "project_root": project_root, "max_bytes": max_bytes}
+    _print_json(_request_json("post", "/assistant/file-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-url-preview")
+def assistant_url_preview(url: str) -> None:
+    _print_json(_request_json("post", "/assistant/url-preview", json={"url": url}, headers=_headers()))
+
+
+@app.command("assistant-workspace-brief")
+def assistant_workspace_brief(project_root: str, include_previews: bool = True) -> None:
+    payload = {"project_root": project_root, "include_previews": include_previews}
+    _print_json(_request_json("post", "/assistant/workspace-brief", json=payload, headers=_headers()))
+
+
+@app.command("assistant-shell-preview")
+def assistant_shell_preview(command: str, cwd: str = ".") -> None:
+    payload = {"command": command, "cwd": cwd}
+    _print_json(_request_json("post", "/assistant/shell-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-shell-approval-preview")
+def assistant_shell_approval_preview(
+    command: str,
+    cwd: str = ".",
+    reason: str | None = None,
+    session_id: str | None = None,
+) -> None:
+    payload = {"command": command, "cwd": cwd, "reason": reason, "session_id": session_id}
+    _print_json(_request_json("post", "/assistant/shell-approval-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-shell-run")
+def assistant_shell_run(
+    command: str,
+    cwd: str = ".",
+    approval_id: str | None = None,
+    approval_payload_hash: str | None = None,
+    session_id: str | None = None,
+) -> None:
+    payload = {
+        "command": command,
+        "cwd": cwd,
+        "approval_id": approval_id,
+        "approval_payload_hash": approval_payload_hash,
+        "session_id": session_id,
+    }
+    _print_json(_request_json("post", "/assistant/shell-run", json=payload, headers=_headers()))
+
+
+@app.command("assistant-patch-preview")
+def assistant_patch_preview(path: str, proposed_content: str, project_root: str | None = None) -> None:
+    payload = {"path": path, "proposed_content": proposed_content, "project_root": project_root}
+    _print_json(_request_json("post", "/assistant/patch-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-patch-approval-preview")
+def assistant_patch_approval_preview(
+    path: str,
+    proposed_content: str,
+    project_root: str | None = None,
+    reason: str | None = None,
+    session_id: str | None = None,
+) -> None:
+    payload = {
+        "path": path,
+        "proposed_content": proposed_content,
+        "project_root": project_root,
+        "reason": reason,
+        "session_id": session_id,
+    }
+    _print_json(_request_json("post", "/assistant/patch-approval-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-patch-apply")
+def assistant_patch_apply(
+    path: str,
+    proposed_content: str,
+    project_root: str | None = None,
+    approval_id: str | None = None,
+    approval_payload_hash: str | None = None,
+    session_id: str | None = None,
+) -> None:
+    payload = {
+        "path": path,
+        "proposed_content": proposed_content,
+        "project_root": project_root,
+        "approval_id": approval_id,
+        "approval_payload_hash": approval_payload_hash,
+        "session_id": session_id,
+    }
+    _print_json(_request_json("post", "/assistant/patch-apply", json=payload, headers=_headers()))
+
+
+@app.command("assistant-browser-preview")
+def assistant_browser_preview(
+    action: str,
+    target_url: str | None = None,
+    app_name: str | None = None,
+    selector: str | None = None,
+    input_preview: str | None = None,
+    reason: str | None = None,
+) -> None:
+    payload = {
+        "action": action,
+        "target_url": target_url,
+        "app_name": app_name,
+        "selector": selector,
+        "input_preview": input_preview,
+        "reason": reason,
+    }
+    _print_json(_request_json("post", "/assistant/browser-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-browser-approval-preview")
+def assistant_browser_approval_preview(
+    action: str,
+    target_url: str | None = None,
+    app_name: str | None = None,
+    selector: str | None = None,
+    input_preview: str | None = None,
+    reason: str | None = None,
+    session_id: str | None = None,
+) -> None:
+    payload = {
+        "action": action,
+        "target_url": target_url,
+        "app_name": app_name,
+        "selector": selector,
+        "input_preview": input_preview,
+        "reason": reason,
+        "session_id": session_id,
+    }
+    _print_json(_request_json("post", "/assistant/browser-approval-preview", json=payload, headers=_headers()))
+
+
+@app.command("assistant-browser-interact")
+def assistant_browser_interact(
+    action: str,
+    target_url: str | None = None,
+    app_name: str | None = None,
+    selector: str | None = None,
+    input_preview: str | None = None,
+    approval_id: str | None = None,
+    approval_payload_hash: str | None = None,
+    session_id: str | None = None,
+) -> None:
+    payload = {
+        "action": action,
+        "target_url": target_url,
+        "app_name": app_name,
+        "selector": selector,
+        "input_preview": input_preview,
+        "approval_id": approval_id,
+        "approval_payload_hash": approval_payload_hash,
+        "session_id": session_id,
+    }
+    _print_json(_request_json("post", "/assistant/browser-interact", json=payload, headers=_headers()))
 
 
 @app.command("assistant-ui-contract")
@@ -663,8 +885,90 @@ def _assistant_dispatch(command: str, top_k: int, temperature: float) -> dict | 
         if not value:
             raise ValueError("/shell-dry-run 명령에는 command가 필요합니다.")
         return _request_json("post", "/project/shell-dry-run", json={"command": value}, headers=_headers())
+    if name == "/shell-preview":
+        if not value:
+            raise ValueError("/shell-preview 명령에는 command가 필요합니다.")
+        return _request_json("post", "/assistant/shell-preview", json={"command": value, "cwd": "."}, headers=_headers())
+    if name == "/shell-approval-preview":
+        if not value:
+            raise ValueError("/shell-approval-preview 명령에는 command가 필요합니다.")
+        return _request_json(
+            "post",
+            "/assistant/shell-approval-preview",
+            json={"command": value, "cwd": ".", "reason": "assistant repl preview"},
+            headers=_headers(),
+        )
+    if name == "/shell-run":
+        if not value:
+            raise ValueError("/shell-run 명령에는 command가 필요합니다.")
+        return _request_json("post", "/assistant/shell-run", json={"command": value, "cwd": "."}, headers=_headers())
+    if name in {"/patch-preview", "/patch-approval-preview", "/patch-apply"}:
+        if not value:
+            raise ValueError(f"{name} 명령에는 path가 필요합니다.")
+        target = Path(value)
+        if not target.exists() or not target.is_file():
+            raise ValueError(f"{name} 명령에는 존재하는 file path가 필요합니다.")
+        proposed_content = target.read_text(encoding="utf-8")
+        endpoint = {
+            "/patch-preview": "/assistant/patch-preview",
+            "/patch-approval-preview": "/assistant/patch-approval-preview",
+            "/patch-apply": "/assistant/patch-apply",
+        }[name]
+        payload = {"path": value, "proposed_content": proposed_content, "project_root": None}
+        if name == "/patch-approval-preview":
+            payload["reason"] = "assistant repl preview"
+        return _request_json("post", endpoint, json=payload, headers=_headers())
+    if name in {"/browser-preview", "/browser-approval-preview", "/browser-interact"}:
+        if not value:
+            raise ValueError(f"{name} 명령에는 action이 필요합니다.")
+        endpoint = {
+            "/browser-preview": "/assistant/browser-preview",
+            "/browser-approval-preview": "/assistant/browser-approval-preview",
+            "/browser-interact": "/assistant/browser-interact",
+        }[name]
+        payload = {"action": value, "reason": "assistant repl preview"}
+        return _request_json("post", endpoint, json=payload, headers=_headers())
     if name == "/capabilities":
         return _request_json("get", "/assistant/capabilities", headers=_headers())
+    if name == "/automation-plan":
+        goal = value or "personal API automation"
+        return _request_json("post", "/assistant/automation-plan", json={"goal": goal}, headers=_headers())
+    if name == "/action-loop-preflight":
+        goal = value or "personal API automation"
+        return _request_json(
+            "post",
+            "/assistant/action-loop-preflight",
+            json={"goal": goal, "proposed_steps": []},
+            headers=_headers(),
+        )
+    if name == "/action-loop-noop-dispatch":
+        goal = value or "personal API automation"
+        return _request_json(
+            "post",
+            "/assistant/action-loop-noop-dispatch",
+            json={"goal": goal, "proposed_steps": []},
+            headers=_headers(),
+        )
+    if name == "/action-loop-read-only-dispatch-preview":
+        goal = value or "personal API automation"
+        return _request_json(
+            "post",
+            "/assistant/action-loop-read-only-dispatch-preview",
+            json={"goal": goal, "proposed_steps": []},
+            headers=_headers(),
+        )
+    if name == "/workspace-brief":
+        if not value:
+            raise ValueError("/workspace-brief 명령에는 project_root가 필요합니다.")
+        return _request_json("post", "/assistant/workspace-brief", json={"project_root": value}, headers=_headers())
+    if name == "/file-preview":
+        if not value:
+            raise ValueError("/file-preview 명령에는 path가 필요합니다.")
+        return _request_json("post", "/assistant/file-preview", json={"path": value}, headers=_headers())
+    if name == "/url-preview":
+        if not value:
+            raise ValueError("/url-preview 명령에는 URL이 필요합니다.")
+        return _request_json("post", "/assistant/url-preview", json={"url": value}, headers=_headers())
     if name == "/root":
         if not value:
             raise ValueError("/root 명령에는 project_root가 필요합니다.")

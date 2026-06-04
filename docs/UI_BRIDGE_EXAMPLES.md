@@ -14,8 +14,9 @@
 1. `GET /assistant/startup`
 2. `POST /assistant/bootstrap`
 3. `POST /assistant/action-preview`
-4. `POST /assistant/message`
-5. `GET /assistant/sessions/{session_id}/messages`
+4. `POST /assistant/automation-plan`
+5. `POST /assistant/message`
+6. `GET /assistant/sessions/{session_id}/messages`
 
 개별 refresh가 필요할 때만 `GET /assistant/ping`, `GET /assistant/config`, `GET /assistant/dashboard`, `GET /assistant/sessions`를 호출한다. 개발/디버그 화면에서 현재 백엔드 API 목록과 보호 여부를 보여줘야 하면 read-only `GET /project/api-inventory`를 호출한다.
 
@@ -57,6 +58,12 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
     },
     {
       "step": 4,
+      "method": "POST",
+      "path": "/assistant/automation-plan",
+      "purpose": "safe personal automation roadmap"
+    },
+    {
+      "step": 5,
       "method": "POST",
       "path": "/assistant/message",
       "purpose": "send confirmed message"
@@ -117,21 +124,70 @@ UI가 따라야 할 API 순서와 렌더링 타입을 확인한다.
     "shell_dry_run": "shell dry-run policy panel",
     "agent_plan": "high-risk plan preview panel",
     "status": "project phase/status panel",
-    "action_preview": "pre-send intent preview panel"
+    "action_preview": "pre-send intent preview panel",
+    "automation_plan": "personal automation readiness panel",
+    "workflow_presets": "personal workflow preset list panel",
+    "workflow_preset_detail": "personal workflow preset detail panel",
+    "workflow_preset_preview": "personal workflow preset preview panel",
+    "task_queue_preview": "locked long-running task queue create preview panel",
+    "task_queue": "locked long-running task queue list panel",
+    "task_queue_drain": "one-shot task queue worker drain panel",
+    "task_queue_detail": "locked long-running task queue detail panel",
+    "task_queue_cancel_preview": "locked long-running task cancellation preview panel",
+    "failure_recovery_preview": "locked failure recovery and rollback plan panel",
+    "rollback_approval_preview": "rollback approval binding preview panel",
+    "rollback_execute": "single-file rollback execution panel",
+    "read_only_scan": "workspace read-only scan panel",
+    "file_preview": "masked file preview panel",
+    "url_preview": "URL fetch preflight panel",
+    "web_search_provider_preview": "locked external web search provider gate panel",
+    "app_os_interaction_preview": "locked app/OS interaction gate panel",
+    "workspace_brief": "workspace brief panel",
+    "shell_preview": "locked shell sandbox preview panel",
+    "shell_approval_preview": "approval binding preview panel",
+    "shell_run_locked": "shell run locked response panel",
+    "patch_preview": "locked patch diff preview panel",
+    "patch_approval_preview": "patch approval binding preview panel",
+    "patch_apply_locked": "patch apply locked response panel",
+    "patch_apply": "single-file patch apply result panel",
+    "browser_preview": "locked browser/app interaction preview panel",
+    "browser_approval_preview": "browser/app approval binding preview panel",
+    "browser_interact_locked": "browser/app interact locked response panel",
+    "browser_observe": "browser observe read-only result panel",
+    "browser_limited_interact": "browser limited interaction candidate panel",
+    "web_search_provider_search": "external web search provider result panel",
+    "action_loop_preflight": "locked action-loop dispatch preflight panel",
+    "action_loop_noop_dispatch": "no-op action-loop route plan panel",
+    "action_loop_read_only_dispatch_preview": "read-only dispatch boundary preview panel",
+    "action_loop_shell_dispatch": "shell action-loop allowlist dispatch panel",
+    "action_loop_patch_dispatch": "patch action-loop single-file dispatch panel",
+    "full_automation_preflight": "full personal automation route preflight panel",
+    "full_automation_dispatch": "full personal automation dispatch gate panel"
   },
   "blocked_actions": [
     "shell_execution",
     "browser_interaction",
     "file_write_delete",
-    "external_llm_api"
+    "external_llm_api",
+    "external_web_search",
+    "app_os_control"
   ],
   "safety": {
     "shell_execution": "disabled",
     "shell_dry_run": "blocked",
+    "shell_sandbox_execution": "locked",
+    "patch_apply": "locked",
     "browser_interaction": "blocked",
+    "browser_interaction_preview": "locked",
+    "action_loop_dispatch": "disabled",
+    "action_loop_preflight": "locked",
     "file_write_delete": "blocked",
     "folder_index": "preview-only via assistant",
-    "external_llm_api": "not-used"
+    "external_llm_api": "not-used",
+    "external_web_search": "disabled",
+    "external_api_enabled": "false",
+    "app_os_control": "disabled",
+    "os_action_execution": "disabled"
   },
   "notes": [
     "UI contract is read-only.",
@@ -150,8 +206,8 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
   "service": "local-ai-server",
   "mode": "read-only",
   "local_only": true,
-  "endpoints_count": 51,
-  "protected_endpoints_count": 35,
+  "endpoints_count": 94,
+  "protected_endpoints_count": 78,
   "public_endpoints_count": 16,
   "endpoints": [
     {
@@ -204,6 +260,100 @@ UI 개발자가 현재 FastAPI route 목록, HTTP method, tag, API key 보호 �
     "shell_execution": "dry-run-only",
     "browser_interaction": "disabled",
     "file_write_delete": "disabled"
+  }
+}
+```
+
+## `POST /assistant/action-loop-read-only-dispatch-preview`
+
+UI가 read-only dispatch boundary와 13차 result wrapper schema를 표시할 때 사용한다. 이 예시는 adapter routing과 wrapper schema만 보여주며 실제 파일 내용 읽기, 폴더 스캔, URL fetch, dispatch를 수행하지 않는다.
+
+```json
+{
+  "service": "local-ai-server",
+  "mode": "action-loop-read-only-dispatch-boundary-preview",
+  "status": "blocked",
+  "goal": "read-only result wrapper smoke",
+  "would_dispatch": false,
+  "would_read": false,
+  "would_fetch": false,
+  "execution_enabled": false,
+  "fail_closed": true,
+  "boundary_mode": "classification-only",
+  "route_plan": [],
+  "result_wrapper_schema": {
+    "schema": "assistant.action_loop.read_only_result_wrapper.v1",
+    "contract_mode": "preview-only",
+    "wrapper_required": true,
+    "wrapper_untrusted_required": true,
+    "raw_content_allowed": false,
+    "masked_summary_only": true,
+    "approval_like_json_trusted": false,
+    "can_mutate_frozen_plan": false,
+    "can_set_next_action": false,
+    "can_request_approval": false,
+    "required_fields": [
+      "schema",
+      "source_adapter",
+      "wrapper",
+      "masked_summary",
+      "metadata",
+      "safety",
+      "audit"
+    ],
+    "prohibited_fields": [
+      "raw_content",
+      "raw_file_bytes",
+      "raw_url_response",
+      "approval",
+      "approval_id",
+      "approval_hash",
+      "next_step",
+      "shell_command",
+      "patch_payload",
+      "browser_action",
+      "unwrapped_tool_result"
+    ],
+    "safety_fields": {
+      "would_dispatch": false,
+      "would_read": false,
+      "would_fetch": false,
+      "execution_enabled": false,
+      "masking_required": true
+    }
+  },
+  "boundary_audit": {
+    "schema": "assistant.action_loop.read_only_boundary_preview.v1",
+    "payload": {
+      "would_dispatch": false,
+      "would_read": false,
+      "would_fetch": false,
+      "execution_enabled": false
+    },
+    "payload_hash": "preview-only"
+  },
+  "gates": {
+    "read_only_tools_only": true,
+    "wrapper_required": true,
+    "wrapper_enforced": true,
+    "real_dispatch_connected": false,
+    "adapter_execution_connected": false,
+    "result_wrapper_required": true,
+    "raw_result_content_allowed": false,
+    "approval_like_json_trusted": false,
+    "result_can_mutate_frozen_plan": false,
+    "file_content_read": false,
+    "folder_scan_performed": false,
+    "url_fetch_performed": false
+  },
+  "safety": {
+    "action_loop_dispatch": "disabled"
+  },
+  "ui": {
+    "response_type": "action_loop_read_only_dispatch_preview",
+    "severity": "warning",
+    "primary_text": "blocked",
+    "display": "panel"
   }
 }
 ```
@@ -420,7 +570,14 @@ SQLite chunk는 있지만 Chroma vector가 누락된 항목만 대상으로 재�
     ],
     "response_types": {
       "answer": "assistant answer bubble",
-      "agent_plan": "high-risk plan preview panel"
+      "agent_plan": "high-risk plan preview panel",
+      "automation_plan": "personal automation readiness panel",
+      "task_queue_preview": "locked long-running task queue create preview panel",
+      "task_queue_drain": "one-shot task queue worker drain panel",
+      "failure_recovery_preview": "locked failure recovery and rollback plan panel",
+      "rollback_execute": "single-file rollback execution panel",
+      "full_automation_preflight": "full personal automation route preflight panel",
+      "full_automation_dispatch": "full personal automation dispatch gate panel"
     },
     "safety": {
       "shell_execution": "disabled",
@@ -432,7 +589,9 @@ SQLite chunk는 있지만 Chroma vector가 누락된 항목만 대상으로 재�
       "shell_execution",
       "browser_interaction",
       "file_write_delete",
-      "external_llm_api"
+      "external_llm_api",
+      "external_web_search",
+      "app_os_control"
     ],
     "notes": [
       "Startup embeds the same UI contract shape."
@@ -683,6 +842,39 @@ shell 명령을 실행하지 않고 정책 판단만 반환한다. UI는 실제 
     "response_type": "agent_plan",
     "severity": "warning",
     "primary_text": "실행 대신 계획만 생성",
+    "display": "panel"
+  }
+}
+```
+
+### `type=automation_plan`
+
+개인 API 자동화 목표를 실제 실행 없이 현재 가능/차단/승인 필요 범위로 나눈 plan-only 응답이다.
+
+```json
+{
+  "type": "automation_plan",
+  "answer": "개인 API 자동화 목표를 안전한 단계별 plan-only 계약으로 정리했습니다.",
+  "data": {
+    "goal": "내 개인 API 자동화",
+    "local_only": true,
+    "would_execute": false,
+    "blocked_until_review": [
+      "실제 shell 실행",
+      "브라우저 click/fill/submit/login/payment/delete 자동화",
+      "원본 파일 생성/수정/삭제 자동화"
+    ]
+  },
+  "safety": {
+    "shell_execution": "disabled",
+    "browser_interaction": "blocked",
+    "file_write_delete": "blocked",
+    "external_llm_api": "not-used"
+  },
+  "ui": {
+    "response_type": "automation_plan",
+    "severity": "warning",
+    "primary_text": "자동화 plan-only",
     "display": "panel"
   }
 }

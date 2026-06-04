@@ -5,6 +5,7 @@ from typer.main import get_command
 
 import cli.main as cli_main
 from app.main import app
+from app.schemas.assistant import AssistantDurableStatePreviewResponse
 from app.services.project_status_service import build_api_inventory
 from scripts import smoke_test_api as smoke
 
@@ -51,6 +52,23 @@ CORE_CLI_COMMANDS = [
 ASSISTANT_ENDPOINTS = [
     "GET /assistant/capabilities",
     "POST /assistant/action-preview",
+    "POST /assistant/action-loop-read-only-dispatch",
+    "POST /assistant/automation-plan",
+    "POST /assistant/read-only-scan",
+    "POST /assistant/file-preview",
+    "POST /assistant/url-preview",
+    "POST /assistant/read-only-adapter/execute",
+    "POST /assistant/workspace-brief",
+    "POST /assistant/shell-preview",
+    "POST /assistant/shell-approval-preview",
+    "POST /assistant/shell-run",
+    "POST /assistant/durable-state-preview/preview",
+    "GET /assistant/approval-console/pending",
+    "GET /assistant/approval-console/{approval_id}",
+    "POST /assistant/approval-console/cleanup-expired",
+    "POST /assistant/patch-preview",
+    "POST /assistant/patch-approval-preview",
+    "POST /assistant/patch-apply",
     "GET /assistant/ping",
     "GET /assistant/config",
     "GET /assistant/ui-contract",
@@ -69,6 +87,17 @@ ASSISTANT_ENDPOINTS = [
 ASSISTANT_CLI_COMMANDS = [
     "local-ai assistant-capabilities",
     "local-ai assistant-action-preview",
+    "local-ai assistant-automation-plan",
+    "local-ai assistant-read-only-scan",
+    "local-ai assistant-file-preview",
+    "local-ai assistant-url-preview",
+    "local-ai assistant-workspace-brief",
+    "local-ai assistant-shell-preview",
+    "local-ai assistant-shell-approval-preview",
+    "local-ai assistant-shell-run",
+    "local-ai assistant-patch-preview",
+    "local-ai assistant-patch-approval-preview",
+    "local-ai assistant-patch-apply",
     "local-ai assistant-ping",
     "local-ai assistant-config",
     "local-ai assistant-ui-contract",
@@ -112,10 +141,20 @@ PUBLIC_DOC_LINKS = [
     "docs/UI_CONTRACT_CHEATSHEET.md",
     "docs/UI_BRIDGE_EXAMPLES.md",
     "docs/UI_QA_CHECKLIST.md",
+    "docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md",
+    "docs/FULL_PERSONAL_AUTOMATION_DECISION_REQUIRED.md",
+    "docs/DURABLE_AUTOMATION_V2_CANDIDATE_DECISION_REQUIRED.md",
+    "docs/DURABLE_STATE_PREVIEW_SCHEMA_CANDIDATE.md",
+    "docs/DURABLE_STATE_PREVIEW_API_SURFACE_DECISION_REQUIRED.md",
+    "docs/LOCAL_JARVIS_APPROVAL_GATE_REVIEW.md",
+    "docs/LOCAL_JARVIS_V1_CANDIDATE_DECISION_REQUIRED.md",
+    "docs/READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md",
+    "docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md",
     "docs/RELEASE_CHECKLIST.md",
     "docs/PUBLIC_RELEASE_SUMMARY.md",
     "docs/PROJECT_SUMMARY.md",
     "docs/CLAUDE_REVIEW_HANDOFF.md",
+    "docs/CODEX_IMPLEMENTATION_NOTES.md",
     "docs/WORKLOG.md",
     "docs/NEXT_CHAT_HANDOFF.md",
     "SECURITY.md",
@@ -139,7 +178,16 @@ PUBLIC_MARKDOWN_FILES = [
     Path("docs/UI_CONTRACT_CHEATSHEET.md"),
     Path("docs/UI_BRIDGE_EXAMPLES.md"),
     Path("docs/UI_QA_CHECKLIST.md"),
+    Path("docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md"),
+    Path("docs/FULL_PERSONAL_AUTOMATION_DECISION_REQUIRED.md"),
+    Path("docs/LOCAL_JARVIS_APPROVAL_GATE_REVIEW.md"),
+    Path("docs/DURABLE_STATE_PREVIEW_SCHEMA_CANDIDATE.md"),
+    Path("docs/DURABLE_STATE_PREVIEW_API_SURFACE_DECISION_REQUIRED.md"),
+    Path("docs/LOCAL_JARVIS_V1_CANDIDATE_DECISION_REQUIRED.md"),
+    Path("docs/READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md"),
+    Path("docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md"),
     Path("docs/CLAUDE_REVIEW_HANDOFF.md"),
+    Path("docs/CODEX_IMPLEMENTATION_NOTES.md"),
     Path("docs/WORKLOG.md"),
     Path("docs/NEXT_CHAT_HANDOFF.md"),
 ]
@@ -269,6 +317,44 @@ def test_runtime_api_inventory_is_documented_in_api_reference() -> None:
     assert documented_public_endpoints == public_endpoints
 
 
+def test_stage76_durable_state_preview_docs_api_drift_guard_matches_schema_and_route_surface() -> None:
+    api_text = DOCS["api"].read_text(encoding="utf-8")
+    docs_text = "\n".join(path.read_text(encoding="utf-8") for path in DOCS.values())
+    inventory = build_api_inventory(app.routes)
+    durable_endpoints = [
+        endpoint for endpoint in inventory["endpoints"] if endpoint["path"].startswith("/assistant/durable-state-preview")
+    ]
+    section = api_text.split("### `POST /assistant/durable-state-preview/preview`", 1)[1].split(
+        "### Approval Console Read-only API",
+        1,
+    )[0]
+
+    assert durable_endpoints == [
+        {
+            "path": "/assistant/durable-state-preview/preview",
+            "methods": ["POST"],
+            "tags": ["assistant"],
+            "name": "assistant_durable_state_preview",
+            "requires_api_key": True,
+        }
+    ]
+    for field in AssistantDurableStatePreviewResponse.model_fields:
+        assert f"`{field}`" in section
+
+    for phrase in [
+        "POST /assistant/durable-state-preview/preview",
+        "response-only/read-only/schema-only",
+        "stored preview lookup/list/cleanup remain Decision Required",
+        "GET /assistant/durable-state-preview/{preview_state_id} remains absent",
+        "GET /assistant/durable-state-preview remains absent",
+        "POST /assistant/durable-state-preview/cleanup-expired remains absent",
+        "no persistence mutation",
+        "no approval consume",
+        "no queue mutation",
+    ]:
+        assert phrase in docs_text
+
+
 def test_runtime_cli_commands_are_documented_in_readme_and_api_reference() -> None:
     readme = DOCS["readme"].read_text(encoding="utf-8")
     api_text = DOCS["api"].read_text(encoding="utf-8")
@@ -337,6 +423,84 @@ def test_public_docs_keep_safety_boundaries_visible() -> None:
     assert "파일 수정" in combined or "file_write_delete" in combined
     for key, value in inventory_safety.items():
         assert f"safety.{key}={value}" in api_text
+
+
+def test_public_docs_surface_decision_required_link_set() -> None:
+    texts = {path: path.read_text(encoding="utf-8") for path in PUBLIC_MARKDOWN_FILES}
+    public_combined = "\n".join(
+        texts[path] for path in [Path("README.md"), Path("docs/PROJECT_SUMMARY.md"), Path("docs/API.md")]
+    )
+    required_links = [
+        "docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md",
+        "docs/FULL_PERSONAL_AUTOMATION_DECISION_REQUIRED.md",
+        "docs/DURABLE_AUTOMATION_V2_CANDIDATE_DECISION_REQUIRED.md",
+        "docs/DURABLE_STATE_PREVIEW_API_SURFACE_DECISION_REQUIRED.md",
+        "docs/LOCAL_JARVIS_APPROVAL_GATE_REVIEW.md",
+        "docs/LOCAL_JARVIS_V1_CANDIDATE_DECISION_REQUIRED.md",
+        "docs/READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md",
+        "docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md",
+    ]
+
+    for link in required_links:
+        assert Path(link).exists(), f"{link} should exist"
+        assert link in public_combined, f"{link} should be visible from public docs"
+        assert any(link in text for text in texts.values()), f"{link} should stay linked in markdown docs"
+
+    for phrase in [
+        "실제 dispatch",
+        "read-only adapter execution",
+        "raw content",
+        "approval-like JSON",
+        "execution_enabled=false",
+        "Local Jarvis",
+        "action_loop_full_dispatch_connected=false",
+        "browser_actual_interaction_connected=false",
+        "app_os_actual_action_connected=false",
+    ]:
+        assert phrase in public_combined
+
+
+def test_stage48_full_automation_action_loop_decision_required_is_publicly_locked() -> None:
+    decision_docs = {
+        "docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md": Path(
+            "docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md"
+        ).read_text(encoding="utf-8"),
+        "docs/FULL_PERSONAL_AUTOMATION_DECISION_REQUIRED.md": Path(
+            "docs/FULL_PERSONAL_AUTOMATION_DECISION_REQUIRED.md"
+        ).read_text(encoding="utf-8"),
+    }
+    public_docs = {
+        "README.md": Path("README.md").read_text(encoding="utf-8"),
+        "SECURITY.md": Path("SECURITY.md").read_text(encoding="utf-8"),
+        "docs/API.md": Path("docs/API.md").read_text(encoding="utf-8"),
+        "docs/TASKS.md": Path("docs/TASKS.md").read_text(encoding="utf-8"),
+        "docs/NEXT_CHAT_HANDOFF.md": Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8"),
+    }
+
+    for path, text in decision_docs.items():
+        for phrase in [
+            "48차",
+            "Full Automation Action-loop Dispatch Decision Required",
+            "실제 action-loop full dispatch는 계속 금지",
+            "사용자 최종 승인",
+            "Opus 리뷰",
+            "connector별 approval consume",
+            "rollback/failure strategy",
+            "browser actual interaction",
+            "app-os actual action",
+        ]:
+            assert phrase in text, f"{path} missing stage48 decision phrase: {phrase}"
+
+    combined_public = "\n".join(public_docs.values())
+    for phrase in [
+        "action_loop_full_dispatch_connected=false",
+        "browser_actual_interaction_connected=false",
+        "app_os_actual_action_connected=false",
+        "사용자 최종 승인",
+        "Opus 리뷰",
+        "실제 action-loop full dispatch는 계속 금지",
+    ]:
+        assert phrase in combined_public
 
 
 def test_release_checklist_covers_publication_gates() -> None:

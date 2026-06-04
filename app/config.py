@@ -27,8 +27,68 @@ class Settings(BaseSettings):
     local_api_key_warn: bool = Field(default=True, alias="LOCAL_API_KEY_WARN")
     agent_execution_enabled: bool = Field(default=False, alias="AGENT_EXECUTION_ENABLED")
     agent_allowed_roots: str = Field(default=".", alias="AGENT_ALLOWED_ROOTS")
+    read_only_adapter_execution_enabled: bool = Field(
+        default=False,
+        alias="READ_ONLY_ADAPTER_EXECUTION_ENABLED",
+    )
+    read_only_action_loop_dispatch_enabled: bool = Field(
+        default=False,
+        alias="READ_ONLY_ACTION_LOOP_DISPATCH_ENABLED",
+    )
+    shell_execution_enabled: bool = Field(default=False, alias="SHELL_EXECUTION_ENABLED")
+    shell_action_loop_dispatch_enabled: bool = Field(
+        default=False,
+        alias="SHELL_ACTION_LOOP_DISPATCH_ENABLED",
+    )
+    patch_apply_enabled: bool = Field(default=False, alias="PATCH_APPLY_ENABLED")
+    patch_action_loop_dispatch_enabled: bool = Field(
+        default=False,
+        alias="PATCH_ACTION_LOOP_DISPATCH_ENABLED",
+    )
+    rollback_executor_enabled: bool = Field(default=False, alias="ROLLBACK_EXECUTOR_ENABLED")
+    full_automation_dispatch_enabled: bool = Field(
+        default=False,
+        alias="FULL_AUTOMATION_DISPATCH_ENABLED",
+    )
+    browser_observe_enabled: bool = Field(default=False, alias="BROWSER_OBSERVE_ENABLED")
+    browser_observe_allowed_origins: str = Field(
+        default="http://127.0.0.1,http://localhost",
+        alias="BROWSER_OBSERVE_ALLOWED_ORIGINS",
+    )
+    browser_limited_interaction_enabled: bool = Field(
+        default=False,
+        alias="BROWSER_LIMITED_INTERACTION_ENABLED",
+    )
+    browser_limited_interaction_allowed_origins: str = Field(
+        default="http://127.0.0.1,http://localhost",
+        alias="BROWSER_LIMITED_INTERACTION_ALLOWED_ORIGINS",
+    )
+    browser_limited_interaction_allowed_selectors: str = Field(
+        default="",
+        alias="BROWSER_LIMITED_INTERACTION_ALLOWED_SELECTORS",
+    )
+    browser_limited_interaction_allowed_fill_fields: str = Field(
+        default="",
+        alias="BROWSER_LIMITED_INTERACTION_ALLOWED_FILL_FIELDS",
+    )
     agent_web_fetch_enabled: bool = Field(default=False, alias="AGENT_WEB_FETCH_ENABLED")
     agent_web_fetch_max_bytes: int = Field(default=100_000, ge=1, alias="AGENT_WEB_FETCH_MAX_BYTES")
+    external_web_search_enabled: bool = Field(default=False, alias="EXTERNAL_WEB_SEARCH_ENABLED")
+    external_web_search_provider: str | None = Field(default=None, alias="EXTERNAL_WEB_SEARCH_PROVIDER")
+    external_web_search_api_key: str | None = Field(default=None, alias="EXTERNAL_WEB_SEARCH_API_KEY")
+    external_web_search_rate_limit_per_minute: int = Field(
+        default=0,
+        ge=0,
+        alias="EXTERNAL_WEB_SEARCH_RATE_LIMIT_PER_MINUTE",
+    )
+    task_queue_worker_enabled: bool = Field(default=False, alias="TASK_QUEUE_WORKER_ENABLED")
+    task_queue_worker_max_drain: int = Field(
+        default=5,
+        ge=1,
+        le=20,
+        alias="TASK_QUEUE_WORKER_MAX_DRAIN",
+    )
+    app_os_control_enabled: bool = Field(default=False, alias="APP_OS_CONTROL_ENABLED")
     agent_file_preview_max_bytes: int = Field(default=50_000, ge=1, alias="AGENT_FILE_PREVIEW_MAX_BYTES")
     agent_file_preview_extensions: str = Field(
         default=".txt,.md,.py,.json,.yaml,.yml,.toml,.csv,.html,.htm,.log",

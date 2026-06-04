@@ -85,6 +85,7 @@ local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-read-only-dispatch-preview "read-only result wrapper smoke" --project-root /Users/juyoung/local-ai-server
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-ui-contract
@@ -96,6 +97,8 @@ local-ai assistant-sessions
 local-ai assistant-messages session-1 --limit 50 --offset 0
 local-ai assistant-message "상태 알려줘" --project-root /Users/juyoung/local-ai-server
 ```
+
+Assistant bridge smoke flow에는 `POST /assistant/action-loop-read-only-dispatch-preview`도 포함된다. 이 단계는 13차 `result_wrapper_schema`의 safe flag만 확인하며 실제 파일 읽기, URL fetch, dispatch를 수행하지 않는다.
 
 공개 전 로컬 데이터와 secret 후보를 점검한다.
 

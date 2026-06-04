@@ -15,7 +15,7 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
 
     assert ".venv/bin/pytest" in text
-    assert "556 passed" in text
+    assert "668 passed, 1 warning" in text
     assert ".venv/bin/python -m compileall app cli scripts" in text
     assert ".venv/bin/python scripts/public_release_check.py --root . --json" in text
     assert ".venv/bin/python scripts/local_ci_check.py --root ." in text
@@ -23,8 +23,35 @@ def test_next_chat_handoff_includes_current_verification_gates() -> None:
     assert "source .venv/bin/activate" not in text
     assert "\npytest\n" not in text
     assert "\npython -m compileall app cli scripts\n" not in text
+    assert "read-only-result-wrapper" in text
     assert "message(auto/status intent)" in text
     assert "message(status)" not in text
+
+
+def test_next_chat_handoff_tracks_stage15_to_24_doc_contracts() -> None:
+    text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
+
+    for phrase in [
+        "24차 Production Hardening 이후 계약 유지",
+        "15차 NEXT_CHAT_HANDOFF와 Decision Required sync",
+        "16차 Claude/Sonnet handoff and final report sync",
+        "17차 public docs Decision Required link contract",
+        "18차",
+        "19차",
+        "20차",
+        "21차",
+        "22차",
+        "23차",
+        "24차",
+        "Production Hardening",
+        "capabilities honesty",
+        "tests/test_public_docs_contract.py::test_public_docs_surface_decision_required_link_set",
+        "docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md",
+        "docs/READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md",
+        "docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md",
+        "668 passed, 1 warning",
+    ]:
+        assert phrase in text
 
 
 def test_next_chat_handoff_links_release_and_ui_docs() -> None:
@@ -39,6 +66,9 @@ def test_next_chat_handoff_links_release_and_ui_docs() -> None:
         "docs/PUBLIC_RELEASE_SUMMARY.md",
         "docs/TASKS.md",
         "docs/USER_DOCUMENT_E2E_PLAN.md",
+        "docs/ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md",
+        "docs/READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md",
+        "docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md",
     ]:
         assert doc in text
 
@@ -58,6 +88,30 @@ def test_next_chat_handoff_tracks_completed_real_user_document_e2e() -> None:
     assert "실제 사용자 문서 E2E는 완료됨" in text
     assert "완료된 실제 사용자 문서 E2E summary 정합성 유지" in text
     assert "추가 사용자 문서로 재검증이 필요하면 사용자 승인과 실제 `.md`, `.txt`, `.html`, `.htm`, `.pdf`, `.docx` 경로를 받은 뒤 실행" in text
+
+
+def test_next_chat_handoff_tracks_stage9_to_14_locked_preview_contracts() -> None:
+    text = Path("docs/NEXT_CHAT_HANDOFF.md").read_text(encoding="utf-8")
+
+    for phrase in [
+        "9차 approval store",
+        "10차 no-op dispatcher",
+        "11차 read-only boundary preview",
+        "12차 read-only adapter execution Decision Required",
+        "13차 result wrapper schema",
+        "14차 UI/smoke expected output",
+        "assistant.action_loop.read_only_result_wrapper.v1",
+        "raw content/approval-like JSON/next step mutation 승격 금지",
+        "would_dispatch=false",
+        "would_read=false",
+        "would_fetch=false",
+        "would_execute=false",
+        "would_apply=false",
+        "would_interact=false",
+        "execution_enabled=false",
+        "approval_consume_mode=validate-only",
+    ]:
+        assert phrase in text
 
 
 def test_next_chat_handoff_tracks_runtime_snapshot_guard_tests() -> None:
@@ -110,6 +164,6 @@ def test_next_chat_handoff_boundaries_match_task_board_and_public_docs() -> None
         for term in shared_safe_terms + shared_manual_or_review_terms:
             assert term in text, f"{path} missing shared boundary term: {term}"
 
-    assert "사용자 수동 확인 또는 별도 승인 후에만 진행할 작업" in docs["docs/NEXT_CHAT_HANDOFF.md"]
+    assert "사용자 승인 또는 Opus 리뷰가 필요한 작업" in docs["docs/NEXT_CHAT_HANDOFF.md"]
     assert "## 사용자 수동 확인 작업" in docs["docs/TASKS.md"]
     assert "## 별도 승인 또는 보안 리뷰가 필요한 작업" in docs["docs/TASKS.md"]

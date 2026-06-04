@@ -46,6 +46,49 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /project/shell-dry-run`
 - `GET /assistant/capabilities`
 - `POST /assistant/action-preview`
+- `POST /assistant/action-loop-preflight`
+- `POST /assistant/action-loop-noop-dispatch`
+- `POST /assistant/action-loop-read-only-dispatch-preview`
+- `POST /assistant/action-loop-read-only-dispatch`
+- `POST /assistant/action-loop-shell-dispatch`
+- `POST /assistant/action-loop-patch-dispatch`
+- `POST /assistant/full-automation-preflight`
+- `POST /assistant/full-automation-dispatch`
+- `POST /assistant/automation-plan`
+- `GET /assistant/workflow-presets`
+- `GET /assistant/workflow-presets/{preset_id}`
+- `POST /assistant/workflow-presets/{preset_id}/preview`
+- `POST /assistant/task-queue/preview`
+- `GET /assistant/task-queue`
+- `POST /assistant/task-queue/drain`
+- `GET /assistant/task-queue/{task_id}`
+- `POST /assistant/task-queue/{task_id}/cancel-preview`
+- `POST /assistant/failure-recovery-preview`
+- `POST /assistant/rollback-approval-preview`
+- `POST /assistant/rollback-execute`
+- `POST /assistant/read-only-scan`
+- `POST /assistant/file-preview`
+- `POST /assistant/url-preview`
+- `POST /assistant/read-only-adapter/execute`
+- `POST /assistant/web-search-provider-preview`
+- `POST /assistant/web-search-provider/search`
+- `POST /assistant/app-os-interaction-preview`
+- `POST /assistant/workspace-brief`
+- `POST /assistant/shell-preview`
+- `POST /assistant/shell-approval-preview`
+- `POST /assistant/shell-run`
+- `POST /assistant/durable-state-preview/preview`
+- `GET /assistant/approval-console/pending`
+- `GET /assistant/approval-console/{approval_id}`
+- `POST /assistant/approval-console/cleanup-expired`
+- `POST /assistant/patch-preview`
+- `POST /assistant/patch-approval-preview`
+- `POST /assistant/patch-apply`
+- `POST /assistant/browser-preview`
+- `POST /assistant/browser-approval-preview`
+- `POST /assistant/browser-interact`
+- `POST /assistant/browser-observe`
+- `POST /assistant/browser-limited-interact`
 - `GET /assistant/ping`
 - `GET /assistant/config`
 - `GET /assistant/ui-contract`
@@ -60,7 +103,11 @@ Authorization: Bearer <LOCAL_API_KEY>
 - `POST /assistant/message`
 - `POST /assistant/project-root/validate`
 
+주의:
+
 현재 API key 없이 읽을 수 있는 public read-only endpoint는 `GET /health`, `GET /health/ollama`, `GET /documents`, `GET /documents/{document_id}`, `GET /documents/{document_id}/chunks`, `GET /documents/supported-types`, `GET /documents/stats`, `GET /documents/integrity`, `GET /documents/repair-preview`, `GET /documents/vector-rebuild-preview`, `GET /chat-logs`, `GET /chat-logs/{chat_log_id}`, `GET /feedback`, `GET /project/status`, `GET /project/next`, `GET /project/api-inventory`이다. `/agent/runs`는 사용자 요청 내용이 포함될 수 있어 보호 endpoint로 둔다. shell dry-run 정책 endpoint는 명령 후보가 포함될 수 있어 `LOCAL_API_KEY` 설정 시 보호된다. 개인 문서가 들어가는 환경에서는 서버를 `127.0.0.1`에만 bind하는 것을 권장한다.
+
+24차 Production Hardening 기준으로 `/assistant/capabilities`와 `/assistant/ui-contract`는 위험 기능을 과장해 enabled로 광고하지 않는다. shell은 27차 allowlist env opt-in, patch는 29차 단일 파일 env opt-in 범위만 표시할 수 있고, task queue worker는 34차 env opt-in one-shot drain 범위만 표시할 수 있다. rollback executor는 35차 env opt-in 단일 파일 restore 범위만 표시할 수 있다. 36~48차 full personal automation은 preflight, no-op orchestrator, read-only adapter step integration, allowlist shell step integration, single-file patch step integration, single-file rollback step integration, read-only task queue step integration, browser observe metadata step integration, browser limited candidate validation step integration, external web search provider step integration, app-os observe-plan preview step integration, policy/audit matrix hardening, Full Automation Action-loop Dispatch Decision Required까지만 제공한다. 실제 action-loop full dispatch는 계속 금지하며, 사용자 최종 승인과 Opus 리뷰 전까지 `action_loop_full_dispatch_connected=false`, `browser_actual_interaction_connected=false`, `app_os_actual_action_connected=false`를 유지한다. browser actual interaction/app-os actual action dispatch는 아직 연결하지 않는다. browser와 app/OS control은 disabled/blocked/locked/preview-only로 표시되어야 한다. 운영 배포 또는 service/daemon 활성화는 이 API 계약에 포함되지 않는다.
 
 ## Rate Limit
 
@@ -230,6 +277,1227 @@ curl -X POST http://127.0.0.1:8000/assistant/action-preview \
 - `needs`
 - `safety`
 - `ui`
+
+### `POST /assistant/automation-plan`
+
+개인 API 자동화 목표를 현재 안전 경계 안에서 단계별 plan-only 계약으로 정리한다. 이 endpoint는 shell 실행, 브라우저 조작, 파일 생성/수정/삭제, 외부 LLM/API 호출을 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/automation-plan \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"내 개인 API 자동화","project_root":"/Users/juyoung/local-ai-server"}'
+```
+
+응답 핵심 필드:
+
+- `goal`
+- `service`
+- `local_only=true`
+- `would_execute=false`
+- `current_capabilities`
+- `automation_stages`
+- `codex_safe_now`
+- `blocked_until_review`
+- `required_user_decisions`
+- `recommended_next_model`
+- `safety`
+- `ui.response_type=automation_plan`
+
+### `POST /assistant/read-only-scan`
+
+허용 root 안의 프로젝트 구조를 read-only로 스캔한다. 파일 내용은 읽지 않고 top-level item, 확장자 count, 중요 파일 존재 여부만 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/read-only-scan \
+  -H "Content-Type: application/json" \
+  -d '{"project_root":"/Users/juyoung/local-ai-server","max_items":120}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `project_root`
+- `resolved_path`
+- `mode=read-only`
+- `would_execute=false`
+- `summary`
+- `important_files`
+- `top_level_items`
+- `extension_counts`
+- `safety`
+- `ui`
+
+### `POST /assistant/file-preview`
+
+허용 root 안의 UTF-8 텍스트 파일만 read-only로 preview한다. `.env`, key, credential 후보는 차단하고 secret-looking 값은 masking한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/file-preview \
+  -H "Content-Type: application/json" \
+  -d '{"path":"/Users/juyoung/local-ai-server/README.md","project_root":"/Users/juyoung/local-ai-server","max_bytes":8000}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `path`
+- `resolved_path`
+- `mode=read-only`
+- `status`
+- `would_execute=false`
+- `metadata`
+- `content_preview`
+- `truncated`
+- `masked`
+- `safety`
+- `ui`
+
+### `POST /assistant/url-preview`
+
+URL 자동화 preflight다. 기본값에서는 네트워크 호출을 수행하지 않고, 명시 URL 단건 read-only fetch가 가능한 조건과 차단 이유만 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/url-preview \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `url`
+- `mode=read-only-url-preflight`
+- `status`
+- `would_fetch=false`
+- `reason`
+- `safety`
+- `ui`
+
+### `POST /assistant/read-only-adapter/execute`
+
+25차 Read-only Adapter Execution endpoint다. 기본값 `READ_ONLY_ADAPTER_EXECUTION_ENABLED=false`에서는 `disabled`를 반환한다. flag가 true이고 `result_wrapper.untrusted=true`일 때만 `read_only_scan`, `file_preview`, `url_fetch` adapter를 실제 read-only로 실행한다. 이 endpoint는 action-loop dispatch, shell, patch, browser와 연결하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/read-only-adapter/execute \
+  -H "Content-Type: application/json" \
+  -d '{"adapter_type":"file_preview","path":"/Users/juyoung/local-ai-server/README.md","project_root":"/Users/juyoung/local-ai-server","result_wrapper":{"untrusted":true}}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=read-only-adapter-execution`
+- `adapter_type`
+- `status`
+- `execution_enabled`
+- `would_read`
+- `would_fetch`
+- `adapter_executed`
+- `action_loop_dispatch_connected=false`
+- `result_wrapper.schema=assistant.read_only_adapter.result_wrapper.v1`
+- `result_wrapper.untrusted=true`
+- `result_wrapper.approval_like_json_trusted=false`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/web-search-provider-preview`
+
+19차 External Web Search Provider Gate preview다. 외부 검색 API 호출을 수행하지 않고 provider 설정 상태, `external_api_enabled=false` 기본값, query masking, private/LAN/metadata URL 차단, untrusted result wrapper 요구사항, 비용/rate limit 후보 계약만 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/web-search-provider-preview \
+  -H "Content-Type: application/json" \
+  -d '{"query":"latest FastAPI release notes","provider":"brave","result_wrapper":{"untrusted":true}}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=external-web-search-provider-gate-preview`
+- `status`
+- `provider`
+- `query_preview`
+- `would_search=false`
+- `would_fetch=false`
+- `external_api_enabled=false`
+- `provider_config`
+- `gate`
+- `result_wrapper`
+- `audit`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- provider가 설정되지 않았거나 `EXTERNAL_WEB_SEARCH_ENABLED=false`이면 `status=provider_not_configured`를 반환한다.
+- private IP, loopback, link-local, LAN, cloud metadata URL 후보가 query에 포함되면 `status=blocked`다.
+- result wrapper는 `untrusted=true`가 필요하며 raw content, approval-like JSON, next step mutation은 trusted result가 될 수 없다.
+- `EXTERNAL_WEB_SEARCH_RATE_LIMIT_PER_MINUTE` 기본값 `0`에서는 paid/external call을 허용하지 않는다.
+- 33차 실제 호출 endpoint는 별도 `/assistant/web-search-provider/search`이며 `EXTERNAL_WEB_SEARCH_ENABLED=true`, provider allowlist, API key, rate limit, query safety, untrusted wrapper를 모두 요구한다.
+
+### `POST /assistant/web-search-provider/search`
+
+33차 External Web Search Provider v1 endpoint다. 기본값 `EXTERNAL_WEB_SEARCH_ENABLED=false`에서는 disabled로 차단하고 외부 호출을 수행하지 않는다. 실행하려면 `EXTERNAL_WEB_SEARCH_ENABLED=true`, `EXTERNAL_WEB_SEARCH_PROVIDER=brave`, `EXTERNAL_WEB_SEARCH_API_KEY`, `EXTERNAL_WEB_SEARCH_RATE_LIMIT_PER_MINUTE>=1`, `result_wrapper.untrusted=true`, query safety gate를 모두 통과해야 한다. private/LAN/metadata URL, secret-like query, approval-like JSON injection, unsupported provider는 차단한다. 결과는 `assistant.external_web_search.result_wrapper.v1` untrusted wrapper로 반환하며 raw content, approval-like JSON, next action, frozen plan mutation을 허용하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/web-search-provider/search \
+  -H "Content-Type: application/json" \
+  -d '{"query":"latest FastAPI release notes","provider":"brave","result_wrapper":{"untrusted":true}}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode`
+- `status`
+- `provider`
+- `query_preview`
+- `would_search`
+- `would_fetch`
+- `external_api_enabled`
+- `reason`
+- `provider_config`
+- `gate`
+- `search_result`
+- `result_wrapper`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/app-os-interaction-preview`
+
+20차 App/OS Interaction Gate preview다. 실제 OS app control을 수행하지 않고 observe-plan 후보, blocked action taxonomy, permission model, approval binding 설계, masking된 audit payload만 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/app-os-interaction-preview \
+  -H "Content-Type: application/json" \
+  -d '{"action":"observe-plan","app_name":"Preview","window_title":"Status"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=app-os-interaction-gate-preview`
+- `status`
+- `action`
+- `app_name`
+- `window_title`
+- `target_path`
+- `allowed=false`
+- `observe_plan_candidate`
+- `would_control_app=false`
+- `os_action_executed=false`
+- `reason`
+- `taxonomy`
+- `permission_model`
+- `approval_binding`
+- `gate`
+- `audit`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- `APP_OS_CONTROL_ENABLED=false` 기본값에서는 app open, click, type, hotkey, file dialog, file open을 수행하지 않는다.
+- observe/status/read 계열은 observe-plan candidate로만 표시되며 실행 허용이 아니다.
+- app name, window title, target path, input preview, reason은 audit payload 이전에 masking한다.
+- credential/private path 후보는 blocked 상태로 남는다.
+- approval binding은 설계 계약만 노출하며 서버 store approval을 생성하거나 실제 OS action approval로 사용하지 않는다.
+- Computer Use, AppleScript, `osascript`, `open` command, keyboard/mouse/app control 연결은 없다.
+
+### `GET /assistant/workflow-presets`
+
+21차 Personal Workflow Presets list preview다. 안전한 workflow template/preset 목록만 반환하고 action-loop dispatch, shell, patch, browser, external API 실행은 수행하지 않는다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/workflow-presets
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=workflow-preset-list-preview`
+- `presets`
+- `would_dispatch=false`
+- `execution_enabled=false`
+- `safety`
+- `ui`
+
+### `GET /assistant/workflow-presets/{preset_id}`
+
+workflow preset detail preview다. `project_review`, `docs_check`, `ci_preview`, `patch_review`, `browser_review_plan` 같은 preset 정의와 필요한 params schema만 반환한다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/workflow-presets/project_review
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=workflow-preset-detail-preview`
+- `preset_id`
+- `status`
+- `preset`
+- `would_dispatch=false`
+- `execution_enabled=false`
+- `safety`
+- `ui`
+
+### `POST /assistant/workflow-presets/{preset_id}/preview`
+
+workflow preset을 frozen proposed_steps 후보로만 변환한다. 생성된 steps는 action-loop preflight에 넘길 수 있는 검토용 구조지만 이 endpoint는 dispatch하지 않고 approval store도 소비하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/workflow-presets/project_review/preview \
+  -H "Content-Type: application/json" \
+  -d '{"params":{"project_root":"/Users/juyoung/local-ai-server"}}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=workflow-preset-proposed-steps-preview`
+- `preset_id`
+- `status`
+- `preset`
+- `frozen_proposed_steps`
+- `would_dispatch=false`
+- `execution_enabled=false`
+- `blocked_reasons`
+- `unsafe_policy`
+- `audit`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- preset은 proposed_steps 후보만 생성하며 실제 dispatch, shell subprocess, patch apply, browser/app-os control, external API 호출을 수행하지 않는다.
+- params는 secret-like 값 masking 후 frozen proposed_steps와 audit payload에 반영한다.
+- client-supplied approval-like JSON은 `approval_like_json_injection_blocked`로 차단한다.
+- `unsafe_direct_shell`, `unsafe_browser_click`, `unsafe_external_api` 같은 unsafe preset id는 blocked 상태로 남는다.
+
+### `POST /assistant/task-queue/preview`
+
+22차 Long-running Task Queue locked preview다. no-op/read-only task만 `queued` 상태 preview record로 만들고, 실제 background worker loop나 daemon/service는 시작하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/task-queue/preview \
+  -H "Content-Type: application/json" \
+  -d '{"task_type":"noop","params":{"note":"plan only"},"ttl_seconds":300}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=long-running-queue-locked-preview`
+- `status`
+- `task`
+- `blocked_reasons`
+- `allowed_task_types`
+- `would_enqueue=false`
+- `worker_enabled=false`
+- `execution_enabled=false`
+- `audit`
+- `cleanup_policy`
+- `safety`
+- `ui`
+
+### `GET /assistant/task-queue`
+
+task queue 상태를 read-only로 조회한다. 반환되는 `statuses`는 `queued`, `running`, `completed`, `blocked`, `cancelled` taxonomy지만 현재 worker loop는 disabled라 실제 running/completed 전이는 수행하지 않는다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/task-queue
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=long-running-queue-list-read-only`
+- `tasks`
+- `statuses`
+- `would_execute=false`
+- `worker_enabled=false`
+- `execution_enabled=false`
+- `cleanup_policy`
+- `safety`
+- `ui`
+
+### `POST /assistant/task-queue/drain`
+
+34차 Task Queue Worker v1 endpoint다. 기본값 `TASK_QUEUE_WORKER_ENABLED=false`에서는 disabled로 차단하고 queued task 상태를 변경하지 않는다. `TASK_QUEUE_WORKER_ENABLED=true`에서만 request-scoped one-shot drain을 수행하며, daemon/service/background infinite loop는 시작하지 않는다. 실제 처리 범위는 `noop`, `read_only_scan`, `file_preview`이고 read-only 실행은 기존 `READ_ONLY_ADAPTER_EXECUTION_ENABLED=true`와 untrusted wrapper gate를 재사용한다. `url_preview` task는 queue에는 만들 수 있지만 worker network fetch에는 아직 연결하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/task-queue/drain \
+  -H "Content-Type: application/json" \
+  -d '{"limit":1}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode`
+- `status`
+- `worker_enabled`
+- `execution_enabled`
+- `would_execute=false`
+- `drained_count`
+- `tasks`
+- `results`
+- `blocked_reasons`
+- `allowed_task_types`
+- `worker`
+- `audit`
+- `cleanup_policy`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- `TASK_QUEUE_WORKER_ENABLED=false`가 기본값이며 이 상태에서는 task 상태를 변경하지 않는다.
+- worker는 explicit request 한 번에만 동작하는 one-shot drain이며 `background_loop_created=false`, `daemon_started=false`, `service_installed=false`를 반환한다.
+- shell task는 queue worker에 연결하지 않았다. shell은 27차 `/assistant/shell-run`과 28차 shell action-loop dispatch의 approval-bound allowlist 계약에만 남아 있다.
+- patch/browser/external API/rollback/app-os/action-loop full dispatch task는 worker에서 실행하지 않는다.
+- result는 `assistant.task_queue.worker_result_wrapper.v1` untrusted wrapper로 반환하며 secret-like 값은 masking된다.
+
+### `GET /assistant/task-queue/{task_id}`
+
+task detail을 read-only로 조회한다. unknown 또는 TTL cleanup 이후 task는 `status=blocked`로 남는다.
+
+```bash
+curl http://127.0.0.1:8000/assistant/task-queue/task-id
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=long-running-queue-detail-read-only`
+- `task_id`
+- `status`
+- `task`
+- `would_execute=false`
+- `worker_enabled=false`
+- `execution_enabled=false`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/task-queue/{task_id}/cancel-preview`
+
+task cancellation state만 preview로 기록한다. 실제 worker cancellation, signal, process kill은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/task-queue/task-id/cancel-preview
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=long-running-cancel-locked-preview`
+- `task_id`
+- `status`
+- `task`
+- `cancellation`
+- `would_cancel_worker=false`
+- `worker_enabled=false`
+- `execution_enabled=false`
+- `audit`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- 허용 task type은 `noop`, `read_only_scan`, `file_preview`, `url_preview`, `workflow_preset_preview` 후보뿐이다.
+- 34차 worker one-shot drain의 실제 처리 범위는 `noop`, `read_only_scan`, `file_preview`로 제한된다. `url_preview`는 network fetch worker에 아직 연결하지 않는다.
+- shell, patch, browser, app/os, external API, action-loop dispatch task는 blocked 상태로 남는다.
+- task params와 audit payload는 secret-like 값 masking 후 반환한다.
+- approval-like JSON injection은 서버 approval이나 task authority로 승격하지 않는다.
+- TTL cleanup은 process-local preview record 정리 정책이며 durable queue나 background worker를 의미하지 않는다.
+
+### `POST /assistant/failure-recovery-preview`
+
+23차 Failure Recovery / Rollback locked preview다. 실패 이유 taxonomy와 rollback plan만 반환하며 자동 rollback 실행, git reset, file restore, shell execution, browser interaction은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/failure-recovery-preview \
+  -H "Content-Type: application/json" \
+  -d '{"tool":"patch","failure_reason":"hash_mismatch","original_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=failure-recovery-rollback-locked-preview`
+- `tool`
+- `status`
+- `failure`
+- `rollback_plan`
+- `manual_instructions`
+- `paste_safe_summary`
+- `would_execute=false`
+- `would_apply=false`
+- `would_interact=false`
+- `rollback_enabled=false`
+- `execution_enabled=false`
+- `audit`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- patch rollback plan은 `original_sha256` precondition을 포함하지만 실제 restore/apply/delete/write를 수행하지 않는다.
+- shell failure recovery는 manual instruction only이며 command 재실행이나 자동 cleanup을 수행하지 않는다.
+- browser failure recovery는 manual instruction only이며 click/fill/submit/session 조작을 수행하지 않는다.
+- failure summary와 params는 paste-safe masking 후 audit과 UI 응답에 포함한다.
+
+### `POST /assistant/rollback-approval-preview`
+
+35차 Rollback Executor Boundary approval endpoint다. 단일 UTF-8 텍스트 파일 restore 후보만 검토하고 서버 발급 approval binding을 만든다. 이 endpoint는 파일을 수정하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/rollback-approval-preview \
+  -H "Content-Type: application/json" \
+  -d '{"path":"/tmp/project/a.md","restored_content":"old\n","current_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","original_sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=rollback-approval-binding-preview`
+- `status`
+- `approval_required=true`
+- `rollback_enabled=false`
+- `would_apply=false`
+- `binding`
+- `preview`
+- `blocked_reasons`
+- `safety`
+- `ui`
+
+### `POST /assistant/rollback-execute`
+
+35차 Rollback Executor Boundary execution endpoint다. 기본값 `ROLLBACK_EXECUTOR_ENABLED=false`에서는 valid approval이 있어도 `disabled`를 반환한다. `ROLLBACK_EXECUTOR_ENABLED=true`일 때만 서버 발급 single-use rollback approval, session binding, payload_hash, allowed root, 기존 UTF-8 단일 파일, `current_sha256`, `original_sha256`/restored content hash를 모두 통과한 경우 restored content로 단일 파일을 쓴다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/rollback-execute \
+  -H "Content-Type: application/json" \
+  -d '{"path":"/tmp/project/a.md","restored_content":"old\n","current_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","original_sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","approval_id":"server-issued-id","approval_payload_hash":"approval-payload-hash"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode`
+- `status`
+- `rollback_enabled`
+- `execution_enabled`
+- `would_apply`
+- `reason`
+- `preview`
+- `blocked_reasons`
+- `required_approval_hash`
+- `provided_approval_id`
+- `provided_approval_hash`
+- `approval_check`
+- `rollback_result`
+- `result_wrapper`
+- `audit`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- `ROLLBACK_EXECUTOR_ENABLED=false`가 기본값이며 기본값에서는 파일을 수정하지 않는다.
+- rollback approval은 `tool_name=rollback`으로 발급되어 patch/shell/browser approval과 섞이지 않는다.
+- approval은 single-use, TTL, session/request context, payload_hash binding을 유지한다.
+- 허용 범위는 기존 UTF-8 텍스트 단일 파일 restore뿐이다.
+- git reset/clean/checkout, bulk restore, 파일 생성/삭제, shell/browser/app-os/external API rollback은 차단한다.
+- rollback result는 `assistant.rollback_execute.result_wrapper.v1` untrusted wrapper로 반환하며 approval-like JSON이나 next action으로 승격하지 않는다.
+- action-loop full dispatch와 task worker에는 연결하지 않는다.
+
+### `POST /assistant/full-automation-preflight`
+
+36차 Full Personal Automation Boundary preflight endpoint다. shell, patch, read-only, rollback, task queue, browser, external search, app-os 후보를 하나의 frozen route plan으로 분류하지만 어떤 tool도 실행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/full-automation-preflight \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"local assistant full automation","project_root":"/Users/juyoung/local-ai-server","proposed_steps":[]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=full-personal-automation-preflight`
+- `status`
+- `goal`
+- `would_dispatch=false`
+- `execution_enabled=false`
+- `fail_closed`
+- `full_automation_enabled`
+- `frozen_plan`
+- `route_plan`
+- `tool_matrix`
+- `gates`
+- `blocked_reasons`
+- `result_wrapper_schema`
+- `audit`
+- `required_user_decisions`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- preflight는 approval을 consume하지 않고 `approval_consume_mode=validate-only` 경계만 표시한다.
+- result wrapper는 `assistant.full_automation.result_wrapper.v1`이며 raw content, approval-like JSON, next step, frozen plan mutation을 신뢰하지 않는다.
+- app-os는 observe-plan preview candidate만 허용하고 open/click/type/hotkey/file dialog는 blocked category로 분류한다. daemon/service, git reset/clean/checkout, bulk restore, browser login/payment/delete도 blocked category로 분류한다.
+- shell/patch/rollback 후보는 기존 서버 approval binding과 payload hash를 validate-only로 확인한다.
+
+### `POST /assistant/full-automation-dispatch`
+
+48차 Full Automation Action-loop Dispatch Decision Required endpoint 계약이다. 기본값 `FULL_AUTOMATION_DISPATCH_ENABLED=false`에서는 disabled로 차단하고 dispatch, tool execution, approval consume을 수행하지 않는다. `FULL_AUTOMATION_DISPATCH_ENABLED=true`만 켜진 경우에는 37차처럼 no-op aggregation만 반환한다. `READ_ONLY_ADAPTER_EXECUTION_ENABLED=true`가 함께 켜지면 read-only category step만 기존 read-only adapter wrapper로 실행한다. `SHELL_EXECUTION_ENABLED=true`와 valid shell approval이 함께 있으면 shell category step만 기존 shell sandbox로 실행한다. `PATCH_APPLY_ENABLED=true`, valid patch approval, allowed root, 기존 UTF-8 단일 파일, `original_sha256` precondition, secret scan을 모두 만족하면 patch category step만 기존 patch boundary로 실행한다. `ROLLBACK_EXECUTOR_ENABLED=true`, valid rollback approval, allowed root, 기존 UTF-8 단일 파일, current/original hash precondition을 모두 만족하면 rollback category step만 기존 rollback boundary로 실행한다. `TASK_QUEUE_WORKER_ENABLED=true`, read-only task type, wrapper gate, params masking, approval-like JSON injection 차단을 모두 만족하면 `noop`, `read_only_scan`, `file_preview` task queue step만 기존 one-shot worker boundary로 실행한다. `BROWSER_OBSERVE_ENABLED=true`, valid browser approval, loopback/명시 allowlist URL, read-only observe action을 모두 만족하면 browser_observe category step만 기존 browser observe metadata boundary로 실행한다. `BROWSER_LIMITED_INTERACTION_ENABLED=true`, valid browser approval, loopback/명시 allowlist origin, selector allowlist, safe fill field allowlist를 모두 만족하면 browser_limited_interaction category step만 기존 candidate validation boundary로 실행한다. `EXTERNAL_WEB_SEARCH_ENABLED=true`, `EXTERNAL_WEB_SEARCH_PROVIDER=brave`, provider configured, rate limit, query safety, `wrapper.untrusted=true`를 모두 만족하면 external_web_search category step만 기존 external web search provider boundary로 실행한다. app_os category step은 기존 `/assistant/app-os-interaction-preview` boundary로만 처리해 observe-plan candidate wrapper를 중첩하며 실제 app open/click/type/hotkey/file dialog는 수행하지 않는다. 47차에서는 `gates`, `audit.payload`, `safety`가 safe connector, preview connector, mutating connector, browser actual interaction, app-os actual action, action-loop full dispatch 상태를 명시했다. 48차에서는 실제 action-loop full dispatch는 계속 금지하고 connector별 approval consume, rollback/failure strategy, 사용자 최종 승인, Opus 리뷰 조건을 Decision Required로 고정한다. 61~73차 Local Jarvis runtime drift guard, failure/timeout drill, manual review packet, approval console state-only review, approval payload hash review, approval store expiry cleanup review, approval console API surface Decision Required, approval-console-read-only API, Durable Automation v2 Candidate Decision Required, Durable State Preview Schema Candidate, and Durable State Preview API Surface Decision Required는 `docs/LOCAL_JARVIS_V1_CANDIDATE_DECISION_REQUIRED.md`, `docs/LOCAL_JARVIS_APPROVAL_GATE_REVIEW.md`, `docs/DURABLE_STATE_PREVIEW_SCHEMA_CANDIDATE.md`, `docs/DURABLE_STATE_PREVIEW_API_SURFACE_DECISION_REQUIRED.md`와 함께 실제 action-loop full dispatch, browser actual interaction, app-os actual action을 계속 미연결로 유지한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/full-automation-dispatch \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"local assistant full automation","project_root":"/Users/juyoung/local-ai-server","proposed_steps":[]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=full-personal-automation-safe-orchestrator`
+- `status`
+- `goal`
+- `dispatched`
+- `would_dispatch`
+- `execution_enabled`
+- `fail_closed`
+- `approval_consume_mode`
+- `approval_consumed`
+- `route_plan`
+- `tool_results`
+- `step_result_wrappers`
+- `orchestrator_plan`
+- `dependency_graph`
+- `failure_strategy`
+- `rollback_strategy`
+- `preflight`
+- `gates`
+- `audit`
+- `blocked_reasons`
+- `safety`
+- `ui`
+
+안전 계약:
+
+- 기본값 `FULL_AUTOMATION_DISPATCH_ENABLED=false`에서는 approval을 소비하지 않고 실제 dispatch도 하지 않는다.
+- read-only step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `READ_ONLY_ADAPTER_EXECUTION_ENABLED=true`, preflight ready, `wrapper.untrusted=true`가 모두 필요하다.
+- shell step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `SHELL_EXECUTION_ENABLED=true`, valid shell approval, allowlist command, allowed cwd, payload hash/session binding이 모두 필요하다.
+- patch step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `PATCH_APPLY_ENABLED=true`, valid patch approval, allowed root, 기존 UTF-8 단일 파일, `original_sha256` precondition, secret scan이 모두 필요하다.
+- rollback step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `ROLLBACK_EXECUTOR_ENABLED=true`, valid rollback approval, allowed root, 기존 UTF-8 단일 파일, current/original hash precondition이 모두 필요하다.
+- task queue step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `TASK_QUEUE_WORKER_ENABLED=true`, `wrapper.untrusted=true`, read-only task type이 모두 필요하다. 허용 task type은 `noop`, `read_only_scan`, `file_preview`뿐이다.
+- browser observe step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `BROWSER_OBSERVE_ENABLED=true`, valid browser approval, loopback/명시 allowlist URL, read-only observe action이 모두 필요하다.
+- browser limited step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `BROWSER_LIMITED_INTERACTION_ENABLED=true`, valid browser approval, loopback/명시 allowlist origin, selector allowlist, safe fill field allowlist가 모두 필요하다.
+- external web search step 실행에는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `EXTERNAL_WEB_SEARCH_ENABLED=true`, `EXTERNAL_WEB_SEARCH_PROVIDER=brave`, provider configured, rate limit, query safety, `wrapper.untrusted=true`가 모두 필요하다.
+- app-os step 처리는 `FULL_AUTOMATION_DISPATCH_ENABLED=true`, `wrapper.untrusted=true`, observe-plan action이 모두 필요하다. 성공해도 preview wrapper만 중첩하며 실제 OS action은 수행하지 않는다.
+- 47차 safe orchestrator는 browser observe metadata connector, browser limited candidate validation connector, external web search provider connector, app-os observe-plan preview connector만 제한적으로 호출하고, browser actual interaction/app-os actual action connector를 직접 호출하지 않는다.
+- `gates`와 `audit.payload`의 `safe_connector_execution_connected`, `preview_connector_execution_connected`, `mutating_connector_execution_connected`, `browser_actual_interaction_connected`, `app_os_actual_action_connected`, `action_loop_full_dispatch_connected`는 실제 연결 범위와 일치해야 한다.
+- 48차 Decision Required 기준에서 `action_loop_full_dispatch_connected=false`, `browser_actual_interaction_connected=false`, `app_os_actual_action_connected=false`는 사용자 최종 승인과 Opus 리뷰 전까지 유지한다.
+- 61~73차 Local Jarvis runtime drift guard, failure/timeout drill, manual review packet, approval console state-only review, approval payload hash review, approval store expiry cleanup review, approval console API surface Decision Required, approval-console-read-only API, Durable Automation v2 Candidate Decision Required, Durable State Preview Schema Candidate, and Durable State Preview API Surface Decision Required 기준에서 `docs/LOCAL_JARVIS_V1_CANDIDATE_DECISION_REQUIRED.md`, `docs/LOCAL_JARVIS_APPROVAL_GATE_REVIEW.md`, `docs/LOCAL_JARVIS_APPROVAL_CONSOLE_API_SURFACE_DECISION_REQUIRED.md`, `docs/DURABLE_STATE_PREVIEW_SCHEMA_CANDIDATE.md`, `docs/DURABLE_STATE_PREVIEW_API_SURFACE_DECISION_REQUIRED.md`는 public docs link contract에 포함되어야 하고, actual action false assertions는 runtime `gates`, `audit.payload`, `safety`와 일치해야 한다. approval console approve/reject는 state-only이며 no execution on approve를 유지해야 한다. 70차 기준 read-only pending/list/detail/cleanup endpoint만 추가했고 approve/reject routes not added 상태다. 71차 기준 durable-automation-v2-candidate-decision-required는 no durable worker started, no scheduler started, no daemon/service/background loop, no automatic replay, no autonomous recovery를 유지한다. 72차 기준 durable-state-preview-schema-candidate는 `state_schema_version=durable_state_preview.v1`, proposal-only contract, schema-only, no durable storage migration, no durable table created, `state_preview_is_not_execution`, `state_preview_does_not_consume_approval`, `state_preview_does_not_mutate_queue`, `would_persist=false`, `approval_consumed=false`를 유지한다. 73차 기준 durable-state-preview-api-surface-decision-required는 endpoint exposure remains blocked, no durable-state-preview endpoints added, route_absence_is_required, `would_expose_endpoint=false`를 유지한다.
+- `step_result_wrappers`는 `assistant.full_automation.step_result_wrapper.v1`이며 raw content, approval-like JSON, next action, frozen plan mutation을 허용하지 않는다.
+- read-only adapter 결과는 기존 `assistant.read_only_adapter.result_wrapper.v1` wrapper를 full automation step wrapper 안에 untrusted로 중첩한다.
+- shell stdout/stderr는 기존 shell sandbox의 secret-like masking과 max bytes cap을 거친 뒤 full automation step wrapper 안에 untrusted로 중첩한다.
+- patch result는 기존 `assistant.patch_apply.v1` audit과 rollback preview metadata를 full automation step wrapper 안에 untrusted로 중첩한다.
+- rollback result는 기존 `assistant.rollback_execute.v1` audit과 `assistant.rollback_execute.result_wrapper.v1` wrapper를 full automation step wrapper 안에 untrusted로 중첩한다.
+- task queue result는 기존 `assistant.task_queue.worker_result_wrapper.v1` wrapper를 full automation step wrapper 안에 untrusted로 중첩한다.
+- browser observe result는 기존 `assistant.browser_observe.result_wrapper.v1` wrapper를 full automation step wrapper 안에 untrusted로 중첩한다.
+- browser limited result는 기존 `assistant.browser_limited_interact.result_wrapper.v1` wrapper를 full automation step wrapper 안에 untrusted로 중첩하며 성공 응답도 `would_interact=false`, `interaction_executed=false`, `browser_launch=not_performed`를 유지한다.
+- external web search result는 기존 `assistant.external_web_search.result_wrapper.v1` wrapper를 full automation step wrapper 안에 untrusted로 중첩하며 API key 원문, raw content, next action authority를 반환하지 않는다.
+- app-os preview result는 기존 `assistant.app_os.interaction_gate.preview.v1` audit을 full automation step wrapper 안에 untrusted로 중첩하며 `would_control_app=false`, `os_action_executed=false`, `can_set_next_action=false`를 유지한다.
+- shell/patch/rollback/browser observe/browser limited approval은 해당 step이 실제 실행될 때만 기존 boundary에서 single-use로 consume한다. read-only step과 task queue step은 approval을 consume하지 않는다.
+- `orchestrator_plan`, `dependency_graph`, `failure_strategy`, `rollback_strategy`는 audit 가능한 metadata이며 mutating 실행 권한이 아니다.
+- browser actual interaction, app-os control, daemon/service, git reset/bulk restore, 운영 배포는 계속 미연결이다.
+
+### `POST /assistant/workspace-brief`
+
+프로젝트 구조 scan과 중요 파일의 masked preview를 묶어 read-only workspace brief를 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/workspace-brief \
+  -H "Content-Type: application/json" \
+  -d '{"project_root":"/Users/juyoung/local-ai-server","include_previews":true}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `project_root`
+- `mode=read-only-workspace-brief`
+- `would_execute=false`
+- `scan`
+- `previews`
+- `next_safe_actions`
+- `safety`
+- `ui`
+
+### `POST /assistant/shell-preview`
+
+5차 shell sandbox preview다. allowlist, cwd 제한, timeout, output masking, audit payload만 반환하며 실제 subprocess 실행은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/shell-preview \
+  -H "Content-Type: application/json" \
+  -d '{"command":"git status","cwd":"/Users/juyoung/local-ai-server","timeout_seconds":30}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=shell-sandbox-preview`
+- `command_preview`
+- `cwd`
+- `resolved_cwd`
+- `status`
+- `would_execute=false`
+- `allowed`
+- `reason`
+- `timeout_seconds`
+- `policy`
+- `audit`
+- `output_preview`
+- `safety`
+- `ui`
+
+### `POST /assistant/shell-approval-preview`
+
+shell 후보 명령을 단일 서버 발급 approval payload에 binding하는 preview다. approval은 process-local in-memory store에 저장되며 single-use, session/request context, payload_hash, TTL에 바인딩된다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/shell-approval-preview \
+  -H "Content-Type: application/json" \
+  -d '{"command":"git status","cwd":"/Users/juyoung/local-ai-server","timeout_seconds":30,"reason":"local CI"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=shell-approval-binding-preview`
+- `status`
+- `approval_required`
+- `would_execute=false`
+- `binding`
+- `preview`
+- `safety`
+- `ui`
+
+### `POST /assistant/shell-run`
+
+27차 Shell Sandbox v1 실행 endpoint다. 기본값 `SHELL_EXECUTION_ENABLED=false`에서는 allowlist preview와 서버 발급 approval binding이 유효해도 `status=disabled`, `execution_enabled=false`, `would_execute=false`를 반환한다. `SHELL_EXECUTION_ENABLED=true`일 때만 allowlist command, `AGENT_ALLOWED_ROOTS` 안쪽 cwd, 1~120초 timeout, 서버 발급 single-use approval, session/request context binding, payload_hash binding을 모두 통과한 단건 subprocess를 `shell=False`로 실행한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/shell-run \
+  -H "Content-Type: application/json" \
+  -d '{"command":"git status","cwd":"/Users/juyoung/local-ai-server","timeout_seconds":30}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=shell-run-locked` 또는 `mode=shell-sandbox-v1`
+- `status`
+- `would_execute`
+- `execution_enabled`
+- `reason`
+- `preview`
+- `output`
+- `required_approval_hash`
+- `provided_approval_id`
+- `provided_approval_hash`
+- `approval_check`
+- `audit`
+- `safety`
+- `ui`
+
+`output`은 secret-like masking과 byte cap 적용 후 `stdout`, `stderr`, `exit_code`, `timeout`, `stdout_truncated`, `stderr_truncated`, `stdout_masked`, `stderr_masked`, `paste_safe_summary`를 반환한다. timeout이나 non-zero exit도 paste-safe summary로 반환하며 action-loop dispatch에는 연결하지 않는다.
+
+### `POST /assistant/durable-state-preview/preview`
+
+74차 Durable State Preview Read-only API Candidate endpoint다. protected endpoint only이며 `LOCAL_API_KEY`가 설정된 경우 `X-API-Key`가 필요하다. 이 endpoint는 response-only/read-only/schema-only preview만 반환하고 durable storage migration, durable table creation, queue mutation, worker, scheduler, replay, recovery, connector dispatch를 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/durable-state-preview/preview \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"durable preview","proposed_steps":[],"require_schema_only":true,"require_read_only":true,"require_no_persistence":true}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode`
+- `status`
+- `preview_state`
+- `preview_state.state_schema_version=durable_state_preview.v1`
+- `preview_state.state_status=candidate-preview`
+- `candidate_steps`
+- `read_only`
+- `schema_only`
+- `response_only`
+- `would_execute`
+- `would_persist`
+- `would_dispatch`
+- `approval_consumed`
+- `gates`
+- `audit`
+- `audit.schema=assistant.durable_state_preview.read_only.v1`
+- `audit.audit_summary_hash`
+- `blocked_reasons`
+- `required_user_decisions`
+- `safety`
+- `ui`
+
+대표 값은 `mode=durable-state-preview-read-only`, `status=completed`, `read_only=true`, `schema_only=true`, `response_only=true`, `would_execute=false`, `would_persist=false`, `would_dispatch=false`, `approval_consumed=false`다.
+
+응답은 masked response only다. raw approval id not included, payload_hash not included 정책을 유지하며 approval-like JSON injection은 실행 또는 approval revive 권한이 아니다.
+
+명시적으로 추가하지 않은 route:
+
+- `GET /assistant/durable-state-preview/{preview_state_id} remains absent`
+- `GET /assistant/durable-state-preview remains absent`
+- `POST /assistant/durable-state-preview/cleanup-expired remains absent`
+
+stored preview lookup/list/cleanup remain Decision Required 상태다. `stored_preview_lookup_connected=false`, `stored_preview_list_connected=false`, `stored_preview_cleanup_connected=false`, `durable_storage_migration_connected=false`, `durable_table_created=false`, `persistence_mutation_connected=false`, `queue_mutation_connected=false`, `action_loop_full_dispatch_connected=false`, `browser_actual_interaction_connected=false`, `app_os_actual_action_connected=false`를 고정한다.
+
+75차 Durable State Preview API Regression Guard는 이 endpoint가 계속 단일 protected preview route로만 남는지 확인한다. `approval_id`, `approval_payload_hash`, `payload_hash`, `token`, `password` 계열 key는 `candidate_steps`와 `metadata` 양쪽에서 `[REDACTED]` 처리되어야 하며 stored preview lookup/list/cleanup route는 계속 absent다.
+
+76차 Durable State Preview Docs/API Drift Guard는 이 섹션의 API docs response fields가 `AssistantDurableStatePreviewResponse`와 계속 일치하는지 확인한다. public docs endpoint listing, security boundary, release summary, handoff도 `POST /assistant/durable-state-preview/preview` protected endpoint only, response-only/read-only/schema-only, no persistence mutation, no approval consume, no queue mutation 범위를 유지해야 한다.
+
+### Approval Console Read-only API
+
+70차 Local Jarvis Approval Console Read-only API Candidate endpoint다. protected endpoint only이며 실제 실행, approve/reject, approval consume을 수행하지 않는다. 응답은 masked response only이고 raw approval id not included, payload_hash not included 정책을 따른다.
+
+- `GET /assistant/approval-console/pending`: pending/list view. `approval-console-read-only`, `would_execute=false`, `approval_consumed=false`를 반환한다.
+- `GET /assistant/approval-console/{approval_id}`: detail view. path의 approval id는 조회에만 쓰고 응답에는 `approval_ref`만 포함한다.
+- `POST /assistant/approval-console/cleanup-expired`: TTL cleanup exposure. `expired_count`, `records_removed`, paste-safe summary를 반환하며 cleanup is not approval consume이다.
+
+명시적으로 추가하지 않은 route:
+
+- `POST /assistant/approval-console/{approval_id}/approve` remains absent
+- `POST /assistant/approval-console/{approval_id}/reject` remains absent
+
+응답 핵심 필드:
+
+- `service`
+- `mode=approval-console-read-only`
+- `status`
+- `read_only=true`
+- `would_execute=false`
+- `approval_consumed=false`
+- `approvals` 또는 `approval` 또는 `cleanup`
+- `gates`
+- `audit.audit_summary_hash`
+- `safety`
+- `ui`
+
+### `POST /assistant/patch-preview`
+
+6차 patch sandbox preview다. 허용 root 안의 기존 UTF-8 텍스트 파일만 대상으로 diff, secret scan, rollback note, audit payload를 반환하며 실제 파일 수정은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/patch-preview \
+  -H "Content-Type: application/json" \
+  -d '{"path":"/Users/juyoung/local-ai-server/README.md","proposed_content":"# local-ai-server\n","project_root":"/Users/juyoung/local-ai-server"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=patch-preview-locked`
+- `path`
+- `resolved_path`
+- `status`
+- `would_apply=false`
+- `allowed`
+- `reason`
+- `diff_preview`
+- `truncated`
+- `secret_scan`
+- `rollback`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/patch-approval-preview`
+
+patch 후보를 단일 서버 발급 approval payload에 binding하는 preview다. approval은 process-local in-memory store에 저장되며 single-use, session/request context, payload_hash, TTL에 바인딩된다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/patch-approval-preview \
+  -H "Content-Type: application/json" \
+  -d '{"path":"/Users/juyoung/local-ai-server/README.md","proposed_content":"# local-ai-server\n","project_root":"/Users/juyoung/local-ai-server","reason":"docs"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=patch-approval-binding-preview`
+- `status`
+- `approval_required`
+- `would_apply=false`
+- `binding`
+- `preview`
+- `safety`
+- `ui`
+
+### `POST /assistant/patch-apply`
+
+29차 Patch Apply Sandbox v1 endpoint다. 기본값 `PATCH_APPLY_ENABLED=false`에서는 patch preview와 서버 발급 approval binding이 유효해도 `status=disabled`, `execution_enabled=false`, `would_apply=false`를 반환한다. `PATCH_APPLY_ENABLED=true`일 때만 허용 root 안의 기존 UTF-8 텍스트 단일 파일, secret scan 통과, 서버 발급 single-use approval, session/request context binding, payload_hash binding, `original_sha256` precondition을 모두 만족하면 proposed content로 파일을 덮어쓴다. 파일 생성/삭제, bulk apply, binary file, sensitive path, workspace 밖 path, 자동 rollback, action-loop dispatch 연결은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/patch-apply \
+  -H "Content-Type: application/json" \
+  -d '{"path":"/Users/juyoung/local-ai-server/README.md","proposed_content":"# local-ai-server\n","project_root":"/Users/juyoung/local-ai-server","original_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","approval_id":"server-issued","approval_payload_hash":"preview-payload-hash"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=patch-apply-locked` 또는 `mode=patch-apply-v1`
+- `status`
+- `would_apply`
+- `execution_enabled`
+- `reason`
+- `preview`
+- `required_approval_hash`
+- `provided_approval_id`
+- `provided_approval_hash`
+- `approval_check`
+- `apply_result`
+- `rollback`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/browser-preview`
+
+7차 browser/app interaction preview다. read-only action taxonomy, 금지 action, URL 형식, OS app control 차단 여부, masking된 audit payload만 반환하며 실제 브라우저 또는 앱 조작은 수행하지 않는다.
+18차 Browser Interaction Sandbox gate 보강 이후 응답에는 `gate.schema=assistant.browser_interaction.gate.v1`도 포함된다. 이 gate는 observe/read 계열을 allowed candidate로만 표시하고, click/fill/submit/login/payment/delete 및 browser launch는 계속 차단한다. domain allowlist는 `domain_allowlist_candidate.mode=design-only`로만 노출되며 실제 browser/network control에는 사용되지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/browser-preview \
+  -H "Content-Type: application/json" \
+  -d '{"action":"observe","target_url":"https://example.com","reason":"read-only QA"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=browser-interaction-preview-locked`
+- `status`
+- `action`
+- `target_url`
+- `app_name`
+- `would_interact=false`
+- `allowed`
+- `reason`
+- `risk`
+- `required_manual_confirmation=true`
+- `taxonomy`
+- `gate`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/browser-approval-preview`
+
+browser/app 후보를 단일 서버 발급 approval payload에 binding하는 preview다. approval은 process-local in-memory store에 저장되며 single-use, session/request context, payload_hash, TTL에 바인딩된다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/browser-approval-preview \
+  -H "Content-Type: application/json" \
+  -d '{"action":"screenshot","target_url":"https://example.com","reason":"read-only QA"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=browser-approval-binding-preview`
+- `status`
+- `approval_required`
+- `would_interact=false`
+- `binding`
+- `preview`
+- `safety`
+- `ui`
+
+### `POST /assistant/browser-interact`
+
+interaction endpoint 이름을 갖지만 7차 기본값에서는 locked/disabled다. browser preview와 서버 발급 approval binding을 검증한 뒤에도 `execution_enabled=false`, `would_interact=false`를 반환한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/browser-interact \
+  -H "Content-Type: application/json" \
+  -d '{"action":"observe","target_url":"https://example.com"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=browser-interact-locked`
+- `status`
+- `would_interact=false`
+- `execution_enabled=false`
+- `reason`
+- `preview`
+- `required_approval_hash`
+- `provided_approval_id`
+- `provided_approval_hash`
+- `approval_check`
+- `safety`
+- `ui`
+
+### `POST /assistant/browser-observe`
+
+31차 Browser Observe v1 endpoint다. 기본값은 `BROWSER_OBSERVE_ENABLED=false`이며 disabled 상태에서는 approval을 소비하지 않는다. `BROWSER_OBSERVE_ENABLED=true`와 서버 발급 browser approval이 모두 유효할 때만 loopback 또는 `BROWSER_OBSERVE_ALLOWED_ORIGINS`에 명시된 origin에 대해 read-only observe 계열 metadata를 조회한다. 실제 click/fill/type/submit/login/payment/delete/download/upload/file dialog, browser profile/session mutation, OS app control, action-loop browser dispatch는 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/browser-observe \
+  -H "Content-Type: application/json" \
+  -d '{"action":"page_title","target_url":"http://127.0.0.1:8000/docs"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode`
+- `status`
+- `action`
+- `target_url`
+- `would_observe`
+- `execution_enabled`
+- `reason`
+- `preview`
+- `observe_result`
+- `result_wrapper`
+- `required_approval_hash`
+- `provided_approval_id`
+- `provided_approval_hash`
+- `approval_check`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/browser-limited-interact`
+
+32차 Browser Limited Interaction v1 endpoint다. 기본값은 `BROWSER_LIMITED_INTERACTION_ENABLED=false`이며 disabled 상태에서는 approval을 소비하지 않는다. 현재 v1은 실제 browser engine launch/click/fill을 수행하지 않고, loopback 또는 명시 allowlist origin, selector allowlist, safe fill field allowlist, 서버 approval binding을 모두 검증한 뒤 candidate result를 untrusted wrapper로 반환한다. login/payment/delete/credential/password/token/secret/submit/download/upload/file dialog, persistent profile/session mutation, action-loop browser dispatch, OS app control은 계속 차단한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/browser-limited-interact \
+  -H "Content-Type: application/json" \
+  -d '{"action":"click","target_url":"http://127.0.0.1:8000/docs","selector":"#ok"}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode`
+- `status`
+- `action`
+- `target_url`
+- `selector`
+- `would_interact`
+- `execution_enabled`
+- `reason`
+- `policy`
+- `interaction_result`
+- `result_wrapper`
+- `required_approval_hash`
+- `provided_approval_id`
+- `provided_approval_hash`
+- `approval_check`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/action-loop-preflight`
+
+8차 action-loop dispatch preflight다. frozen plan, wrapper 강제, approval binding, payload hash gate만 확인하며 실제 dispatch, shell 실행, patch apply, browser/app interaction은 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-loop-preflight \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"개인 API dispatch","proposed_steps":[]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=action-loop-dispatch-preflight-locked`
+- `status`
+- `goal`
+- `would_dispatch=false`
+- `execution_enabled=false`
+- `fail_closed`
+- `frozen_plan`
+- `step_previews`
+- `gates`
+- `required_user_decisions`
+- `safety`
+- `ui`
+
+### `POST /assistant/action-loop-noop-dispatch`
+
+10차 no-op dispatcher dry-run이다. action-loop preflight 결과를 route plan과 noop audit으로 변환하지만 실제 dispatch, shell 실행, patch apply, browser/app interaction은 수행하지 않는다. approval은 consume하지 않고 validate-only로 확인한다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-loop-noop-dispatch \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"개인 API dispatch","proposed_steps":[]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=action-loop-noop-dispatch-preview`
+- `status`
+- `goal`
+- `would_dispatch=false`
+- `would_dispatch_noop_only`
+- `execution_enabled=false`
+- `fail_closed`
+- `approval_consume_mode`
+- `route_plan`
+- `noop_audit`
+- `preflight`
+- `gates`
+- `required_user_decisions`
+- `safety`
+- `ui`
+
+### `POST /assistant/action-loop-read-only-dispatch-preview`
+
+11차 read-only dispatch boundary preview다. `read_only_scan`, `file_preview`, `url_preview`, `workspace_brief` 후보를 classification-only route plan으로 분류하지만 실제 파일 내용 읽기, 폴더 스캔, URL fetch, dispatch는 수행하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-loop-read-only-dispatch-preview \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"read only dispatch","proposed_steps":[]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=action-loop-read-only-dispatch-boundary-preview`
+- `status`
+- `goal`
+- `would_dispatch=false`
+- `would_read=false`
+- `would_fetch=false`
+- `execution_enabled=false`
+- `fail_closed`
+- `boundary_mode=classification-only`
+- `route_plan`
+- `result_wrapper_schema`
+- `boundary_audit`
+- `gates`
+- `safety`
+- `ui`
+
+`result_wrapper_schema`는 13차 preview-only 계약이다. schema 값은 `assistant.action_loop.read_only_result_wrapper.v1`이며 `raw_content_allowed=false`, `approval_like_json_trusted=false`, `can_mutate_frozen_plan=false`, `can_set_next_action=false`를 유지한다. 자세한 계약은 `docs/READ_ONLY_RESULT_WRAPPER_SCHEMA.md`를 본다.
+
+### `POST /assistant/action-loop-read-only-dispatch`
+
+26차 Read-only Action-loop Dispatch endpoint다. 기본값 `READ_ONLY_ACTION_LOOP_DISPATCH_ENABLED=false`에서는 `disabled`를 반환한다. `READ_ONLY_ACTION_LOOP_DISPATCH_ENABLED=true`와 `READ_ONLY_ADAPTER_EXECUTION_ENABLED=true`가 모두 설정된 경우에만 frozen proposed_steps 중 read-only adapter 후보를 실제 read-only로 호출한다. shell, patch, browser dispatch는 연결하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-loop-read-only-dispatch \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"read workspace","project_root":"/Users/juyoung/local-ai-server","proposed_steps":[{"tool":"file_preview","params":{"path":"/Users/juyoung/local-ai-server/README.md"},"wrapper":{"untrusted":true}}]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=action-loop-read-only-dispatch`
+- `status`
+- `goal`
+- `dispatched`
+- `execution_enabled`
+- `fail_closed`
+- `would_read`
+- `would_fetch`
+- `shell_execution_connected=false`
+- `patch_apply_connected=false`
+- `browser_interaction_connected=false`
+- `adapter_results`
+- `boundary_preview`
+- `gates`
+- `audit`
+- `safety`
+- `ui`
+
+### `POST /assistant/action-loop-shell-dispatch`
+
+28차 Shell Action-loop Integration endpoint다. 기본값 `SHELL_ACTION_LOOP_DISPATCH_ENABLED=false`에서는 `disabled`를 반환하고 approval을 소비하지 않는다. `SHELL_ACTION_LOOP_DISPATCH_ENABLED=true`와 `SHELL_EXECUTION_ENABLED=true`가 모두 설정된 경우에만 frozen proposed_steps 중 `tool=shell` step을 27차 `/assistant/shell-run` allowlist 계약으로 호출한다. patch, browser, external API, task worker, rollback, app-os dispatch는 연결하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-loop-shell-dispatch \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"run safe shell","project_root":"/Users/juyoung/local-ai-server","proposed_steps":[{"tool":"shell","params":{"command":"pwd","cwd":"/Users/juyoung/local-ai-server"},"wrapper":{"untrusted":true},"approval_binding":{"approval_id":"server-issued","payload_hash":"preview-hash","session_id":"session-1"}}]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=action-loop-shell-dispatch`
+- `status`
+- `goal`
+- `dispatched`
+- `execution_enabled`
+- `fail_closed`
+- `shell_execution_connected`
+- `patch_apply_connected=false`
+- `browser_interaction_connected=false`
+- `route_plan`
+- `shell_results`
+- `gates`
+- `audit`
+- `safety`
+- `ui`
+
+`shell_results`는 `assistant.action_loop.shell_result_wrapper.v1` wrapper로 감싼다. wrapper는 `untrusted=true`, `approval_like_json_trusted=false`, `can_mutate_frozen_plan=false`, `can_set_next_action=false`를 유지한다.
+
+### `POST /assistant/action-loop-patch-dispatch`
+
+30차 Patch Action-loop Integration endpoint다. 기본값 `PATCH_ACTION_LOOP_DISPATCH_ENABLED=false`에서는 `disabled`를 반환하고 approval을 소비하지 않는다. `PATCH_ACTION_LOOP_DISPATCH_ENABLED=true`와 `PATCH_APPLY_ENABLED=true`가 모두 설정된 경우에만 frozen proposed_steps 중 `tool=patch` step을 29차 `/assistant/patch-apply` 단일 파일 계약으로 호출한다. shell, browser, external API, task worker, rollback executor, app-os dispatch는 연결하지 않는다.
+
+```bash
+curl -X POST http://127.0.0.1:8000/assistant/action-loop-patch-dispatch \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"apply safe patch","project_root":"/Users/juyoung/local-ai-server","proposed_steps":[{"tool":"patch","params":{"path":"/Users/juyoung/local-ai-server/README.md","proposed_content":"# local-ai-server\n","project_root":"/Users/juyoung/local-ai-server","original_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"wrapper":{"untrusted":true},"approval_binding":{"approval_id":"server-issued","payload_hash":"preview-payload-hash","session_id":"session-1"}}]}'
+```
+
+응답 핵심 필드:
+
+- `service`
+- `mode=action-loop-patch-dispatch`
+- `status`
+- `goal`
+- `dispatched`
+- `execution_enabled`
+- `fail_closed`
+- `shell_execution_connected=false`
+- `patch_apply_connected`
+- `browser_interaction_connected=false`
+- `route_plan`
+- `patch_results`
+- `gates`
+- `audit`
+- `safety`
+- `ui`
+
+`patch_results`는 `assistant.action_loop.patch_result_wrapper.v1` wrapper로 감싼다. wrapper는 `untrusted=true`, `approval_like_json_trusted=false`, `can_mutate_frozen_plan=false`, `can_set_next_action=false`를 유지한다.
 
 ### `GET /assistant/ping`
 
@@ -1429,6 +2697,23 @@ local-ai shell-policy
 local-ai shell-dry-run "pwd"
 local-ai assistant-capabilities
 local-ai assistant-action-preview "브라우저 열어줘" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-preflight "개인 API dispatch" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-noop-dispatch "개인 API dispatch" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-action-loop-read-only-dispatch-preview "read only dispatch" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-automation-plan "내 개인 API 자동화" --project-root /Users/juyoung/local-ai-server
+local-ai assistant-read-only-scan /Users/juyoung/local-ai-server
+local-ai assistant-file-preview /Users/juyoung/local-ai-server/README.md --project-root /Users/juyoung/local-ai-server
+local-ai assistant-url-preview https://example.com
+local-ai assistant-workspace-brief /Users/juyoung/local-ai-server
+local-ai assistant-shell-preview "git status" --cwd /Users/juyoung/local-ai-server
+local-ai assistant-shell-approval-preview "git status" --cwd /Users/juyoung/local-ai-server --reason "local CI"
+local-ai assistant-shell-run "git status" --cwd /Users/juyoung/local-ai-server
+local-ai assistant-patch-preview /Users/juyoung/local-ai-server/README.md "# local-ai-server"
+local-ai assistant-patch-approval-preview /Users/juyoung/local-ai-server/README.md "# local-ai-server" --reason "docs"
+local-ai assistant-patch-apply /Users/juyoung/local-ai-server/README.md "# local-ai-server"
+local-ai assistant-browser-preview observe --target-url https://example.com
+local-ai assistant-browser-approval-preview screenshot --target-url https://example.com --reason "read-only QA"
+local-ai assistant-browser-interact observe --target-url https://example.com
 local-ai assistant-ping
 local-ai assistant-config
 local-ai assistant-ui-contract
@@ -1507,7 +2792,7 @@ sanitized smoke summary는 `safe_to_paste=true`, `mode=document-rag`, `steps[].s
 python scripts/smoke_test_api.py --base-url http://127.0.0.1:8000 --assistant-bridge-only --project-root /Users/juyoung/local-ai-server
 ```
 
-Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/message`, `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 순서로 호출한다. `/assistant/message`는 `mode=auto`와 상태 질문으로 호출해 status intent로 분기하므로 Ollama 답변 생성은 사용하지 않지만 SQLite에 assistant session/message 기록은 추가된다.
+Assistant bridge smoke는 `GET /assistant/startup`, `GET /project/api-inventory`, `POST /assistant/bootstrap`, `POST /assistant/action-preview`, `POST /assistant/action-loop-read-only-dispatch-preview`, `POST /assistant/message`, `GET /assistant/sessions`, `GET /assistant/sessions/{session_id}/messages` 순서로 호출한다. read-only wrapper step은 `result_wrapper_schema`의 safe flag만 요약하며 실제 파일 읽기, URL fetch, dispatch를 수행하지 않는다. `/assistant/message`는 `mode=auto`와 상태 질문으로 호출해 status intent로 분기하므로 Ollama 답변 생성은 사용하지 않지만 SQLite에 assistant session/message 기록은 추가된다.
 
 ## Local CI Check
 

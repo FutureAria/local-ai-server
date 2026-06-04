@@ -14,6 +14,8 @@
 - Typer 기반 `local-ai` CLI
 - assistant UI bridge API contract
 - Agent plan, approval, dry-run, 조건부 read-only execution v1
+- assistant locked preview 계약: shell, patch, browser/app, action-loop preflight, no-op dispatcher, read-only boundary preview
+- 서버 발급 approval store preview 계약과 read-only result wrapper schema
 - feedback 저장과 SFT JSONL export
 - 공개 전 보안 점검, 운영 Runbook, UI QA, handoff 문서
 
@@ -42,6 +44,20 @@
 - `GET /assistant/startup`
 - `POST /assistant/bootstrap`
 - `POST /assistant/action-preview`
+- `POST /assistant/automation-plan`
+- `POST /assistant/action-loop-preflight`
+- `POST /assistant/action-loop-noop-dispatch`
+- `POST /assistant/action-loop-read-only-dispatch-preview`
+- `POST /assistant/shell-preview`
+- `POST /assistant/shell-approval-preview`
+- `POST /assistant/shell-run`
+- `POST /assistant/durable-state-preview/preview`
+- `POST /assistant/patch-preview`
+- `POST /assistant/patch-approval-preview`
+- `POST /assistant/patch-apply`
+- `POST /assistant/browser-preview`
+- `POST /assistant/browser-approval-preview`
+- `POST /assistant/browser-interact`
 - `POST /assistant/message`
 - `GET /assistant/sessions`
 - `GET /project/status`
@@ -77,6 +93,9 @@
 - `local-ai export-sft`
 - `local-ai assistant`
 - `local-ai assistant-startup`
+- `local-ai assistant-action-loop-preflight`
+- `local-ai assistant-action-loop-noop-dispatch`
+- `local-ai assistant-action-loop-read-only-dispatch-preview`
 - `local-ai assistant-message "현재 상태 알려줘"`
 - `local-ai api-inventory`
 - `local-ai shell-policy`
@@ -110,11 +129,11 @@ git diff --check
 
 현재 검증 상태:
 
-- `.venv/bin/pytest`: `556 passed`
+- `.venv/bin/pytest`: `815 passed, 1 warning`
 - `.venv/bin/python -m compileall app cli scripts`: 성공
-- `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, finding 없음
+- `.venv/bin/python scripts/public_release_check.py --root . --json`: `ok=true`, `scanned_files=134`, finding 없음
 - `git diff --check`: 성공
-- `.venv/bin/python scripts/local_ci_check.py --root .`: 성공
+- `.venv/bin/python scripts/local_ci_check.py --root .`: 성공. 내부 pytest `815 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=134`, finding 없음, git diff check 성공
 
 ## 6. 현재 한계
 
@@ -122,14 +141,33 @@ git diff --check
 - 런타임 LLM/embedding은 Ollama local API만 사용한다.
 - 외부 LLM API, LangChain, cloud vector DB는 사용하지 않는다.
 - Agent 실행 엔진은 preview, approval, dry-run, 조건부 read-only 중심이다.
-- 실제 shell 실행은 지원하지 않는다.
+- 9-15차 action-loop 계열 기능은 locked/preview 계약이다. 실제 dispatch, read-only adapter execution, approval consume mode 전환은 수행하지 않는다.
+- 기본값에서는 shell 실행이 disabled이고 27차 allowlist env opt-in 범위만 허용한다.
 - 브라우저 click/fill/submit 자동화는 지원하지 않는다.
 - 파일 생성/수정/삭제 자동화는 지원하지 않는다.
 - Chroma/SQLite repair는 preview만 제공하며 실제 repair/delete/rebuild는 수행하지 않는다.
 - 운영 배포, 클라우드/Oracle 리소스 연결 또는 생성은 수행하지 않았다.
 - 다중 사용자 auth/RBAC, HTTPS termination, 분산 rate limit은 제공하지 않는다.
 
-## 7. 다음 추천 개선 사항
+## 7. Decision Required 상태
+
+실제 자동화 활성화 전에는 아래 문서를 먼저 검토해야 한다.
+
+- [ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md](ACTION_LOOP_ACTIVATION_DECISION_REQUIRED.md): 실제 action-loop dispatch, shell/patch/browser 연결, approval consume mode 전환 전 필수 결정
+- [READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md](READ_ONLY_ADAPTER_EXECUTION_DECISION_REQUIRED.md): 실제 파일 내용 읽기, 폴더 스캔, URL fetch 전 필수 결정
+- [READ_ONLY_RESULT_WRAPPER_SCHEMA.md](READ_ONLY_RESULT_WRAPPER_SCHEMA.md): read-only result wrapper schema와 raw content/approval-like JSON/next step 승격 금지 계약
+
+현재 유지해야 하는 실행 경계:
+
+- `would_dispatch=false`
+- `would_read=false`
+- `would_fetch=false`
+- `would_execute=false`
+- `would_apply=false`
+- `would_interact=false`
+- `execution_enabled=false`
+
+## 8. 다음 추천 개선 사항
 
 Codex가 바로 이어서 할 수 있는 안전한 개선:
 
@@ -139,11 +177,13 @@ Codex가 바로 이어서 할 수 있는 안전한 개선:
 4. preview-only queue/rebuild 계약을 실제 queue/rebuild 활성화 조건 문서로 계속 정리
 5. assistant bridge smoke expected output과 UI 수동 QA 체크리스트 유지
 6. PDF OCR fallback mock coverage와 `/documents/supported-types`의 `pdf_ocr` 계약 유지
+7. `docs/NEXT_CHAT_HANDOFF.md`, `docs/CLAUDE_REVIEW_HANDOFF.md`, `docs/FINAL_REPORT.md`의 최신 검증 수치와 Decision Required 문서 링크 유지
 
 별도 승인 또는 보안 리뷰가 필요한 개선:
 
 1. 실제 repair/delete/rebuild 실행 명령
 2. 실제 shell 실행 또는 파일 생성/수정/삭제 자동화
 3. 실제 브라우저 click/fill/submit 자동화
-4. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
-5. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
+4. 실제 read-only adapter execution 또는 action-loop dispatch 활성화
+5. JavaScript 렌더링, 외부 URL 크롤링, pdf2image/poppler 기반 page rendering OCR 확장
+6. 운영 배포, HTTPS termination, 다중 사용자 권한 관리, 분산 rate limit
