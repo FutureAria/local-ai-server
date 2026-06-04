@@ -2,6 +2,27 @@
 
 ## 2026-06-05 KST
 
+### 161차 Post-push Clean State Sync
+
+- 새 실행 기능을 열지 않고 161차 Post-push Clean State Sync를 문서/테스트로 고정했다.
+- Post-push Clean State Sync는 사용자 최종 승인 이후 stage/commit/push가 완료된 상태를 handoff 문서와 release summary에 반영하는 guard다.
+- 161차는 post-push documentation sync이며 browser actual interaction, app-os actual action, action-loop full dispatch, daemon/service/background loop, durable execution을 열지 않는다.
+- stage/commit/push completed after explicit user approval.
+- post-push clean state keeps git status clean.
+- post-push clean state keeps main aligned with origin/main.
+- post-push clean state keeps commit approval separate from activation approval.
+- post-push clean state keeps production deployment unperformed.
+- final verification evidence는 `.venv/bin/pytest` `815 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=134`, finding 없음, git diff --check 성공, local CI 성공이다.
+- disabled boundary는 browser actual interaction, app-os actual action, action-loop full dispatch, daemon/service/background loop, durable execution, durable storage migration/table/worker/replay/recovery가 열리지 않았음을 포함한다.
+
+### 161차 Post-push Clean State Sync 검증
+
+| 명령 | 결과 |
+|---|---|
+| `.venv/bin/python -m pytest tests/test_portfolio_docs_contract.py -q -k "stage158"` | `1 passed, 50 deselected, 1 warning` |
+| `.venv/bin/python -m pytest tests/test_portfolio_docs_contract.py tests/test_public_docs_contract.py tests/test_public_release_summary.py tests/test_next_chat_handoff.py tests/test_tasks_doc.py -q` | `88 passed, 1 warning` |
+| `.venv/bin/python scripts/local_ci_check.py --root .` | 성공. 내부 pytest `815 passed, 1 warning`, compileall 성공, public release check `ok=true`, `scanned_files=134`, finding 없음, `git diff --check` 성공 |
+
 ### 160차 Continue Still Not Git Approval Guard
 
 - 새 실행 기능을 열지 않고 160차 Continue Still Not Git Approval Guard를 문서/테스트로 고정했다.

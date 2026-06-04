@@ -182,7 +182,8 @@
 - [x] 158차 Final Approval Required Hold Packet으로 final approval required hold 상태를 유지
 - [x] 159차 Continue Instruction Is Not Git Approval Guard로 continue instruction이 git approval로 해석되지 않게 유지
 - [x] 160차 Continue Still Not Git Approval Guard로 반복 continue instruction도 git approval로 해석되지 않게 유지
-- [ ] 사용자 최종 승인 후 commit scope, commit message, push/PR 여부를 결정
+- [x] 사용자 최종 승인 후 commit scope, commit message, push/PR 여부를 결정하고 stage/commit/push 완료
+- [x] 161차 Post-push Clean State Sync로 push 완료 후 clean 상태를 handoff/release summary에 반영
 - [x] `/assistant/action-loop-preflight`가 frozen plan, wrapper, approval binding, payload hash gate만 반환하고 실제 action-loop dispatch를 하지 않는지 유지
 - [x] 8차 이후 실제 action-loop 활성화 전 Decision Required 문서를 작성해 activation 조건, 금지 조건, P0/P1/P2, 회귀 테스트 요구사항을 고정
 - [x] 9차 approval store를 in-memory preview store로 구현해 서버 발급 approval id, single-use, session/request context binding, payload_hash binding, TTL, injection 차단을 locked endpoint와 action-loop preflight 테스트로 고정
